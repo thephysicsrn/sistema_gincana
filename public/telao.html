@@ -6,7 +6,7 @@
   <title>Placar Ao Vivo - Telão da Gincana Escolar</title>
   <meta name="description" content="Modo Telão em alta definição e tempo real para projetor e televisão da gincana escolar SESI CONECTA 2026.">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231e3a8a%22/><text x=%2250%22 y=%2265%22 font-family=%22sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffffff%22>T</text></svg>">
+  <link rel="icon" type="image/png" href="img/logo-sesi-escola.png">
   <style>
     /* =======================================================================
        ESTILOS DA TELA DE ESPERA / STANDBY (LOGO SESI EM DESTAQUE)
@@ -527,9 +527,8 @@
     <div class="standby-glow-ring"></div>
     
     <div class="standby-logo-wrap">
-      <div class="standby-logo-emblem">
-        <div class="standby-emblem-text">SESI</div>
-        <div class="standby-emblem-sub">ESCOLA</div>
+      <div style="background: rgba(255, 255, 255, 0.96); padding: 18px 36px; border-radius: 24px; box-shadow: 0 0 70px rgba(37, 99, 235, 0.5), 0 10px 30px rgba(0, 0, 0, 0.4); display: inline-block;">
+        <img src="img/logo-sesi-escola.png" alt="SESI Escola" style="max-height: 140px; width: auto; object-fit: contain; display: block;">
       </div>
     </div>
 
@@ -598,16 +597,19 @@
       
       <!-- Cabeçalho do Telão -->
       <header class="telao-header">
-        <div class="telao-title-wrap">
-          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
-            <div class="live-indicator" style="background: rgba(5, 150, 105, 0.2); border-color: rgba(5, 150, 105, 0.4); color: #34d399;">
-              <span class="live-dot" style="background: #10b981;"></span>
-              PLACAR AO VIVO • SINCRONIZAÇÃO A CADA 60s
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <img src="img/logo-sesi-escola.png" alt="SESI Escola" style="height: 56px; background: rgba(255,255,255,0.96); padding: 4px 12px; border-radius: 10px; object-fit: contain; box-shadow: 0 4px 16px rgba(0,0,0,0.4); flex-shrink: 0;">
+          <div class="telao-title-wrap">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;">
+              <div class="live-indicator" style="background: rgba(5, 150, 105, 0.2); border-color: rgba(5, 150, 105, 0.4); color: #34d399;">
+                <span class="live-dot" style="background: #10b981;"></span>
+                PLACAR AO VIVO • SINCRONIZAÇÃO A CADA 60s
+              </div>
+              <span style="color: var(--text-muted); font-size: 0.9rem;">• SESI Escola RN • Unidades Macau, Mossoró e São Gonçalo do Amarante</span>
             </div>
-            <span style="color: var(--text-muted); font-size: 0.9rem;">• SESI Escola RN • Unidades Macau, Mossoró e São Gonçalo do Amarante</span>
+            <h1 id="telao-event-title">SESI CONECTA 2026</h1>
+            <p id="telao-event-sub">Tecnologia que transforma, resíduo que ganha novo destino • Gincana Escolar 2026</p>
           </div>
-          <h1 id="telao-event-title">SESI CONECTA 2026</h1>
-          <p id="telao-event-sub">Tecnologia que transforma, resíduo que ganha novo destino • Gincana Escolar 2026</p>
         </div>
 
         <!-- Controles do Telão -->
