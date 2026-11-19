@@ -251,13 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function getAllAvailableProvas() {
-    const list = [...state.getProvas()];
-    // Inclui Pesagem E-Lixo como prova especial
-    const hasPesagem = list.some((p) => p.id === 'prova_elixo_pesagem');
-    if (!hasPesagem) {
-      list.push(state.getProva('prova_elixo_pesagem'));
-    }
-    return list;
+    return state.getProvas();
   }
 
   function initScoringForm() {

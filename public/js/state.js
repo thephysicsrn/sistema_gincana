@@ -5,7 +5,7 @@
  */
 class GincanaState {
   constructor() {
-    this.storageKey = 'gincana_sesi_conecta_2026_v2';
+    this.storageKey = 'gincana_sesi_conecta_2026_v3';
     this.channel = null;
     this.socket = null;
     this.listeners = new Set();
@@ -358,462 +358,170 @@ class GincanaState {
           penalties: []
         }
       ],
-      // Provas oficiais do Edital SESI CONECTA com suas rubricas e regras
+      // 10 Provas Oficiais da Gincana
       provas: [
         {
           id: 'p_parodia',
-          title: 'Apresentação da Equipe com Paródia',
+          title: 'Apresentação com paródia',
           shortTitle: 'Paródia',
           icon: 'P1',
           category: 'Cultural & Artística',
-          anexo: 'Anexo VI',
-          itemEdital: 'Item 26',
-          description: 'Identidade da equipe e paródia com letra autoral. Tempo máximo total: 5 minutos (exceder resulta em zero). Avaliação por rubrica (100 pts) convertida nos pontos da gincana (1º=100, 2º=75, 3º=50, demais=25).',
+          anexo: 'Cultural',
+          itemEdital: 'Prova 1',
+          description: 'Identidade da equipe e apresentação com paródia musical autoral. Avaliação por critérios (rubricas) de 0 a 100 pontos e colocação.',
           type: 'rubrica_colocacao',
           maxScore: 100,
-          status: 'completed',
+          status: 'active',
           timeLimitSeconds: 300,
           criteria: [
-            { name: 'Relação com o tema e qualidade da mensagem', max: 20 },
-            { name: 'Criatividade', max: 20 },
-            { name: 'Letra autoral da paródia', max: 15 },
-            { name: 'Interpretação e apresentação', max: 15 },
-            { name: 'Identidade: mascote, estandarte e grito de paz', max: 15 },
-            { name: 'Organização e participação dos integrantes', max: 15 }
+            { name: 'Letra e Relação com o Tema', max: 25 },
+            { name: 'Criatividade e Originalidade', max: 25 },
+            { name: 'Interpretação e Presença de Palco', max: 25 },
+            { name: 'Organização e Torcida', max: 25 }
           ]
         },
         {
           id: 'p_recicla',
-          title: 'Recicla-Tech',
-          shortTitle: 'Recicla-Tech',
+          title: 'Recicla Tech',
+          shortTitle: 'Recicla Tech',
           icon: 'P2',
           category: 'Tecnologia & Sustentabilidade',
-          anexo: 'Anexo IX',
-          itemEdital: 'Item 24',
-          description: 'Objeto ou escultura com materiais predominantemente reaproveitados ou recicláveis, representando a relação entre tecnologia, sustentabilidade e criatividade. Avaliação por rubrica (100 pts) convertida nos pontos da gincana (1º=100, 2º=75, 3º=50, demais=25).',
+          anexo: 'Tecnologia',
+          itemEdital: 'Prova 2',
+          description: 'Criação de objeto ou protótipo funcional utilizando materiais reaproveitados e tecnologia.',
           type: 'rubrica_colocacao',
           maxScore: 100,
-          status: 'completed',
+          status: 'active',
           criteria: [
-            { name: 'Criatividade', max: 25 },
-            { name: 'Utilização de materiais reaproveitados', max: 25 },
-            { name: 'Relação com o tema', max: 20 },
-            { name: 'Originalidade', max: 15 },
-            { name: 'Apresentação e explicação da peça', max: 15 }
+            { name: 'Criatividade e Inovação', max: 25 },
+            { name: 'Aproveitamento de Materiais', max: 25 },
+            { name: 'Relação com o Tema', max: 25 },
+            { name: 'Apresentação e Defesa', max: 25 }
           ]
         },
         {
-          id: 'p_video',
-          title: 'Vídeo E-Lixo em 60 segundos',
-          shortTitle: 'Vídeo 60s',
+          id: 'p_xadrez',
+          title: 'Xadrez',
+          shortTitle: 'Xadrez',
           icon: 'P3',
-          category: 'Comunicação & Audiovisual',
-          anexo: 'Anexo VII',
-          itemEdital: 'Item 25',
-          description: 'Vídeo educativo original de até 60 segundos respondendo obrigatoriamente: "O que acontece quando descartamos um equipamento eletrônico de forma inadequada?". Avaliação por rubrica (100 pts) convertida nos pontos da gincana (1º=100, 2º=75, 3º=50, demais=25).',
+          category: 'Jogos & Raciocínio',
+          anexo: 'Esportes da Mente',
+          itemEdital: 'Prova 3',
+          description: 'Torneio de xadrez disputado entre os representantes de cada equipe.',
+          type: 'standard_colocacao',
+          maxScore: 100,
+          status: 'active',
+          criteria: []
+        },
+        {
+          id: 'p_social',
+          title: 'Prova Social',
+          shortTitle: 'Prova Social',
+          icon: 'P4',
+          category: 'Ação Social & Solidariedade',
+          anexo: 'Solidariedade',
+          itemEdital: 'Prova 4',
+          description: 'Mobilização comunitária, arrecadação solidária e impacto social.',
           type: 'rubrica_colocacao',
           maxScore: 100,
-          status: 'completed',
-          timeLimitSeconds: 60,
+          status: 'active',
           criteria: [
-            { name: 'Criatividade', max: 20 },
-            { name: 'Clareza da mensagem', max: 20 },
-            { name: 'Relação com o tema', max: 20 },
-            { name: 'Qualidade do conteúdo', max: 20 },
-            { name: 'Participação da equipe', max: 10 },
-            { name: 'Qualidade técnica', max: 10 }
+            { name: 'Volume Arrecadado / Meta', max: 40 },
+            { name: 'Mobilização e Engajamento', max: 30 },
+            { name: 'Organização e Entrega', max: 30 }
           ]
         },
         {
-          id: 'p_assiduidade',
-          title: 'Prova de Assiduidade',
-          shortTitle: 'Assiduidade',
-          icon: 'P4',
-          category: 'Pedagógica & Frequência',
-          anexo: 'Item 32',
-          itemEdital: 'Item 32',
-          description: 'Classificação das turmas com menor total absoluto de faltas no 4º bimestre. Pontuação por colocação: 1º=100 pts, 2º=75 pts, 3º=50 pts, demais turmas=0 pts (empates compartilham e pulam posições).',
-          type: 'top3_zero',
-          maxScore: 100,
-          status: 'active',
-          criteria: []
-        },
-        {
-          id: 'p_avalia_sesi',
-          title: 'Prova Avalia SESI',
-          shortTitle: 'Avalia SESI',
+          id: 'p_elixo',
+          title: 'Desafio E-Lixo',
+          shortTitle: 'Desafio E-Lixo',
           icon: 'P5',
-          category: 'Desempenho Acadêmico',
-          anexo: 'Item 33',
-          itemEdital: 'Item 33',
-          description: 'Soma das proficiências médias oficiais nas 4 áreas (Linguagens, Humanas, Natureza e Matemática) no 2º semestre de 2026. Pontuação por colocação: 1º=100 pts, 2º=75 pts, 3º=50 pts, demais=0 pts.',
-          type: 'top3_zero',
+          category: 'Sustentabilidade & Meio Ambiente',
+          anexo: 'E-Lixo',
+          itemEdital: 'Prova 5',
+          description: 'Campanha oficial de recolhimento e descarte correto de lixo eletrônico.',
+          type: 'rubrica_colocacao',
           maxScore: 100,
           status: 'active',
-          criteria: []
-        },
-        {
-          id: 'p_surpresa1',
-          title: 'Prova Surpresa 1',
-          shortTitle: 'Surpresa 1',
-          icon: 'P6',
-          category: 'Desafio Relâmpago',
-          anexo: 'Item 31',
-          itemEdital: 'Item 31',
-          description: 'Conteúdo surpresa revelado no momento da prova. Pontuação por colocação (Item 36): 1º=100 pts, 2º=75 pts, 3º=50 pts, demais participações válidas=25 pts.',
-          type: 'standard_colocacao',
-          maxScore: 100,
-          status: 'upcoming',
-          criteria: []
-        },
-        {
-          id: 'p_surpresa2',
-          title: 'Prova Surpresa 2',
-          shortTitle: 'Surpresa 2',
-          icon: 'P7',
-          category: 'Desafio Relâmpago',
-          anexo: 'Item 31',
-          itemEdital: 'Item 31',
-          description: 'Conteúdo surpresa revelado no momento da prova. Pontuação por colocação (Item 36): 1º=100 pts, 2º=75 pts, 3º=50 pts, demais=25 pts.',
-          type: 'standard_colocacao',
-          maxScore: 100,
-          status: 'upcoming',
-          criteria: []
+          criteria: [
+            { name: 'Volume / Peso E-Lixo Arrecadado', max: 50 },
+            { name: 'Mobilização da Comunidade', max: 30 },
+            { name: 'Organização da Triagem', max: 20 }
+          ]
         },
         {
           id: 'p_quiz',
-          title: 'Quiz Desafio SESI (Opcional da Unidade)',
-          shortTitle: 'Quiz SESI',
-          icon: 'P8',
+          title: 'Prova 1 - Quiz Temático',
+          shortTitle: 'Quiz Temático',
+          icon: 'P6',
           category: 'Conhecimentos Gerais',
-          anexo: 'Item 27',
-          itemEdital: 'Item 27',
-          description: 'Perguntas sobre SESI, indústria, educação, tecnologia, meio ambiente e cultura. Pontuação por colocação (Item 36): 1º=100, 2º=75, 3º=50, demais=25.',
+          anexo: 'Dinâmica 1',
+          itemEdital: 'Prova 6',
+          description: 'Batalha de perguntas e respostas de raciocínio rápido e conhecimentos gerais.',
           type: 'standard_colocacao',
           maxScore: 100,
-          status: 'upcoming',
+          status: 'active',
           criteria: []
         },
         {
-          id: 'p_elixo_mob',
-          title: 'Mobilização da Campanha E-Lixo',
-          shortTitle: 'Mobilização E-Lixo',
-          icon: 'P9',
-          category: 'Campanha Social E-Lixo',
-          anexo: 'Anexo V',
-          itemEdital: 'Item 20 & Anexo V',
-          description: 'Avaliação da campanha comunitária do E-Lixo (máximo 100 pts). A média das avaliações integra a pontuação da campanha E-Lixo, respeitando o teto global de 50%.',
-          type: 'rubrica_elixo_mob',
+          id: 'p_musica',
+          title: 'Prova 2 - Complete a música',
+          shortTitle: 'Complete a Música',
+          icon: 'P7',
+          category: 'Dinâmica & Palco',
+          anexo: 'Dinâmica 2',
+          itemEdital: 'Prova 7',
+          description: 'Desafio musical no palco: acertar e cantar o trecho correto da canção.',
+          type: 'standard_colocacao',
           maxScore: 100,
           status: 'active',
-          criteria: [
-            { name: 'Criatividade da campanha', max: 20 },
-            { name: 'Participação dos estudantes', max: 20 },
-            { name: 'Envolvimento das famílias', max: 20 },
-            { name: 'Comunicação e divulgação', max: 20 },
-            { name: 'Impacto e alcance da ação', max: 20 }
-          ]
+          criteria: []
+        },
+        {
+          id: 'p_arco',
+          title: 'Prova 3 - Corrida do arco',
+          shortTitle: 'Corrida do Arco',
+          icon: 'P8',
+          category: 'Esportiva & Agilidade',
+          anexo: 'Dinâmica 3',
+          itemEdital: 'Prova 8',
+          description: 'Prova de agilidade, reflexo e trabalho em equipe com arcos na quadra.',
+          type: 'standard_colocacao',
+          maxScore: 100,
+          status: 'active',
+          criteria: []
+        },
+        {
+          id: 'p_balao',
+          title: 'Prova 4 - Estoura o balão',
+          shortTitle: 'Estoura o Balão',
+          icon: 'P9',
+          category: 'Recreativa & Agilidade',
+          anexo: 'Dinâmica 4',
+          itemEdital: 'Prova 9',
+          description: 'Prova recreativa dinâmica de velocidade e trabalho em equipe.',
+          type: 'standard_colocacao',
+          maxScore: 100,
+          status: 'active',
+          criteria: []
+        },
+        {
+          id: 'p_pingpong',
+          title: 'Ping Pong',
+          shortTitle: 'Ping Pong',
+          icon: 'P10',
+          category: 'Esportes & Tênis de Mesa',
+          anexo: 'Esportiva',
+          itemEdital: 'Prova 10',
+          description: 'Torneio de tênis de mesa / ping pong disputado entre as equipes.',
+          type: 'standard_colocacao',
+          maxScore: 100,
+          status: 'active',
+          criteria: []
         }
       ],
       // Lançamentos de notas
-      scores: [
-        // Apresentação com Paródia (Anexo VI)
-        {
-          id: 'sc-1',
-          teamId: 't1',
-          provaId: 'p_parodia',
-          judgeName: 'Comissão Julgadora 1',
-          rubricScore: 92.0,
-          points: 100, // 1º lugar após ranking da prova
-          placeInProva: 1,
-          criteriaDetails: {
-            'Relação com o tema e qualidade da mensagem': 19,
-            'Criatividade': 19,
-            'Letra autoral da paródia': 14,
-            'Interpretação e apresentação': 14,
-            'Identidade: mascote, estandarte e grito de paz': 13,
-            'Organização e participação dos integrantes': 13
-          },
-          note: 'Paródia autoral com excelente ritmo e mensagem clara sobre o descarte de resíduos.',
-          createdAt: new Date(Date.now() - 3600000 * 4).toISOString()
-        },
-        {
-          id: 'sc-2',
-          teamId: 't2',
-          provaId: 'p_parodia',
-          judgeName: 'Comissão Julgadora 1',
-          rubricScore: 88.0,
-          points: 75, // 2º lugar
-          placeInProva: 2,
-          criteriaDetails: {
-            'Relação com o tema e qualidade da mensagem': 18,
-            'Criatividade': 18,
-            'Letra autoral da paródia': 13,
-            'Interpretação e apresentação': 13,
-            'Identidade: mascote, estandarte e grito de paz': 14,
-            'Organização e participação dos integrantes': 12
-          },
-          note: 'Boa animação e ótimo estandarte com elementos de circuito.',
-          createdAt: new Date(Date.now() - 3600000 * 4 + 60000).toISOString()
-        },
-        {
-          id: 'sc-3',
-          teamId: 't3',
-          provaId: 'p_parodia',
-          judgeName: 'Comissão Julgadora 1',
-          rubricScore: 84.0,
-          points: 50, // 3º lugar
-          placeInProva: 3,
-          criteriaDetails: {
-            'Relação com o tema e qualidade da mensagem': 17,
-            'Criatividade': 17,
-            'Letra autoral da paródia': 12,
-            'Interpretação e apresentação': 13,
-            'Identidade: mascote, estandarte e grito de paz': 13,
-            'Organização e participação dos integrantes': 12
-          },
-          note: 'Apresentação dentro do tempo de 5 minutos.',
-          createdAt: new Date(Date.now() - 3600000 * 4 + 120000).toISOString()
-        },
-        {
-          id: 'sc-4',
-          teamId: 't4',
-          provaId: 'p_parodia',
-          judgeName: 'Comissão Julgadora 1',
-          rubricScore: 78.0,
-          points: 25, // Demais participações válidas
-          placeInProva: 4,
-          criteriaDetails: {
-            'Relação com o tema e qualidade da mensagem': 16,
-            'Criatividade': 15,
-            'Letra autoral da paródia': 11,
-            'Interpretação e apresentação': 12,
-            'Identidade: mascote, estandarte e grito de paz': 12,
-            'Organização e participação dos integrantes': 12
-          },
-          note: 'Participação válida com mascote.',
-          createdAt: new Date(Date.now() - 3600000 * 4 + 180000).toISOString()
-        },
-        // Recicla-Tech (Anexo IX)
-        {
-          id: 'sc-5',
-          teamId: 't2',
-          provaId: 'p_recicla',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 95.0,
-          points: 100, // 1º lugar
-          placeInProva: 1,
-          criteriaDetails: {
-            'Criatividade': 24,
-            'Utilização de materiais reaproveitados': 25,
-            'Relação com o tema': 19,
-            'Originalidade': 14,
-            'Apresentação e explicação da peça': 13
-          },
-          note: 'Escultura robô feita com carcaças de computadores obsoletos e papelão.',
-          createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
-        },
-        {
-          id: 'sc-6',
-          teamId: 't1',
-          provaId: 'p_recicla',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 91.0,
-          points: 75, // 2º lugar
-          placeInProva: 2,
-          criteriaDetails: {
-            'Criatividade': 23,
-            'Utilização de materiais reaproveitados': 23,
-            'Relação com o tema': 18,
-            'Originalidade': 14,
-            'Apresentação e explicação da peça': 13
-          },
-          note: 'Árvore tecnológica com cabos e mouses descartados.',
-          createdAt: new Date(Date.now() - 3600000 * 3 + 60000).toISOString()
-        },
-        {
-          id: 'sc-7',
-          teamId: 't3',
-          provaId: 'p_recicla',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 85.0,
-          points: 50, // 3º lugar
-          placeInProva: 3,
-          criteriaDetails: {
-            'Criatividade': 21,
-            'Utilização de materiais reaproveitados': 22,
-            'Relação com o tema': 17,
-            'Originalidade': 13,
-            'Apresentação e explicação da peça': 12
-          },
-          note: 'Peça artística demonstrando o ciclo da economia circular.',
-          createdAt: new Date(Date.now() - 3600000 * 3 + 120000).toISOString()
-        },
-        {
-          id: 'sc-8',
-          teamId: 't4',
-          provaId: 'p_recicla',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 80.0,
-          points: 25, // Demais
-          placeInProva: 4,
-          criteriaDetails: {
-            'Criatividade': 20,
-            'Utilização de materiais reaproveitados': 20,
-            'Relação com o tema': 16,
-            'Originalidade': 12,
-            'Apresentação e explicação da peça': 12
-          },
-          note: 'Escultura com embalagens recicláveis.',
-          createdAt: new Date(Date.now() - 3600000 * 3 + 180000).toISOString()
-        },
-        // Vídeo E-Lixo em 60 segundos (Anexo VII)
-        {
-          id: 'sc-9',
-          teamId: 't3',
-          provaId: 'p_video',
-          judgeName: 'Comissão Julgadora 3',
-          rubricScore: 96.0,
-          points: 100, // 1º lugar
-          placeInProva: 1,
-          criteriaDetails: {
-            'Criatividade': 19,
-            'Clareza da mensagem': 20,
-            'Relação com o tema': 20,
-            'Qualidade do conteúdo': 19,
-            'Participação da equipe': 9,
-            'Qualidade técnica': 9
-          },
-          note: 'Vídeo impecável, respondeu exatamente à pergunta obrigatória com animação e roteiro claro.',
-          createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
-        },
-        {
-          id: 'sc-10',
-          teamId: 't1',
-          provaId: 'p_video',
-          judgeName: 'Comissão Julgadora 3',
-          rubricScore: 90.0,
-          points: 75, // 2º lugar
-          placeInProva: 2,
-          criteriaDetails: {
-            'Criatividade': 18,
-            'Clareza da mensagem': 18,
-            'Relação com o tema': 18,
-            'Qualidade do conteúdo': 18,
-            'Participação da equipe': 9,
-            'Qualidade técnica': 9
-          },
-          note: 'Edição dinâmica e mensagem sobre os perigos do descarte inadequado.',
-          createdAt: new Date(Date.now() - 3600000 * 2 + 60000).toISOString()
-        },
-        {
-          id: 'sc-11',
-          teamId: 't2',
-          provaId: 'p_video',
-          judgeName: 'Comissão Julgadora 3',
-          rubricScore: 86.0,
-          points: 50, // 3º lugar
-          placeInProva: 3,
-          criteriaDetails: {
-            'Criatividade': 17,
-            'Clareza da mensagem': 17,
-            'Relação com o tema': 17,
-            'Qualidade do conteúdo': 17,
-            'Participação da equipe': 9,
-            'Qualidade técnica': 9
-          },
-          note: 'Entregue no prazo e dentro de 60 segundos.',
-          createdAt: new Date(Date.now() - 3600000 * 2 + 120000).toISOString()
-        },
-        {
-          id: 'sc-12',
-          teamId: 't4',
-          provaId: 'p_video',
-          judgeName: 'Comissão Julgadora 3',
-          rubricScore: 80.0,
-          points: 25, // Demais
-          placeInProva: 4,
-          criteriaDetails: {
-            'Criatividade': 16,
-            'Clareza da mensagem': 16,
-            'Relação com o tema': 16,
-            'Qualidade do conteúdo': 16,
-            'Participação da equipe': 8,
-            'Qualidade técnica': 8
-          },
-          note: 'Participação válida com mensagem educativa.',
-          createdAt: new Date(Date.now() - 3600000 * 2 + 180000).toISOString()
-        },
-        // Mobilização E-Lixo (Anexo V)
-        {
-          id: 'sc-13',
-          teamId: 't1',
-          provaId: 'p_elixo_mob',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 90.0,
-          points: 90.0, // Nota direta de mobilização (até 100)
-          criteriaDetails: {
-            'Criatividade da campanha': 18,
-            'Participação dos estudantes': 18,
-            'Envolvimento das famílias': 19,
-            'Comunicação e divulgação': 18,
-            'Impacto e alcance da ação': 17
-          },
-          note: 'Excelente mobilização nas redes sociais e com as famílias.',
-          createdAt: new Date(Date.now() - 3600000).toISOString()
-        },
-        {
-          id: 'sc-14',
-          teamId: 't2',
-          provaId: 'p_elixo_mob',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 95.0,
-          points: 95.0,
-          criteriaDetails: {
-            'Criatividade da campanha': 19,
-            'Participação dos estudantes': 19,
-            'Envolvimento das famílias': 20,
-            'Comunicação e divulgação': 19,
-            'Impacto e alcance da ação': 18
-          },
-          note: 'Campanha de grande impacto com cartazes e panfletagem no bairro.',
-          createdAt: new Date(Date.now() - 3600000 + 60000).toISOString()
-        },
-        {
-          id: 'sc-15',
-          teamId: 't3',
-          provaId: 'p_elixo_mob',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 85.0,
-          points: 85.0,
-          criteriaDetails: {
-            'Criatividade da campanha': 17,
-            'Participação dos estudantes': 17,
-            'Envolvimento das famílias': 17,
-            'Comunicação e divulgação': 17,
-            'Impacto e alcance da ação': 17
-          },
-          note: 'Relatório entregue conforme Anexo VIII.',
-          createdAt: new Date(Date.now() - 3600000 + 120000).toISOString()
-        },
-        {
-          id: 'sc-16',
-          teamId: 't4',
-          provaId: 'p_elixo_mob',
-          judgeName: 'Comissão Julgadora 2',
-          rubricScore: 80.0,
-          points: 80.0,
-          criteriaDetails: {
-            'Criatividade da campanha': 16,
-            'Participação dos estudantes': 16,
-            'Envolvimento das famílias': 16,
-            'Comunicação e divulgação': 16,
-            'Impacto e alcance da ação': 16
-          },
-          note: 'Boa participação de toda a turma.',
-          createdAt: new Date(Date.now() - 3600000 + 180000).toISOString()
-        }
-      ],
+      scores: [],
       // Histórico de penalidades do Item 37
       penalties: []
     };
@@ -852,6 +560,14 @@ class GincanaState {
           }
         });
       }
+      const hasOldProvas = !Array.isArray(this.data.provas) || 
+                           this.data.provas.length === 0 || 
+                           this.data.provas.some((p) => p.id === 'p_video' || p.id === 'p_assiduidade');
+      if (hasOldProvas) {
+        this.data.provas = this.getDefaultData().provas;
+        this.saveToStorage(false);
+      }
+
       if (Array.isArray(this.data.provas)) {
         this.data.provas.forEach((p, idx) => {
           if (!p.icon || /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(p.icon)) {
@@ -1180,67 +896,43 @@ class GincanaState {
     if (!team) return null;
 
     const scores = this.getScores().filter((s) => s.teamId === teamId);
-    const tetoELixo = this.getTetoELixo();
-    const { bonusMap, rankMap } = this.getELixoRankingsAndBonus();
-
-    // 1. Provas regulares (Valor A)
     let pontosDemaisProvas = 0;
     const byProva = {};
 
     scores.forEach((s) => {
-      if (s.provaId !== 'p_elixo_mob') {
-        const pts = Number(s.points || 0);
-        pontosDemaisProvas += pts;
-        byProva[s.provaId] = (byProva[s.provaId] || 0) + pts;
-      }
+      const pts = Number(s.points || 0);
+      pontosDemaisProvas += pts;
+      byProva[s.provaId] = (byProva[s.provaId] || 0) + pts;
     });
 
-    // 2. Desafio E-Lixo
-    const pesoKg = Number(team.pesoELixoKg || 0);
-    const pontosPeso = pesoKg; // 1 kg = 1 ponto
-    const bonusPeso = pesoKg > 0 ? (bonusMap[team.id] || 0) : 0;
-    
-    // Mobilização do E-Lixo (Anexo V)
-    const mobScore = scores.find((s) => s.provaId === 'p_elixo_mob');
-    const pontosMobilizacao = mobScore ? Number(mobScore.points || 0) : 0;
-
-    const elixoBruto = pesoKg > 0 ? (pontosPeso + bonusPeso + pontosMobilizacao) : 0;
-    const elixoComTeto = Math.min(elixoBruto, tetoELixo);
-    const elixoExcedente = Math.max(0, elixoBruto - tetoELixo);
-
-    // 3. Penalidades (Item 37)
     const totalPenalidades = this.getTeamPenalties(teamId);
-
-    // 4. Subtotal e Total Final não negativo
-    const subtotal = pontosDemaisProvas + elixoComTeto;
-    const totalFinal = Math.max(0, Math.round((subtotal - totalPenalidades) * 100) / 100);
+    const totalFinal = Math.max(0, Math.round((pontosDemaisProvas - totalPenalidades) * 10) / 10);
 
     return {
       team,
-      pontosDemaisProvas, // Valor A
-      pesoKg,
-      pontosPeso,
-      bonusPeso,
-      rankPeso: rankMap[team.id],
-      pontosMobilizacao,
-      elixoBruto,
-      elixoComTeto, // Valor B
-      elixoExcedente,
-      tetoELixo,
+      pontosDemaisProvas,
+      pesoKg: Number(team.pesoELixoKg || 0),
+      pontosPeso: 0,
+      bonusPeso: 0,
+      rankPeso: null,
+      pontosMobilizacao: byProva['p_elixo'] || 0,
+      elixoBruto: byProva['p_elixo'] || 0,
+      elixoComTeto: byProva['p_elixo'] || 0,
+      elixoExcedente: 0,
+      tetoELixo: 1000,
       totalPenalidades,
-      subtotal,
+      subtotal: pontosDemaisProvas,
       totalFinal,
       byProva
     };
   }
 
   /**
-   * Ranking Oficial aplicando Critérios de Desempate Geral (Anexo XI):
-   * 1. Maior pontuação total no Desafio E-Lixo.
-   * 2. Maior peso efetivamente arrecadado e validado (mesmo acima do teto).
-   * 3. Melhor nota de avaliação da apresentação da equipe com paródia.
-   * 4. Melhor nota de avaliação do vídeo E-Lixo em 60 segundos.
-   * 5. Persistindo empate, prova de desempate.
+   * Ranking Oficial aplicando Critérios de Desempate Geral:
+   * 1. Maior pontuação total final.
+   * 2. Melhor nota na apresentação com paródia.
+   * 3. Melhor pontuação na Prova Social.
+   * 4. Melhor pontuação no Recicla Tech.
    */
   getTeamRankings() {
     const teams = this.getTeams();
@@ -1251,32 +943,32 @@ class GincanaState {
       if (b.totalFinal !== a.totalFinal) {
         return b.totalFinal - a.totalFinal;
       }
-      // Critério 1 do Anexo XI: Maior pontuação total no Desafio E-Lixo
-      if (b.elixoComTeto !== a.elixoComTeto) {
-        return b.elixoComTeto - a.elixoComTeto;
-      }
-      // Critério 2 do Anexo XI: Maior peso efetivamente arrecadado
-      if (b.pesoKg !== a.pesoKg) {
-        return b.pesoKg - a.pesoKg;
-      }
-      // Critério 3 do Anexo XI: Melhor nota na Paródia
+      // Critério 1 de Desempate: Melhor nota na Paródia
       const parodiaA = a.byProva['p_parodia'] || 0;
       const parodiaB = b.byProva['p_parodia'] || 0;
       if (parodiaB !== parodiaA) {
         return parodiaB - parodiaA;
       }
-      // Critério 4 do Anexo XI: Melhor nota no Vídeo de 60s
-      const videoA = a.byProva['p_video'] || 0;
-      const videoB = b.byProva['p_video'] || 0;
-      return videoB - videoA;
+      // Critério 2 de Desempate: Melhor pontuação na Prova Social
+      const socialA = a.byProva['p_social'] || 0;
+      const socialB = b.byProva['p_social'] || 0;
+      if (socialB !== socialA) {
+        return socialB - socialA;
+      }
+      // Critério 3 de Desempate: Melhor pontuação no Recicla Tech
+      const reciclaA = a.byProva['p_recicla'] || 0;
+      const reciclaB = b.byProva['p_recicla'] || 0;
+      if (reciclaB !== reciclaA) {
+        return reciclaB - reciclaA;
+      }
+      return 0;
     });
 
     const leaderPoints = list.length > 0 ? list[0].totalFinal : 0;
 
     return list.map((item, idx) => {
       const rank = idx + 1;
-      // Item 39: Nota escolar da turma (Trabalho em grupo / A2)
-      let notaEscolar = 70; // Demais turmas participantes
+      let notaEscolar = 70;
       if (rank === 1) notaEscolar = 100;
       else if (rank === 2) notaEscolar = 90;
       else if (rank === 3) notaEscolar = 80;
@@ -1419,27 +1111,23 @@ class GincanaState {
 
   exportCSV() {
     const rankings = this.getTeamRankings();
-    const rows = [
-      ['Ranking', 'Turma / Equipe', 'Segmento', 'Tutor', 'Demais Provas (A)', 'Peso E-Lixo (kg)', 'Bônus Peso', 'Mobilização E-Lixo', 'E-Lixo com Teto (B)', 'Teto E-Lixo', 'Penalidades', 'TOTAL FINAL', 'Nota Escolar (Item 39)']
-    ];
+    const provas = this.getProvas();
+    const header = ['Ranking', 'Turma / Equipe', 'Segmento', ...provas.map((p) => `"${p.title}"`), 'Penalidades', 'TOTAL FINAL'];
+    const rows = [header];
 
     rankings.forEach((r) => {
       const s = r.stats;
-      rows.push([
+      const row = [
         `"${r.rank}º"`,
         `"${r.name} (${r.turma})"`,
-        `"${r.className}"`,
-        `"${r.tutor || '-'}"`,
-        s.pontosDemaisProvas,
-        s.pesoKg,
-        s.bonusPeso,
-        s.pontosMobilizacao,
-        s.elixoComTeto,
-        s.tetoELixo,
-        s.totalPenalidades,
-        s.totalFinal,
-        `"${r.notaEscolar} pts"`
-      ]);
+        `"${r.className || r.segmento || '-'}"`
+      ];
+      provas.forEach((p) => {
+        row.push(s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0);
+      });
+      row.push(s.totalPenalidades);
+      row.push(s.totalFinal);
+      rows.push(row);
     });
 
     return '\uFEFF' + rows.map((row) => row.join(';')).join('\r\n');

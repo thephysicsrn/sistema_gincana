@@ -141,12 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ABA DO JUIZ: LANÇAMENTO DE NOTAS
   // ==========================================
   function getAllDesktopProvas() {
-    const list = [...state.getProvas()];
-    const hasPesagem = list.some((p) => p.id === 'prova_elixo_pesagem');
-    if (!hasPesagem) {
-      list.push(state.getProva('prova_elixo_pesagem'));
-    }
-    return list;
+    return state.getProvas();
   }
 
   function renderJudgeTab() {
@@ -738,17 +733,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
 
     const teams = state.getTeams();
-    const provas = state.getProvas().filter((p) => p.id !== 'p_elixo_mob');
+    const provas = state.getProvas();
     const rankings = state.getTeamRankings();
-    const tetoELixo = state.getTetoELixo();
 
     container.innerHTML = `
       <div style="background: rgba(15,23,42,0.85); border: 1px solid var(--border-glass-bright); border-radius: 12px; padding: 1.5rem; overflow-x: auto;">
         <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <h4 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">Planilha Geral de Pontuação (Anexo X do Edital)</h4>
+            <h4 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">Planilha Geral de Pontuação Oficial</h4>
             <span style="font-size: 0.85rem; color: #94a3b8;">
-              Teto do Desafio E-Lixo = <strong>${tetoELixo} pts</strong> (Igual à soma máxima das demais provas). Pontuação Máxima Possível da Gincana = <strong>${tetoELixo * 2} pts</strong>.
+              Acompanhamento oficial de notas das 10 provas e apuração em tempo real.
             </span>
           </div>
           <button id="btn-export-anexo-x" class="btn btn-secondary btn-sm">Exportar Planilha (CSV)</button>
@@ -757,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <table class="data-table" style="font-size: 0.82rem;">
           <thead>
             <tr>
-              <th style="min-width: 220px;">Prova ou Registro (Edital)</th>
+              <th style="min-width: 220px;">Prova da Gincana</th>
               <th style="text-align: center;">Máx</th>
               ${teams.map((t) => `
                 <th style="text-align: center; color: ${t.color}; min-width: 140px;">
@@ -769,8 +763,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <tbody>
             ${provas.map((p) => `
               <tr>
-                <td><strong>${p.title}</strong> <small style="color:#818cf8;">(${p.anexo || p.itemEdital})</small></td>
-                <td style="text-align: center; color: #94a3b8;">${p.maxScore}</td>
+                <td><strong>${p.title}</strong> <small style="color:#818cf8;">(${p.category || p.itemEdital})</small></td>
+                <td style="text-align: center; color: #94a3b8;">${p.maxScore || 100}</td>
                 ${teams.map((t) => {
                   const sc = state.getScores().find((s) => s.teamId === t.id && s.provaId === p.id);
                   const pts = sc ? sc.points : '-';
@@ -779,69 +773,19 @@ document.addEventListener('DOMContentLoaded', () => {
               </tr>
             `).join('')}
 
-            <!-- Linha A: Soma das demais provas -->
+            <!-- Subtotal Provas -->
             <tr style="background: rgba(99,102,241,0.15); font-weight: 800;">
-              <td>A — Soma das demais provas</td>
-              <td style="text-align: center; color: #818cf8;">${tetoELixo}</td>
+              <td>Subtotal de Provas</td>
+              <td style="text-align: center; color: #818cf8;">-</td>
               ${teams.map((t) => {
                 const s = state.getTeamFullStats(t.id);
                 return `<td style="text-align: center; color: #818cf8; font-size: 1rem;">${s.pontosDemaisProvas}</td>`;
               }).join('')}
             </tr>
 
-            <!-- Linha E-Lixo: Peso Líquido -->
-            <tr>
-              <td>Peso E-Lixo validado (1 kg = 1 pt)</td>
-              <td style="text-align: center; color: #94a3b8;">Livre</td>
-              ${teams.map((t) => {
-                const s = state.getTeamFullStats(t.id);
-                return `<td style="text-align: center; color: #34d399;">${s.pesoKg.toFixed(2)} kg</td>`;
-              }).join('')}
-            </tr>
-
-            <!-- Linha E-Lixo: Bônus de Colocação -->
-            <tr>
-              <td>Bônus Colocação Peso (1º=300, 2º=250, 3º=200, demais=100)</td>
-              <td style="text-align: center; color: #94a3b8;">300</td>
-              ${teams.map((t) => {
-                const s = state.getTeamFullStats(t.id);
-                return `<td style="text-align: center; color: #fbbf24;">+${s.bonusPeso} pts</td>`;
-              }).join('')}
-            </tr>
-
-            <!-- Linha E-Lixo: Mobilização -->
-            <tr>
-              <td>Mobilização da Campanha E-Lixo (Anexo V)</td>
-              <td style="text-align: center; color: #94a3b8;">100</td>
-              ${teams.map((t) => {
-                const s = state.getTeamFullStats(t.id);
-                return `<td style="text-align: center;">${s.pontosMobilizacao} pts</td>`;
-              }).join('')}
-            </tr>
-
-            <!-- Linha B: Total E-Lixo após Teto -->
-            <tr style="background: rgba(16,185,129,0.15); font-weight: 800;">
-              <td>B — Total E-Lixo após teto (Máx 50% = ${tetoELixo} pts)</td>
-              <td style="text-align: center; color: #34d399;">${tetoELixo}</td>
-              ${teams.map((t) => {
-                const s = state.getTeamFullStats(t.id);
-                return `<td style="text-align: center; color: #34d399; font-size: 1rem;">${s.elixoComTeto} pts</td>`;
-              }).join('')}
-            </tr>
-
-            <!-- Subtotal A + B -->
-            <tr style="background: rgba(255,255,255,0.05); font-weight: 700;">
-              <td>Subtotal (A + B)</td>
-              <td style="text-align: center;">${tetoELixo * 2}</td>
-              ${teams.map((t) => {
-                const s = state.getTeamFullStats(t.id);
-                return `<td style="text-align: center;">${s.subtotal}</td>`;
-              }).join('')}
-            </tr>
-
             <!-- Penalidades -->
             <tr style="color: #f87171;">
-              <td>Desconto de Penalidades (Item 37)</td>
+              <td>Desconto de Penalidades</td>
               <td style="text-align: center;">-</td>
               ${teams.map((t) => {
                 const s = state.getTeamFullStats(t.id);
@@ -851,21 +795,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             <!-- TOTAL FINAL -->
             <tr style="background: rgba(234,179,8,0.2); font-weight: 900; font-size: 1.15rem;">
-              <td style="color: #fde047;">TOTAL FINAL OFICIAL (Não negativo)</td>
-              <td style="text-align: center; color: #fde047;">${tetoELixo * 2}</td>
+              <td style="color: #fde047;">TOTAL FINAL OFICIAL</td>
+              <td style="text-align: center; color: #fde047;">-</td>
               ${teams.map((t) => {
                 const s = state.getTeamFullStats(t.id);
                 return `<td style="text-align: center; color: #fde047; font-size: 1.25rem;">${s.totalFinal}</td>`;
               }).join('')}
             </tr>
 
-            <!-- NOTA ESCOLAR -->
+            <!-- Classificação Atual -->
             <tr style="background: rgba(16,185,129,0.25); font-weight: 800;">
-              <td style="color: #6ee7b7;">Nota Escolar da Turma (Item 39 - Trabalho em Grupo / A2)</td>
-              <td style="text-align: center; color: #6ee7b7;">100</td>
+              <td style="color: #6ee7b7;">Classificação no Placar</td>
+              <td style="text-align: center; color: #6ee7b7;">-</td>
               ${teams.map((t) => {
                 const r = rankings.find((item) => item.id === t.id);
-                return `<td style="text-align: center; color: #6ee7b7; font-size: 1.1rem;">${r ? r.notaEscolar : '-'} pts</td>`;
+                return `<td style="text-align: center; color: #6ee7b7; font-size: 1.1rem;">${r ? r.rank + 'º Lugar' : '-'}</td>`;
               }).join('')}
             </tr>
           </tbody>
@@ -877,8 +821,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnExp) {
       btnExp.addEventListener('click', () => {
         const csv = state.exportCSV();
-        downloadFile(csv, 'planilha_geral_sesi_conecta_anexo_x.csv', 'text/csv;charset=utf-8;');
-        showToast('Planilha do Anexo X exportada!', 'toast-success');
+        downloadFile(csv, 'planilha_geral_gincana.csv', 'text/csv;charset=utf-8;');
+        showToast('Planilha da Gincana exportada!', 'toast-success');
       });
     }
   }

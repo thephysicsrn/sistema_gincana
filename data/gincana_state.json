@@ -26,8 +26,8 @@
     },
     {
       "id": "j4",
-      "name": "Comissão de Pesagem E-Lixo",
-      "role": "Conferente Oficial",
+      "name": "Comissão Esportiva & Dinâmicas",
+      "role": "Juiz de Quadra",
       "pin": "1234"
     }
   ],
@@ -47,7 +47,7 @@
       "tutor": "Prof. André",
       "representatives": "Lucas Silva e Camila Costa",
       "slogan": "Conectar para transformar, reciclar para renovar!",
-      "pesoELixoKg": 145.5,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -65,7 +65,7 @@
       "tutor": "Prof.ª Renata",
       "representatives": "Gabriel Santos e Mariana Lima",
       "slogan": "Tecnologia consciente, futuro presente!",
-      "pesoELixoKg": 182.2,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -83,7 +83,7 @@
       "tutor": "Prof. Carlos",
       "representatives": "Matheus Rocha e Beatriz Alves",
       "slogan": "Resíduo zero, inovação máxima!",
-      "pesoELixoKg": 120,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -101,7 +101,7 @@
       "tutor": "Prof.ª Juliana",
       "representatives": "Rafael Souza e Sofia Mendes",
       "slogan": "Cuidando do planeta com a força da juventude!",
-      "pesoELixoKg": 95.8,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -119,7 +119,7 @@
       "tutor": "Prof. Felipe",
       "representatives": "Pedro Duarte e Letícia Lima",
       "slogan": "Construindo o futuro peça por peça!",
-      "pesoELixoKg": 110.4,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -137,7 +137,7 @@
       "tutor": "Prof.ª Marcela",
       "representatives": "João Lucas e Ana Clara",
       "slogan": "A pulsação da natureza em nossas mãos!",
-      "pesoELixoKg": 88,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -155,7 +155,7 @@
       "tutor": "Prof. Roberto",
       "representatives": "Enzo Gabriel e Laura Dias",
       "slogan": "Pequenos passos para grandes transformações!",
-      "pesoELixoKg": 74.3,
+      "pesoELixoKg": 0,
       "penalties": []
     },
     {
@@ -173,8 +173,169 @@
       "tutor": "Prof.ª Vanessa",
       "representatives": "Vinicius Costa e Julia Paiva",
       "slogan": "Energia limpa e atitude sustentável!",
-      "pesoELixoKg": 102.5,
+      "pesoELixoKg": 0,
       "penalties": []
+    }
+  ],
+  "provas": [
+    {
+      "id": "p_parodia",
+      "title": "Apresentação com paródia",
+      "shortTitle": "Paródia",
+      "icon": "P1",
+      "category": "Cultural & Artística",
+      "anexo": "Cultural",
+      "itemEdital": "Prova 1",
+      "description": "Identidade da equipe e apresentação com paródia musical autoral.",
+      "type": "rubrica_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "timeLimitSeconds": 300,
+      "criteria": [
+        { "name": "Letra e Relação com o Tema", "max": 25 },
+        { "name": "Criatividade e Originalidade", "max": 25 },
+        { "name": "Interpretação e Presença de Palco", "max": 25 },
+        { "name": "Organização e Torcida", "max": 25 }
+      ]
+    },
+    {
+      "id": "p_recicla",
+      "title": "Recicla Tech",
+      "shortTitle": "Recicla Tech",
+      "icon": "P2",
+      "category": "Tecnologia & Sustentabilidade",
+      "anexo": "Tecnologia",
+      "itemEdital": "Prova 2",
+      "description": "Criação de objeto ou protótipo funcional utilizando materiais reaproveitados e tecnologia.",
+      "type": "rubrica_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": [
+        { "name": "Criatividade e Inovação", "max": 25 },
+        { "name": "Aproveitamento de Materiais", "max": 25 },
+        { "name": "Relação com o Tema", "max": 25 },
+        { "name": "Apresentação e Defesa", "max": 25 }
+      ]
+    },
+    {
+      "id": "p_xadrez",
+      "title": "Xadrez",
+      "shortTitle": "Xadrez",
+      "icon": "P3",
+      "category": "Jogos & Raciocínio",
+      "anexo": "Esportes da Mente",
+      "itemEdital": "Prova 3",
+      "description": "Torneio de xadrez disputado entre os representantes de cada equipe.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
+    },
+    {
+      "id": "p_social",
+      "title": "Prova Social",
+      "shortTitle": "Prova Social",
+      "icon": "P4",
+      "category": "Ação Social & Solidariedade",
+      "anexo": "Solidariedade",
+      "itemEdital": "Prova 4",
+      "description": "Mobilização comunitária, arrecadação solidária e impacto social.",
+      "type": "rubrica_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": [
+        { "name": "Volume Arrecadado / Meta", "max": 40 },
+        { "name": "Mobilização e Engajamento", "max": 30 },
+        { "name": "Organização e Entrega", "max": 30 }
+      ]
+    },
+    {
+      "id": "p_elixo",
+      "title": "Desafio E-Lixo",
+      "shortTitle": "Desafio E-Lixo",
+      "icon": "P5",
+      "category": "Sustentabilidade & Meio Ambiente",
+      "anexo": "E-Lixo",
+      "itemEdital": "Prova 5",
+      "description": "Campanha oficial de recolhimento e descarte correto de lixo eletrônico.",
+      "type": "rubrica_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": [
+        { "name": "Volume / Peso E-Lixo Arrecadado", "max": 50 },
+        { "name": "Mobilização da Comunidade", "max": 30 },
+        { "name": "Organização da Triagem", "max": 20 }
+      ]
+    },
+    {
+      "id": "p_quiz",
+      "title": "Prova 1 - Quiz Temático",
+      "shortTitle": "Quiz Temático",
+      "icon": "P6",
+      "category": "Conhecimentos Gerais",
+      "anexo": "Dinâmica 1",
+      "itemEdital": "Prova 6",
+      "description": "Batalha de perguntas e respostas de raciocínio rápido e conhecimentos gerais.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
+    },
+    {
+      "id": "p_musica",
+      "title": "Prova 2 - Complete a música",
+      "shortTitle": "Complete a Música",
+      "icon": "P7",
+      "category": "Dinâmica & Palco",
+      "anexo": "Dinâmica 2",
+      "itemEdital": "Prova 7",
+      "description": "Desafio musical no palco: acertar e cantar o trecho correto da canção.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
+    },
+    {
+      "id": "p_arco",
+      "title": "Prova 3 - Corrida do arco",
+      "shortTitle": "Corrida do Arco",
+      "icon": "P8",
+      "category": "Esportiva & Agilidade",
+      "anexo": "Dinâmica 3",
+      "itemEdital": "Prova 8",
+      "description": "Prova de agilidade, reflexo e trabalho em equipe com arcos na quadra.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
+    },
+    {
+      "id": "p_balao",
+      "title": "Prova 4 - Estoura o balão",
+      "shortTitle": "Estoura o Balão",
+      "icon": "P9",
+      "category": "Recreativa & Agilidade",
+      "anexo": "Dinâmica 4",
+      "itemEdital": "Prova 9",
+      "description": "Prova recreativa dinâmica de velocidade e trabalho em equipe.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
+    },
+    {
+      "id": "p_pingpong",
+      "title": "Ping Pong",
+      "shortTitle": "Ping Pong",
+      "icon": "P10",
+      "category": "Esportes & Tênis de Mesa",
+      "anexo": "Esportiva",
+      "itemEdital": "Prova 10",
+      "description": "Torneio de tênis de mesa / ping pong disputado entre as equipes.",
+      "type": "standard_colocacao",
+      "maxScore": 100,
+      "status": "active",
+      "criteria": []
     }
   ],
   "scores": [],
