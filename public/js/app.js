@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (tabId === 'tab-penalidades') renderPenalidades();
     else if (tabId === 'tab-provas') renderProvasManagement();
     else if (tabId === 'tab-equipes') renderTeamsManagement();
+    else if (tabId === 'tab-admin-professores') renderProfessoresAdmin();
   }
 
   navTabs.forEach((btn) => {
@@ -153,11 +154,27 @@ document.addEventListener('DOMContentLoaded', () => {
     if (judgeSelect) {
       judgeSelect.innerHTML = `
         <option value="">-- Selecione seu nome / Comissão --</option>
-        ${judges.map((j) => `<option value="${j.name}">${j.name} (${j.role})</option>`).join('')}
+        ${judges.map((j) => {
+          const pr = j.assignedProvaId ? state.getProva(j.assignedProvaId) : null;
+          const resp = pr ? ` [Resp: ${pr.title}]` : '';
+          return `<option value="${j.name}">${j.name} (${j.role}${resp})</option>`;
+        }).join('')}
       `;
       if (judgeFormState.selectedJudge) {
         judgeSelect.value = judgeFormState.selectedJudge;
       }
+      judgeSelect.onchange = () => {
+        judgeFormState.selectedJudge = judgeSelect.value;
+        const found = judges.find((j) => j.name === judgeSelect.value);
+        if (found && found.assignedProvaId) {
+          judgeFormState.selectedProvaId = found.assignedProvaId;
+          renderDesktopProvaTabs();
+          updateDesktopActiveProvaHero();
+          renderDesktopTeamGrid();
+          renderProvaControls();
+          updateJudgeSummaryPreview();
+        }
+      };
     }
 
     if (!judgeFormState.selectedProvaId && allProvas.length > 0) {
@@ -1061,6 +1078,171 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // =========================================================================
+  // GESTÃO DE PROFESSORES / AVALIADORES (ADMIN)
+  // =========================================================================
+
+  function renderProfessoresAdmin() {
+    const container = document.getElementById('admin-judges-list');
+    if (!container) return;
+
+    const judges = state.getJudges();
+    const provas = state.getProvas();
+
+    if (!judges || judges.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px dashed var(--border-glass);">
+          <p style="color: #94a3b8; margin-bottom: 1rem;">Nenhum professor ou avaliador cadastrado.</p>
+          <button class="btn btn-primary" onclick="document.getElementById('btn-open-add-judge-modal').click()">Cadastrar Primeiro Professor</button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = judges.map((j) => {
+      const assigned = j.assignedProvaId ? provas.find(p => p.id === j.assignedProvaId) : null;
+      const provaBadge = assigned
+        ? `<span class="badge" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.4); font-size: 0.78rem; padding: 0.25rem 0.5rem; border-radius: 4px;">📌 Resp: <strong>${assigned.title}</strong></span>`
+        : `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.78rem; padding: 0.25rem 0.5rem; border-radius: 4px;">🌐 Acesso Geral / Todas</span>`;
+
+      return `
+        <div class="judge-admin-card" style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; transition: transform 0.2s ease, border-color 0.2s ease;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0;">${j.name}</h4>
+              <span class="badge" style="background: rgba(234, 179, 8, 0.15); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); font-family: monospace; font-size: 0.85rem; padding: 0.2rem 0.5rem; border-radius: 4px;" title="PIN para login no celular (/juiz.html)">
+                PIN: <strong>${j.pin || '1234'}</strong>
+              </span>
+            </div>
+            <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 0.75rem;">${j.role || 'Avaliador Oficial'}</p>
+            <div>${provaBadge}</div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem;">
+            <button class="btn btn-secondary btn-sm btn-edit-judge" data-id="${j.id}" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-sm btn-delete-judge" data-id="${j.id}" data-name="${j.name}" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+              🗑️ Excluir
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.btn-edit-judge').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const judge = state.getJudges().find(j => j.id === id);
+        if (judge) openJudgeModal(judge);
+      });
+    });
+
+    container.querySelectorAll('.btn-delete-judge').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        if (confirm(`Deseja realmente remover o avaliador "${name}"?`)) {
+          state.deleteJudge(id);
+          showToast(`Avaliador "${name}" excluído.`, 'toast-info');
+          renderProfessoresAdmin();
+        }
+      });
+    });
+  }
+
+  function openJudgeModal(judge = null) {
+    const modal = document.getElementById('modal-judge-form');
+    if (!modal) return;
+
+    const modalTitle = document.getElementById('modal-judge-title');
+    const inputId = document.getElementById('input-judge-id');
+    const inputName = document.getElementById('input-judge-name');
+    const selectProva = document.getElementById('select-judge-prova');
+    const inputRole = document.getElementById('input-judge-role');
+    const inputPin = document.getElementById('input-judge-pin');
+
+    const provas = state.getProvas();
+    selectProva.innerHTML = `
+      <option value="">-- Acesso Geral / Todas as Provas --</option>
+      ${provas.map(p => `<option value="${p.id}">${p.title} (${state.isMultiJudgeProva(p.id) ? 'Banca' : 'Juiz Único'})</option>`).join('')}
+    `;
+
+    if (judge) {
+      modalTitle.innerText = 'Editar Professor / Avaliador';
+      inputId.value = judge.id;
+      inputName.value = judge.name || '';
+      inputRole.value = judge.role || '';
+      selectProva.value = judge.assignedProvaId || '';
+      inputPin.value = judge.pin || '1234';
+    } else {
+      modalTitle.innerText = 'Cadastrar Professor / Avaliador';
+      inputId.value = '';
+      inputName.value = '';
+      inputRole.value = 'Professor / Avaliador';
+      selectProva.value = '';
+      inputPin.value = String(Math.floor(1000 + Math.random() * 9000));
+    }
+
+    modal.classList.add('active');
+  }
+
+  function setupProfessoresAdminEvents() {
+    const btnOpenAdd = document.getElementById('btn-open-add-judge-modal');
+    const btnClose = document.getElementById('btn-close-judge-modal');
+    const btnCancel = document.getElementById('btn-cancel-judge-modal');
+    const btnSave = document.getElementById('btn-save-judge');
+    const btnGeneratePin = document.getElementById('btn-generate-pin');
+    const modal = document.getElementById('modal-judge-form');
+
+    if (btnOpenAdd) {
+      btnOpenAdd.addEventListener('click', () => openJudgeModal(null));
+    }
+
+    if (btnClose) {
+      btnClose.addEventListener('click', () => modal && modal.classList.remove('active'));
+    }
+
+    if (btnCancel) {
+      btnCancel.addEventListener('click', () => modal && modal.classList.remove('active'));
+    }
+
+    if (btnGeneratePin) {
+      btnGeneratePin.addEventListener('click', () => {
+        const pinInput = document.getElementById('input-judge-pin');
+        if (pinInput) pinInput.value = String(Math.floor(1000 + Math.random() * 9000));
+      });
+    }
+
+    if (btnSave) {
+      btnSave.addEventListener('click', () => {
+        const id = document.getElementById('input-judge-id').value;
+        const name = document.getElementById('input-judge-name').value.trim();
+        const role = document.getElementById('input-judge-role').value.trim();
+        const assignedProvaId = document.getElementById('select-judge-prova').value || null;
+        const pin = document.getElementById('input-judge-pin').value.trim() || '1234';
+
+        if (!name) {
+          showToast('Por favor, informe o nome do professor.', 'toast-error');
+          return;
+        }
+
+        try {
+          if (id) {
+            state.updateJudge(id, { name, role, assignedProvaId, pin });
+            showToast(`Professor "${name}" atualizado com sucesso!`, 'toast-success');
+          } else {
+            state.addJudge({ name, role, assignedProvaId, pin });
+            showToast(`Professor "${name}" cadastrado com sucesso!`, 'toast-success');
+          }
+          if (modal) modal.classList.remove('active');
+          renderProfessoresAdmin();
+        } catch (err) {
+          showToast(err.message || 'Erro ao salvar professor.', 'toast-error');
+        }
+      });
+    }
+  }
+
   // Fechar modais
   document.querySelectorAll('.modal-close-btn, .btn-modal-cancel').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1078,7 +1260,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeTab && activeTab.dataset.tab === 'tab-penalidades') renderPenalidades();
     if (activeTab && activeTab.dataset.tab === 'tab-provas') renderProvasAdmin();
     if (activeTab && activeTab.dataset.tab === 'tab-equipes') renderTeamsAdmin();
+    if (activeTab && activeTab.dataset.tab === 'tab-admin-professores') renderProfessoresAdmin();
   });
+
+  setupProfessoresAdminEvents();
 
   // Render inicial
   renderPlacar();

@@ -1192,6 +1192,7 @@ class GincanaState {
         id: judge.id,
         name: judge.name,
         role: judge.role,
+        assignedProvaId: judge.assignedProvaId || null,
         authenticatedAt: new Date().toISOString()
       };
       this.setLoggedInJudge(authSession);
@@ -1461,13 +1462,14 @@ class GincanaState {
   // GESTÃO DE JUÍZES (CADASTRO / EDIÇÃO / EXCLUSÃO)
   // =========================================================================
 
-  addJudge({ name, role, pin }) {
+  addJudge({ name, role, pin, assignedProvaId = null }) {
     if (!name || !name.trim()) throw new Error('O nome do avaliador é obrigatório.');
 
     const newJudge = {
       id: 'j_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
       name: name.trim(),
-      role: (role || 'Avaliador Oficial').trim(),
+      role: (role || 'Professor / Avaliador').trim(),
+      assignedProvaId: assignedProvaId || null,
       pin: String(pin || '1234').trim()
     };
 
@@ -1477,12 +1479,13 @@ class GincanaState {
     return newJudge;
   }
 
-  updateJudge(judgeId, { name, role, pin }) {
+  updateJudge(judgeId, { name, role, pin, assignedProvaId }) {
     const judge = (this.data.judges || []).find((j) => j.id === judgeId);
     if (!judge) return false;
 
     if (name) judge.name = name.trim();
-    if (role) judge.role = role.trim();
+    if (role !== undefined) judge.role = role.trim();
+    if (assignedProvaId !== undefined) judge.assignedProvaId = assignedProvaId || null;
     if (pin !== undefined && pin !== null) judge.pin = String(pin).trim();
 
     this.saveToStorage(true, { action: 'UPDATE_JUDGE', judgeId });

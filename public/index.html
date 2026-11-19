@@ -63,6 +63,9 @@
         <button class="nav-tab-btn" data-tab="tab-equipes" id="tab-btn-equipes">
           Turmas / Equipes
         </button>
+        <button class="nav-tab-btn" data-tab="tab-admin-professores" id="tab-btn-admin-professores">
+          Professores (Admin)
+        </button>
       </nav>
     </header>
 
@@ -302,6 +305,76 @@
       </div>
     </section>
 
+    <!-- ========================================================
+         ABA 7: GESTÃO DE PROFESSORES / AVALIADORES (ADMIN)
+         ======================================================== -->
+    <section id="tab-admin-professores" class="tab-content" style="display: none;">
+      <div class="history-card">
+        <div class="section-header" style="flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+          <div class="section-title">
+            <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+              <span>👨‍🏫</span> Professores & Avaliadores Responsáveis
+            </h3>
+            <span style="font-size: 0.85rem; color: #94a3b8;">
+              Cadastre cada professor, defina qual prova ele é responsável por lançar as notas e o PIN de 4 dígitos para acesso no celular (/juiz.html).
+            </span>
+          </div>
+          <button id="btn-open-add-judge-modal" class="btn btn-primary" style="font-weight: 700; white-space: nowrap;">
+            + Novo Professor / Avaliador
+          </button>
+        </div>
+
+        <!-- Grade de Professores Cadastrados -->
+        <div id="admin-judges-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+          <!-- Preenchido via app.js -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Modal de Cadastro / Edição de Professor -->
+  <div id="modal-judge-form" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-judge-title">Cadastrar Professor / Avaliador</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-judge-modal">&times;</button>
+      </div>
+      <div style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+        <input type="hidden" id="input-judge-id">
+        <div>
+          <label class="form-label" for="input-judge-name">Nome do Professor / Avaliador:</label>
+          <input type="text" id="input-judge-name" class="form-input" placeholder="Ex: Prof. Roberto Alves" required>
+        </div>
+        <div>
+          <label class="form-label" for="select-judge-prova">Prova de Responsabilidade:</label>
+          <select id="select-judge-prova" class="form-select" style="background: #0f172a; color: #fff;">
+            <!-- Opções preenchidas dinamicamente -->
+          </select>
+          <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">
+            O professor terá acesso prioritário para lançar as notas desta prova.
+          </small>
+        </div>
+        <div>
+          <label class="form-label" for="input-judge-role">Disciplina / Função:</label>
+          <input type="text" id="input-judge-role" class="form-input" placeholder="Ex: Professor de Educação Física">
+        </div>
+        <div>
+          <label class="form-label" for="input-judge-pin">PIN de Acesso (4 dígitos numéricos):</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="input-judge-pin" class="form-input" maxlength="6" placeholder="1234" value="1234" style="font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; text-align: center;">
+            <button type="button" id="btn-generate-pin" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Gerar PIN</button>
+          </div>
+          <small style="color: #94a3b8; font-size: 0.75rem; margin-top: 4px; display: block;">
+            PIN que o professor digitará para acessar o Portal do Juiz no celular (/juiz.html).
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-judge-modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-save-judge">Salvar Professor</button>
+      </div>
+    </div>
   </div>
 
   <!-- Modal de Definição de Critérios e Rubricas da Prova (Admin / Juiz) -->

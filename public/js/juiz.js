@@ -123,9 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderJudgeLoginSelect() {
     const judges = state.getJudges();
-    loginJudgeSelect.innerHTML = judges.map((j) => `
-      <option value="${j.id}">${j.name} (${j.role})</option>
-    `).join('');
+    const provas = state.getProvas();
+    loginJudgeSelect.innerHTML = judges.map((j) => {
+      let respText = '';
+      if (j.assignedProvaId) {
+        const p = provas.find((pr) => pr.id === j.assignedProvaId);
+        if (p) respText = ` • Resp: ${p.title}`;
+      }
+      return `<option value="${j.id}">${j.name} (${j.role}${respText})</option>`;
+    }).join('');
   }
 
   function showPinScreen() {
@@ -140,7 +146,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyLoggedInState(judge) {
     pinOverlay.classList.add('hidden');
     headerJudgeName.innerText = judge.name;
-    headerJudgeRole.innerText = `${judge.role} • Autenticado`;
+    let respText = '';
+    if (judge.assignedProvaId) {
+      const p = state.getProva(judge.assignedProvaId);
+      if (p) {
+        respText = ` • Resp: ${p.title}`;
+        form.provaId = judge.assignedProvaId;
+      }
+    }
+    headerJudgeRole.innerText = `${judge.role}${respText} • Autenticado`;
     initScoringForm();
 
     // Registra presença imediata
