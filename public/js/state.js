@@ -878,8 +878,11 @@ class GincanaState {
     });
   }
 
-  getTeams() {
-    return this.data.teams || [];
+  getTeams(turno = null) {
+    const list = this.data.teams || [];
+    if (!turno || turno === 'all') return list;
+    const cleanTurno = String(turno).trim().toLowerCase();
+    return list.filter((t) => String(t.turno || '').trim().toLowerCase() === cleanTurno);
   }
 
   getTeam(teamId) {
@@ -1194,8 +1197,8 @@ class GincanaState {
    * 3. Melhor pontuação na Prova Social.
    * 4. Melhor pontuação no Recicla Tech.
    */
-  getTeamRankings() {
-    const teams = this.getTeams();
+  getTeamRankings(turno = null) {
+    const teams = this.getTeams(turno);
     const list = teams.map((t) => this.getTeamFullStats(t.id)).filter(Boolean);
 
     list.sort((a, b) => {

@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state.setTelaoTurno('Matutino');
         updateTelaoTurnoButtons('Matutino');
         sound.playClick();
+        scrollPosition = 0;
+        syncTelaoMode();
         renderTelao();
       });
     }
@@ -106,6 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
         state.setTelaoTurno('Vespertino');
         updateTelaoTurnoButtons('Vespertino');
         sound.playClick();
+        scrollPosition = 0;
+        syncTelaoMode();
         renderTelao();
       });
     }
@@ -323,6 +327,23 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTelao(withSuspense = false) {
     const currentTurno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
     updateTelaoTurnoButtons(currentTurno);
+
+    const activePill = document.getElementById('telao-active-turno-pill');
+    if (activePill) {
+      if (currentTurno === 'Matutino') {
+        activePill.innerHTML = '☀️ GINCANA MATUTINO (8 TURMAS)';
+        activePill.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+      } else {
+        activePill.innerHTML = '🌙 GINCANA VESPERTINO (8 TURMAS)';
+        activePill.style.background = 'linear-gradient(135deg, #7c3aed, #db2777)';
+      }
+    }
+
+    const tickerLeaderBadge = document.getElementById('ticker-leader-badge');
+    if (tickerLeaderBadge) {
+      tickerLeaderBadge.innerText = `1º LUGAR • ${currentTurno.toUpperCase()}`;
+    }
+
     const rankings = state.getTeamRankings(currentTurno);
     if (rankings.length === 0) return;
 

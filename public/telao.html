@@ -600,8 +600,13 @@
         <div style="display: flex; align-items: center; gap: 1.5rem;">
           <img src="img/logo-sesi-escola.png" alt="SESI Escola" style="height: 56px; background: rgba(255,255,255,0.96); padding: 4px 12px; border-radius: 10px; object-fit: contain; box-shadow: 0 4px 16px rgba(0,0,0,0.4); flex-shrink: 0;">
           <div class="telao-title-wrap">
-            <h1 id="telao-event-title">SESI CONECTA 2026</h1>
-            <p id="telao-event-sub">Tecnologia que transforma, resíduo que ganha novo destino • Gincana Escolar 2026</p>
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+              <h1 id="telao-event-title" style="margin: 0; line-height: 1.1;">SESI CONECTA 2026</h1>
+              <span id="telao-active-turno-pill" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: #ffffff; font-size: 0.85rem; font-weight: 800; padding: 0.25rem 0.95rem; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);">
+                ☀️ GINCANA MATUTINO (8 TURMAS)
+              </span>
+            </div>
+            <p id="telao-event-sub" style="margin-top: 0.3rem;">Tecnologia que transforma, resíduo que ganha novo destino • Gincana Escolar 2026</p>
           </div>
         </div>
 
@@ -630,7 +635,7 @@
       <!-- Barra de Destaque da Transmissão e Líder Atual -->
       <div class="sliding-ticker-header">
         <div class="ticker-leader-highlight" id="ticker-leader-box">
-          <span class="ticker-leader-badge">1º LUGAR ATUAL</span>
+          <span class="ticker-leader-badge" id="ticker-leader-badge">1º LUGAR ATUAL</span>
           <div id="ticker-leader-content" style="display: flex; align-items: center; gap: 0.75rem; font-weight: 800; font-size: 1.15rem; color: #ffffff;">
             Carregando liderança...
           </div>
