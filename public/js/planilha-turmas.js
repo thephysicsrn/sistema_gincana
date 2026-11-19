@@ -17,8 +17,7 @@
       'Turno': 'Matutino',
       'Cor': 'Vermelho',
       'Tutor / Professor': 'Prof. André',
-      'Representantes': 'Lucas Silva e Camila Costa',
-      'Slogan / Grito de Guerra': 'Conectar para transformar, reciclar para renovar!'
+      'Representantes': 'Lucas Silva e Camila Costa'
     },
     {
       'Nome da Equipe': 'Bio Circuitos',
@@ -27,8 +26,7 @@
       'Turno': 'Matutino',
       'Cor': 'Azul',
       'Tutor / Professor': 'Prof.ª Renata',
-      'Representantes': 'Gabriel Santos e Mariana Lima',
-      'Slogan / Grito de Guerra': 'Tecnologia consciente, futuro presente!'
+      'Representantes': 'Gabriel Santos e Mariana Lima'
     },
     {
       'Nome da Equipe': 'Eco Titans',
@@ -37,8 +35,7 @@
       'Turno': 'Matutino',
       'Cor': 'Verde',
       'Tutor / Professor': 'Prof. Carlos',
-      'Representantes': 'Felipe Rocha e Beatriz Souza',
-      'Slogan / Grito de Guerra': 'Reciclando o futuro, liderando o presente!'
+      'Representantes': 'Felipe Rocha e Beatriz Souza'
     },
     {
       'Nome da Equipe': 'Cyber Guardiões',
@@ -47,8 +44,7 @@
       'Turno': 'Matutino',
       'Cor': 'Dourado',
       'Tutor / Professor': 'Prof. Marcos',
-      'Representantes': 'Pedro Henrique e Sofia Ramos',
-      'Slogan / Grito de Guerra': 'Pequenos gestos, grandes transformações!'
+      'Representantes': 'Pedro Henrique e Sofia Ramos'
     }
   ];
 
@@ -76,8 +72,7 @@
       { wch: 14 }, // Turno
       { wch: 14 }, // Cor
       { wch: 20 }, // Tutor
-      { wch: 32 }, // Representantes
-      { wch: 45 }  // Slogan
+      { wch: 32 }  // Representantes
     ];
 
     const wb = window.XLSX.utils.book_new();
@@ -93,8 +88,7 @@
       'Turno',
       'Cor',
       'Tutor / Professor',
-      'Representantes',
-      'Slogan / Grito de Guerra'
+      'Representantes'
     ];
 
     let csvContent = '\uFEFF'; // BOM para o Excel no Windows/Mac abrir com acentos corretos
@@ -245,7 +239,7 @@
         color,
         tutor,
         representatives,
-        slogan
+        slogan: slogan || ''
       });
     });
 
