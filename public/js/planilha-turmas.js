@@ -15,7 +15,6 @@
       'Turma': '3ª Série A',
       'Segmento': 'Ensino Médio',
       'Turno': 'Matutino',
-      'Cor': 'Vermelho',
       'Tutor / Professor': 'Prof. André',
       'Representantes': 'Lucas Silva e Camila Costa'
     },
@@ -24,7 +23,6 @@
       'Turma': '2ª Série A',
       'Segmento': 'Ensino Médio',
       'Turno': 'Matutino',
-      'Cor': 'Azul',
       'Tutor / Professor': 'Prof.ª Renata',
       'Representantes': 'Gabriel Santos e Mariana Lima'
     },
@@ -33,7 +31,6 @@
       'Turma': '1ª Série A',
       'Segmento': 'Ensino Médio',
       'Turno': 'Matutino',
-      'Cor': 'Verde',
       'Tutor / Professor': 'Prof. Carlos',
       'Representantes': 'Felipe Rocha e Beatriz Souza'
     },
@@ -42,7 +39,6 @@
       'Turma': '9º Ano A',
       'Segmento': 'Ensino Fundamental II',
       'Turno': 'Matutino',
-      'Cor': 'Dourado',
       'Tutor / Professor': 'Prof. Marcos',
       'Representantes': 'Pedro Henrique e Sofia Ramos'
     }
@@ -70,7 +66,6 @@
       { wch: 14 }, // Turma
       { wch: 24 }, // Segmento
       { wch: 14 }, // Turno
-      { wch: 14 }, // Cor
       { wch: 20 }, // Tutor
       { wch: 32 }  // Representantes
     ];
@@ -86,7 +81,6 @@
       'Turma',
       'Segmento',
       'Turno',
-      'Cor',
       'Tutor / Professor',
       'Representantes'
     ];
