@@ -347,7 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (prova.type === 'elixo_pesagem') modeText = '1 kg = 1 pt + Bônus';
     else if (prova.type === 'rubrica_elixo_mob') modeText = 'Rubrica Mobilização (Até 100 pts)';
 
-    if (heroProvaMode) heroProvaMode.innerText = `Modo: ${modeText}`;
+    const isMulti = state.isMultiJudgeProva(form.provaId);
+    const judgeRuleText = isMulti 
+      ? ' • <span style="color:#c084fc; font-weight:700;">⚖️ Avaliação em Banca (Múltiplos Jurados com Média)</span>'
+      : ' • <span style="color:#38bdf8; font-weight:700;">👤 Juiz Único (1 Nota Oficial por Equipe)</span>';
+
+    if (heroProvaMode) heroProvaMode.innerHTML = `Modo: ${modeText}${judgeRuleText}`;
     if (heroProvaDesc) heroProvaDesc.innerHTML = `<strong>Regra do Edital:</strong> ${prova.description}`;
 
     // Mostra/oculta botão de critérios se for pesagem pura
@@ -669,22 +674,34 @@ document.addEventListener('DOMContentLoaded', () => {
       activeTeamChipLabel.innerHTML = `Turma: <span style="color: ${currentTeam.color}; font-weight:800;">${currentTeam.turma} • ${currentTeam.name}</span>`;
     }
 
+    const isMulti = state.isMultiJudgeProva(form.provaId);
+    const judge = state.getLoggedInJudge();
+
     teamGrid.innerHTML = filteredTeams.map((t) => {
       const isSelected = t.id === form.teamId;
       const score = state.getTeamScore(t.id, form.provaId);
       const isEvaluated = score !== null;
 
       let statusBadge = '';
-      if (isPesagem) {
-        if (t.pesoELixoKg > 0) {
-          statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">${t.pesoELixoKg} kg</span>`;
+      if (isMulti) {
+        // Apresentação com Paródia: banca com múltiplos juízes
+        const myScore = judge ? state.getTeamScore(t.id, form.provaId, judge.id || judge.name) : null;
+        const allScoresForTeam = state.getScores().filter((s) => s.teamId === t.id && s.provaId === form.provaId);
+        const countJudges = allScoresForTeam.length;
+
+        if (myScore) {
+          statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">Sua nota: ${myScore.points} pts (${countJudges} na banca)</span>`;
+        } else if (countJudges > 0) {
+          statusBadge = `<span style="font-size: 0.68rem; color: #38bdf8; font-weight: 600;">${countJudges} jurado(s) já avaliaram</span>`;
         } else {
-          statusBadge = `<span style="font-size: 0.68rem; color: #94a3b8;">Sem pesagem</span>`;
+          statusBadge = `<span style="font-size: 0.68rem; color: #fbbf24;">Pendente</span>`;
         }
       } else {
+        // As outras 9 provas: Juiz Único (1 nota oficial por equipe)
         if (isEvaluated) {
-          const rubricPart = score.rubricScore !== undefined ? ` (Rubrica: ${score.rubricScore})` : '';
-          statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">${score.points} pts${rubricPart}</span>`;
+          const rubricPart = score.rubricScore !== undefined && score.rubricScore !== score.points ? ` (Rubrica: ${score.rubricScore})` : '';
+          const judgeNameTag = score.judgeName ? ` [${score.judgeName}]` : '';
+          statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">${score.points} pts${rubricPart}${judgeNameTag}</span>`;
         } else {
           statusBadge = `<span style="font-size: 0.68rem; color: #fbbf24;">Pendente</span>`;
         }
@@ -725,7 +742,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadExistingScoreForTeam(teamId) {
-    const existing = state.getTeamScore(teamId, form.provaId);
+    const judge = state.getLoggedInJudge();
+    const isMulti = state.isMultiJudgeProva(form.provaId);
+    const existing = isMulti && judge 
+      ? state.getTeamScore(teamId, form.provaId, judge.id || judge.name) 
+      : state.getTeamScore(teamId, form.provaId);
+
     if (existing && !existing.isWeight) {
       if (existing.criteriaDetails) {
         form.criteriaValues = { ...existing.criteriaDetails };
@@ -736,6 +758,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (noteInput && existing.note) {
         noteInput.value = existing.note;
       }
+    } else {
+      form.criteriaValues = {};
+      form.directPlace = 1;
+      if (noteInput) noteInput.value = '';
     }
   }
 
@@ -1233,6 +1259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.addScore({
           teamId: form.teamId,
           provaId: form.provaId,
+          judgeId: judge.id,
           judgeName: judge.name,
           points: total,
           rubricScore: rubricTotal,

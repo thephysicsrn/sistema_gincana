@@ -673,6 +673,12 @@ class GincanaState {
     return this.data.judges || [];
   }
 
+  isMultiJudgeProva(provaId) {
+    // Apresentação com paródia: banca com múltiplos juízes (calcula a média das notas)
+    // Recicla Tech, Xadrez, Prova Social, Desafio E-Lixo, Quiz, Complete a música, Corrida do arco, Estoura o balão, Ping Pong: apenas um juiz lança a nota para cada equipe
+    return provaId === 'p_parodia';
+  }
+
   getScores() {
     return this.data.scores || [];
   }
@@ -681,29 +687,40 @@ class GincanaState {
     return this.data.penalties || [];
   }
 
-  getTeamScore(teamId, provaId) {
-    if (provaId === 'prova_elixo_pesagem') {
-      const team = this.getTeam(teamId);
-      return team && team.pesoELixoKg > 0 ? { points: team.pesoELixoKg, isWeight: true } : null;
+  getTeamScore(teamId, provaId, specificJudge = null) {
+    const scores = (this.data.scores || []).filter((s) => s.teamId === teamId && s.provaId === provaId);
+    if (scores.length === 0) return null;
+
+    if (this.isMultiJudgeProva(provaId)) {
+      if (specificJudge) {
+        const found = scores.find((s) => (s.judgeId && s.judgeId === specificJudge) || s.judgeName === specificJudge);
+        if (found) return found;
+      }
+      // Retorna a média da banca julgadora
+      const totalPoints = scores.reduce((acc, s) => acc + Number(s.points || 0), 0);
+      const totalRubric = scores.reduce((acc, s) => acc + Number(s.rubricScore || s.points || 0), 0);
+      const avgPoints = Math.round((totalPoints / scores.length) * 10) / 10;
+      const avgRubric = Math.round((totalRubric / scores.length) * 10) / 10;
+
+      return {
+        teamId,
+        provaId,
+        points: avgPoints,
+        rubricScore: avgRubric,
+        judgesCount: scores.length,
+        judgesNames: scores.map((s) => s.judgeName).join(', '),
+        isMultiJudgeAverage: true,
+        scoresList: scores
+      };
     }
-    return (this.data.scores || []).find((s) => s.teamId === teamId && s.provaId === provaId) || null;
+
+    // Prova de juiz único
+    return scores[0];
   }
 
   getProvaScores(provaId) {
-    if (provaId === 'prova_elixo_pesagem') {
-      const { bonusMap, rankMap } = this.getELixoRankingsAndBonus();
-      return this.getTeams().map((t) => ({
-        id: 'elixo_' + t.id,
-        teamId: t.id,
-        provaId: 'prova_elixo_pesagem',
-        judgeName: 'Comissão de Pesagem',
-        pesoKg: Number(t.pesoELixoKg || 0),
-        points: Number(t.pesoELixoKg || 0) + (bonusMap[t.id] || 0),
-        bonus: bonusMap[t.id] || 0,
-        rank: rankMap[t.id] || null,
-        isWeight: true,
-        evaluated: Number(t.pesoELixoKg || 0) > 0
-      })).filter((s) => s.pesoKg > 0);
+    if (this.isMultiJudgeProva(provaId)) {
+      return this.getTeams().map((t) => this.getTeamScore(t.id, provaId)).filter(Boolean);
     }
     return (this.data.scores || []).filter((s) => s.provaId === provaId);
   }
@@ -895,14 +912,17 @@ class GincanaState {
     const team = this.getTeam(teamId);
     if (!team) return null;
 
-    const scores = this.getScores().filter((s) => s.teamId === teamId);
+    const provas = this.getProvas();
     let pontosDemaisProvas = 0;
     const byProva = {};
 
-    scores.forEach((s) => {
-      const pts = Number(s.points || 0);
-      pontosDemaisProvas += pts;
-      byProva[s.provaId] = (byProva[s.provaId] || 0) + pts;
+    provas.forEach((p) => {
+      const sc = this.getTeamScore(teamId, p.id);
+      if (sc && sc.points !== undefined && sc.points !== null) {
+        const pts = Number(sc.points || 0);
+        pontosDemaisProvas += pts;
+        byProva[p.id] = pts;
+      }
     });
 
     const totalPenalidades = this.getTeamPenalties(teamId);
@@ -991,18 +1011,20 @@ class GincanaState {
   /**
    * Adiciona ou atualiza nota lançada por um juiz
    */
-  addScore({ teamId, provaId, judgeName, points, criteriaDetails = {}, rubricScore = 0, placeInProva = null, note = '' }) {
+  addScore({ teamId, provaId, judgeId = null, judgeName, points, criteriaDetails = {}, rubricScore = 0, placeInProva = null, note = '' }) {
     if (!teamId || !provaId) {
       throw new Error('Equipe e Prova são obrigatórios.');
     }
 
     const calculatedPoints = Math.round(Number(points || 0) * 10) / 10;
+    const finalJudgeName = (judgeName || 'Comissão Avaliadora').trim();
 
     const newScore = {
       id: 'sc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       teamId,
       provaId,
-      judgeName: judgeName || 'Comissão Avaliadora',
+      judgeId: judgeId || null,
+      judgeName: finalJudgeName,
       points: calculatedPoints,
       rubricScore: Number(rubricScore || calculatedPoints),
       placeInProva,
@@ -1012,13 +1034,30 @@ class GincanaState {
     };
 
     if (!this.data.scores) this.data.scores = [];
-    
-    // Substitui lançamento anterior da mesma equipe e prova se houver, ou adiciona
-    const existingIdx = this.data.scores.findIndex((s) => s.teamId === teamId && s.provaId === provaId);
-    if (existingIdx !== -1) {
-      this.data.scores[existingIdx] = newScore;
+
+    const isMultiJudge = this.isMultiJudgeProva(provaId);
+
+    if (isMultiJudge) {
+      // Paródia: banca com múltiplos juízes. Cada juiz tem sua própria nota para a equipe.
+      const existingIdx = this.data.scores.findIndex((s) => 
+        s.teamId === teamId && 
+        s.provaId === provaId && 
+        ((judgeId && s.judgeId === judgeId) || s.judgeName === finalJudgeName)
+      );
+
+      if (existingIdx !== -1) {
+        this.data.scores[existingIdx] = newScore;
+      } else {
+        this.data.scores.unshift(newScore);
+      }
     } else {
-      this.data.scores.unshift(newScore);
+      // As outras 9 provas: apenas UM juiz lança a nota para cada equipe (nota única)
+      const existingIdx = this.data.scores.findIndex((s) => s.teamId === teamId && s.provaId === provaId);
+      if (existingIdx !== -1) {
+        this.data.scores[existingIdx] = newScore;
+      } else {
+        this.data.scores.unshift(newScore);
+      }
     }
 
     // Verifica se houve mudança de liderança geral para acionar fanfarra e confetes

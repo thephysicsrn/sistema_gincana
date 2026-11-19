@@ -287,7 +287,12 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (prova.type === 'elixo_pesagem') modeText = '1 kg = 1 pt + Bônus';
     else if (prova.type === 'rubrica_elixo_mob') modeText = 'Rubrica Mobilização (Até 100 pts)';
 
-    if (heroMode) heroMode.innerText = `Modo: ${modeText}`;
+    const isMulti = state.isMultiJudgeProva(prova.id);
+    const judgeRuleText = isMulti 
+      ? ' • <span style="color:#c084fc; font-weight:700;">⚖️ Avaliação em Banca (Múltiplos Jurados com Média)</span>'
+      : ' • <span style="color:#38bdf8; font-weight:700;">👤 Juiz Único (1 Nota Oficial por Equipe)</span>';
+
+    if (heroMode) heroMode.innerHTML = `Modo: ${modeText}${judgeRuleText}`;
     if (heroDesc) heroDesc.innerHTML = `<strong>Regra do Edital:</strong> ${prova.description}`;
 
     if (btnCriteria) {
@@ -534,21 +539,34 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const isMulti = state.isMultiJudgeProva(provaId);
+    const selectedJudge = judgeFormState.selectedJudge;
+
     teamGrid.innerHTML = filtered.map((t) => {
       const isSelected = t.id === judgeFormState.selectedTeamId;
       const score = state.getTeamScore(t.id, provaId);
       const isEvaluated = score !== null;
 
       let badge = '';
-      if (isPesagem) {
-        badge = t.pesoELixoKg > 0 
-          ? `<span style="font-size: 0.7rem; color: #34d399; font-weight: 700;">${t.pesoELixoKg} kg</span>`
-          : `<span style="font-size: 0.7rem; color: #94a3b8;">Sem pesagem</span>`;
+      if (isMulti) {
+        const myScore = selectedJudge ? state.getTeamScore(t.id, provaId, selectedJudge) : null;
+        const allScoresForTeam = state.getScores().filter((s) => s.teamId === t.id && s.provaId === provaId);
+        const countJudges = allScoresForTeam.length;
+
+        if (myScore) {
+          badge = `<span style="font-size: 0.7rem; color: #34d399; font-weight: 700;">Sua nota: ${myScore.points} (${countJudges} na banca)</span>`;
+        } else if (countJudges > 0) {
+          badge = `<span style="font-size: 0.7rem; color: #38bdf8; font-weight: 600;">${countJudges} jurado(s) avaliaram</span>`;
+        } else {
+          badge = `<span style="font-size: 0.7rem; color: #fbbf24;">Pendente</span>`;
+        }
       } else {
-        const rubricPart = (isEvaluated && score.rubricScore !== undefined) ? ` (${score.rubricScore} pts rubrica)` : '';
-        badge = isEvaluated
-          ? `<span style="font-size: 0.7rem; color: #34d399; font-weight: 700;">${score.points} pts${rubricPart}</span>`
-          : `<span style="font-size: 0.7rem; color: #fbbf24;">Pendente</span>`;
+        if (isEvaluated) {
+          const judgeWhoScored = score.judgeName ? ` [${score.judgeName}]` : '';
+          badge = `<span style="font-size: 0.7rem; color: #34d399; font-weight: 700;">${score.points} pts${judgeWhoScored}</span>`;
+        } else {
+          badge = `<span style="font-size: 0.7rem; color: #fbbf24;">Pendente</span>`;
+        }
       }
 
       return `
@@ -585,7 +603,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadExistingScoreDesktop(teamId) {
-    const existing = state.getTeamScore(teamId, judgeFormState.selectedProvaId);
+    const isMulti = state.isMultiJudgeProva(judgeFormState.selectedProvaId);
+    const selectedJudge = judgeFormState.selectedJudge;
+    const existing = isMulti && selectedJudge 
+      ? state.getTeamScore(teamId, judgeFormState.selectedProvaId, selectedJudge)
+      : state.getTeamScore(teamId, judgeFormState.selectedProvaId);
+
     if (existing && !existing.isWeight) {
       if (existing.criteriaDetails) {
         judgeFormState.criteriaValues = { ...existing.criteriaDetails };
@@ -594,9 +617,14 @@ document.addEventListener('DOMContentLoaded', () => {
         judgeFormState.directPlace = existing.placeInProva;
       }
       const noteEl = document.getElementById('input-judge-note');
-      if (noteEl && existing.note) {
-        noteEl.value = existing.note;
+      if (noteEl) {
+        noteEl.value = existing.note || '';
       }
+    } else {
+      judgeFormState.criteriaValues = {};
+      judgeFormState.directPlace = 1;
+      const noteEl = document.getElementById('input-judge-note');
+      if (noteEl) noteEl.value = '';
     }
   }
 
