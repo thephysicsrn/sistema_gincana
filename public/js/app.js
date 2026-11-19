@@ -142,16 +142,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lista Geral
     const listEl = document.getElementById('leaderboard-list');
     if (listEl) {
-      const leaderPoints = rankings[0].totalPoints || 1;
+      const leaderPoints = (rankings[0] && rankings[0].totalPoints) ? rankings[0].totalPoints : 0;
 
       listEl.innerHTML = rankings.map((team) => {
-        const percent = Math.min(100, Math.max(15, Math.round((team.totalPoints / leaderPoints) * 100)));
+        const percent = (leaderPoints > 0 && team.totalPoints > 0)
+          ? Math.min(100, Math.max(8, Math.round((team.totalPoints / leaderPoints) * 100)))
+          : 0;
         let rankBadgeClass = '';
         if (team.rank === 1) rankBadgeClass = 'gold';
         else if (team.rank === 2) rankBadgeClass = 'silver';
         else if (team.rank === 3) rankBadgeClass = 'bronze';
 
-        const diffText = team.rank === 1 ? 'Líder da Gincana' : `-${team.diffToLeader} pts`;
+        let diffText = '';
+        if (leaderPoints === 0 && team.totalPoints === 0) {
+          diffText = 'Aguardando notas';
+        } else if (team.rank === 1 || team.totalPoints === leaderPoints) {
+          diffText = team.rank === 1 ? 'Líder da Gincana' : 'Empatada na liderança';
+        } else {
+          diffText = `-${team.diffToLeader} pts`;
+        }
 
         return `
           <div class="team-row-card" style="--team-color: ${team.color}">

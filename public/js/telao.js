@@ -236,7 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function createSlidingTeamCardHtml(team, maxPoints) {
-    const percent = Math.min(100, Math.max(12, Math.round((team.totalPoints / (maxPoints || 1)) * 100)));
+    const hasPoints = maxPoints > 0 && team.totalPoints > 0;
+    const percent = hasPoints ? Math.min(100, Math.max(8, Math.round((team.totalPoints / maxPoints) * 100))) : 0;
     let rankBadgeClass = 'rank-other';
     let rankLabel = `#${team.rank}`;
     if (team.rank === 1) {
@@ -250,9 +251,14 @@ document.addEventListener('DOMContentLoaded', () => {
       rankLabel = '#3';
     }
 
-    const diffText = team.rank === 1 
-      ? 'LÍDER DA GINCANA' 
-      : `-${(maxPoints - team.totalPoints).toLocaleString('pt-BR')} PTS DA LIDERANÇA`;
+    let diffText = '';
+    if (maxPoints === 0 && team.totalPoints === 0) {
+      diffText = 'AGUARDANDO NOTAS';
+    } else if (team.rank === 1 || team.totalPoints === maxPoints) {
+      diffText = team.rank === 1 ? 'LÍDER DA GINCANA' : 'EMPATADA NA LIDERANÇA';
+    } else {
+      diffText = `-${(maxPoints - team.totalPoints).toLocaleString('pt-BR')} PTS DA LIDERANÇA`;
+    }
 
     return `
       <div class="sliding-team-card" style="--team-color: ${team.color};">

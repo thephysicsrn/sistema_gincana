@@ -1398,14 +1398,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
 
     // Lista Geral de Todas as Equipes
-    const leaderPoints = (rankings[0] && rankings[0].totalPoints) ? rankings[0].totalPoints : 1;
+    const leaderPoints = (rankings[0] && rankings[0].totalPoints) ? rankings[0].totalPoints : 0;
 
     judgeRankingList.innerHTML = rankings.map((team) => {
-      const percent = Math.min(100, Math.max(10, Math.round((team.totalPoints / leaderPoints) * 100)));
       const isLeader = team.rank === 1;
       const rankBadgeColor = team.rank === 1 ? '#facc15' : team.rank === 2 ? '#cbd5e1' : team.rank === 3 ? '#f97316' : '#64748b';
       const rankBadgeBg = team.rank === 1 ? 'rgba(234,179,8,0.15)' : team.rank === 2 ? 'rgba(203,213,225,0.15)' : team.rank === 3 ? 'rgba(249,115,22,0.15)' : 'rgba(100,116,139,0.15)';
-      const diffText = isLeader ? 'Líder do Placar' : `-${team.diffToLeader} pts do líder`;
+
+      let diffText = '';
+      if (leaderPoints === 0 && team.totalPoints === 0) {
+        diffText = 'Aguardando notas';
+      } else if (isLeader || team.totalPoints === leaderPoints) {
+        diffText = isLeader ? 'Líder do Placar' : 'Empatada na liderança';
+      } else {
+        diffText = `-${team.diffToLeader} pts do líder`;
+      }
 
       return `
         <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid ${team.color || '#3b82f6'}; border-radius: 8px; padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 0.45rem;">
