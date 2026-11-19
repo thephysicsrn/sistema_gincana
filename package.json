@@ -1,0 +1,22 @@
+{
+  "name": "sistema-gincana-escolar",
+  "version": "1.0.0",
+  "description": "Sistema completo para pontuação e placar de gincana escolar em tempo real",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "gincana",
+    "escola",
+    "placar",
+    "juiz",
+    "pontuacao"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.22.0"
+  }
+}

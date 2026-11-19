@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor da Gincana - SESI CONECTA 2026</title>
+  <meta name="description" content="Painel de Gestão e Coordenação Central da Gincana SESI CONECTA 2026. Acompanhamento em tempo real, presença dos avaliadores, matriz de pendências, controle do telão e configurações do evento.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231e3a8a%22/><text x=%2250%22 y=%2265%22 font-family=%22sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffffff%22>S</text></svg>">
+  <style>
+    /* =======================================================================
+       1. TELA DE LOGIN DO GESTOR COM PIN MASTER (MODAL FIXO)
+       ======================================================================= */
+    .pin-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, #172554 0%, #030712 85%);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      backdrop-filter: blur(25px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .pin-overlay.hidden {
+      display: none !important;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pin-card {
+      background: rgba(15, 23, 42, 0.94);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 2.2rem 2rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+    }
+    .pin-dots-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .pin-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+    .pin-dot.filled {
+      background: #3b82f6;
+      border-color: #60a5fa;
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.8);
+      transform: scale(1.15);
+    }
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      max-width: 280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .key-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .key-btn:active, .key-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #3b82f6;
+      transform: scale(0.96);
+    }
+    .key-btn.key-action {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+
+    /* =======================================================================
+       2. CABEÇALHO SUPERIOR COMPACTO E ELEGANTE
+       ======================================================================= */
+    .gestor-header {
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.85rem 1.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .gestor-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .gestor-badge-corp {
+      background: #1e3a8a;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+    }
+
+    /* =======================================================================
+       3. NAVEGAÇÃO PRINCIPAL EM ABAS SEGREGADAS
+       ======================================================================= */
+    .gestor-nav-container {
+      background: rgba(10, 14, 23, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.5rem 1.75rem;
+      position: sticky;
+      top: 61px;
+      z-index: 990;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+    }
+    .gestor-nav-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .gestor-nav-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+    .gestor-nav-tabs {
+      display: flex;
+      gap: 0.45rem;
+      width: 100%;
+      min-width: max-content;
+    }
+    .gestor-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 0.55rem 0.95rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .gestor-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .gestor-tab-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #3b82f6;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45);
+    }
+    .tab-index-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    /* Indicadores de Status */
+    .pulse-online {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseGreen 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .dot-offline {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.85rem;
+    }
+    .matrix-table th, .matrix-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+    .matrix-table th {
+      background: rgba(15, 23, 42, 0.85);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+    .matrix-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .status-badge-concluido {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      letter-spacing: 0.3px;
+    }
+    .status-badge-pendente {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      letter-spacing: 0.3px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="theme-stadium-dark">
+
+  <!-- ========================================================================= -->
+  <!-- TELA DE LOGIN DO GESTOR COM PIN MASTER (MODAL FIXO COM BACKDROP BLUR)     -->
+  <!-- ========================================================================= -->
+  <div id="gestor-pin-overlay" class="pin-overlay">
+    <div class="pin-card">
+      <div style="font-weight: 900; font-size: 0.85rem; letter-spacing: 2px; color: #60a5fa; text-transform: uppercase; margin-bottom: 0.5rem;">
+        SESI CONECTA 2026
+      </div>
+      <h2 style="font-size: 1.45rem; font-weight: 900; margin-bottom: 0.25rem;">Painel da Coordenação</h2>
+      <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        Acesso restrito à Coordenação Geral e Comissão Central
+      </p>
+
+      <div style="background: rgba(255, 255, 255, 0.04); padding: 0.75rem; border-radius: 6px; margin-bottom: 1.25rem; font-size: 0.8rem; color: #94a3b8; border-left: 3px solid #3b82f6;">
+        PIN Padrão Inicial: <code>9999</code> (redefinível na aba de configurações).
+      </div>
+
+      <div class="pin-dots-container">
+        <span class="pin-dot" id="gdot-0"></span>
+        <span class="pin-dot" id="gdot-1"></span>
+        <span class="pin-dot" id="gdot-2"></span>
+        <span class="pin-dot" id="gdot-3"></span>
+      </div>
+
+      <div id="gestor-pin-error" class="pin-error-msg" style="min-height: 20px; font-weight: 700; color: #ef4444; margin-bottom: 1rem; font-size: 0.85rem;"></div>
+
+      <div class="pin-keypad">
+        <button class="key-btn" data-key="1">1</button>
+        <button class="key-btn" data-key="2">2</button>
+        <button class="key-btn" data-key="3">3</button>
+        <button class="key-btn" data-key="4">4</button>
+        <button class="key-btn" data-key="5">5</button>
+        <button class="key-btn" data-key="6">6</button>
+        <button class="key-btn" data-key="7">7</button>
+        <button class="key-btn" data-key="8">8</button>
+        <button class="key-btn" data-key="9">9</button>
+        <button class="key-btn key-action" data-key="clear" title="Limpar">Limpar</button>
+        <button class="key-btn" data-key="0">0</button>
+        <button class="key-btn key-action" data-key="backspace" title="Apagar">Apagar</button>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: center;">
+        <a href="index.html" class="btn-clean" style="font-size: 0.85rem; color: #94a3b8; text-decoration: none;">
+          Voltar ao Placar Oficial
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. CABEÇALHO SUPERIOR INSTITUCIONAL DO GESTOR                             -->
+  <!-- ========================================================================= -->
+  <header class="gestor-header">
+    <div class="gestor-brand">
+      <div class="gestor-badge-corp">SESI ESCOLA</div>
+      <div>
+        <div style="font-weight: 900; font-size: 1.05rem; letter-spacing: -0.3px; display: flex; align-items: center; gap: 0.5rem;">
+          <span id="header-event-title">SESI CONECTA 2026</span>
+          <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); font-size: 0.7rem; font-weight: 800;">GESTÃO CENTRAL</span>
+        </div>
+        <div id="header-unit-subtitle" style="font-size: 0.75rem; color: var(--text-secondary);">
+          Coordenação Geral • Unidade Operacional
+        </div>
+      </div>
+    </div>
+
+    <!-- Ações e Links Rápidos do Gestor -->
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <a href="telao.html" target="_blank" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; font-weight: 800;" title="Abrir Telão da Quadra em Nova Aba">
+        Abrir Telão da Quadra
+      </a>
+      <a href="index.html" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Placar Geral">
+        Placar Oficial
+      </a>
+      <a href="juiz.html" target="_blank" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Portal do Avaliador">
+        Portal do Juiz
+      </a>
+      <button id="btn-gestor-logout" class="btn btn-outline" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; border-color: #ef4444; color: #f87171;" title="Encerrar Sessão">
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. NAVEGAÇÃO PRINCIPAL EM 7 ABAS TOTALMENTE SEGREGADAS                     -->
+  <!-- ========================================================================= -->
+  <nav class="gestor-nav-container">
+    <div class="gestor-nav-tabs">
+      <button class="gestor-tab-btn active" data-tab="tab-telao-control">
+        <span class="tab-index-badge">1</span> Controle do Telão
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-online-judges">
+        <span class="tab-index-badge">2</span> Status dos Avaliadores
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-matrix">
+        <span class="tab-index-badge">3</span> Matriz de Respostas
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-audit">
+        <span class="tab-index-badge">4</span> Auditoria de Notas
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-judges-crud">
+        <span class="tab-index-badge">5</span> Avaliadores & PINs
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-teams-crud">
+        <span class="tab-index-badge">6</span> Equipes & Turmas
+      </button>
+      <button class="gestor-tab-btn" data-tab="tab-config">
+        <span class="tab-index-badge">7</span> Configurações Gerais
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- 3. CONTEÚDO PRINCIPAL (CADA ABA EM SEU PRÓPRIO ESPAÇO)                     -->
+  <!-- ========================================================================= -->
+  <main style="max-width: 1400px; margin: 0 auto; padding: 1.75rem 1.25rem;">
+
+    <!-- ======================================================================= -->
+    <!-- ABA 1: CONTROLE EXCLUSIVO DO TELÃO E TRANSMISSÃO                        -->
+    <!-- ======================================================================= -->
+    <section id="tab-telao-control" class="gestor-tab-content">
+      <div class="glass-card" style="padding: 2rem; margin-bottom: 1.5rem; border-left: 4px solid #2563eb;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #60a5fa;">MÓDULO DE TRANSMISSÃO AO VIVO</span>
+            <h2 style="font-size: 1.6rem; font-weight: 900; margin-top: 0.25rem;">Controle de Exibição do Telão da Quadra</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.35rem; max-width: 750px;">
+              Gerencie o que o público e as turmas visualizam na quadra. Bloqueie as notas para exibir apenas a Logo Oficial durante a apuração e dispare o show de revelação animada no momento da premiação.
+            </p>
+          </div>
+          <div>
+            <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--text-secondary); font-weight: 700; margin-bottom: 0.35rem;">Status Atual da Transmissão:</div>
+            <span id="telao-status-badge" class="status-badge-concluido" style="font-size: 0.95rem; padding: 0.5rem 1.1rem; border-radius: 8px;">
+              Carregando status...
+            </span>
+          </div>
+        </div>
+
+        <!-- Painel de Ações Rápidas do Telão -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
+          
+          <!-- Opção 1: Bloquear e mostrar Logo -->
+          <div class="glass-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.6); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">Modo de Espera</div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Exibir Apenas Logo no Telão</h3>
+              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+                Oculta totalmente o pódio e o quadro geral na quadra. O telão exibe exclusivamente o brasão do SESI com efeitos de luz e a mensagem "Apuração Oficial em Andamento".
+              </p>
+            </div>
+            <button id="btn-telao-set-standby" class="btn btn-secondary" style="margin-top: 1.25rem; width: 100%; font-weight: 700;">
+              Bloquear e Exibir Logo
+            </button>
+          </div>
+
+          <!-- Opção 2: Liberar Resultados com Animação -->
+          <div class="glass-card" style="padding: 1.5rem; background: rgba(6, 78, 59, 0.25); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 1px;">Momento da Premiação</div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Liberar Resultados com Animação</h3>
+              <p style="font-size: 0.85rem; color: #a7f3d0; line-height: 1.4;">
+                Dispara no telão a Cerimônia Oficial de Premiação com contagem regressiva (3, 2, 1), rufar de tambores, revelação gradativa do 3º, 2º e a Apoteose do 1º Lugar com fanfarra e confetes!
+              </p>
+            </div>
+            <button id="btn-telao-release-results" class="btn btn-success" style="margin-top: 1.25rem; width: 100%; font-weight: 800; background: #059669; border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.35);">
+              Liberar Resultados com Animação
+            </button>
+          </div>
+
+          <!-- Opção 3: Liberar Ranking Deslizante Contínuo -->
+          <div class="glass-card" style="padding: 1.5rem; background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: 1px;">Transmissão Contínua</div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Liberar Ranking Deslizante</h3>
+              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+                Libera a esteira contínua e suave de todas as turmas na tela da quadra. As pontuações deslizam em loop contínuo com destaque para a liderança.
+              </p>
+            </div>
+            <button id="btn-telao-release-direct" class="btn btn-primary" style="margin-top: 1.25rem; width: 100%; font-weight: 700;">
+              Liberar Ranking Deslizante
+            </button>
+          </div>
+
+          <!-- Opção 4: Repetir Animação da Cerimônia -->
+          <div class="glass-card" style="padding: 1.5rem; background: rgba(88, 28, 135, 0.25); border: 1px solid rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 800; color: #d8b4fe; text-transform: uppercase; letter-spacing: 1px;">Reexecução</div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Repetir Show do Pódio</h3>
+              <p style="font-size: 0.85rem; color: #e9d5ff; line-height: 1.4;">
+                Reexecuta a contagem, os tambores e a revelação do campeão geral a qualquer instante para homenagens adicionais ou gravações do evento.
+              </p>
+            </div>
+            <button id="btn-telao-trigger-reveal" class="btn btn-secondary" style="margin-top: 1.25rem; width: 100%; font-weight: 700; border-color: #a855f7; color: #f3e8ff;">
+              Repetir Animação Completa
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 2: MONITOR DE PRESENÇA DOS AVALIADORES                              -->
+    <!-- ======================================================================= -->
+    <section id="tab-online-judges" class="gestor-tab-content hidden">
+      <!-- Métricas Rápidas -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Avaliadores Online</div>
+          <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem;">
+            <span id="metric-online-count" style="font-size: 2.2rem; font-weight: 900; color: #10b981;">0</span>
+            <span id="metric-total-judges" style="color: var(--text-secondary); font-size: 0.95rem;">/ 4 avaliadores</span>
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Sincronização em tempo real ativa</div>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Progresso Geral de Notas</div>
+          <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem;">
+            <span id="metric-progress-percent" style="font-size: 2.2rem; font-weight: 900; color: #3b82f6;">0%</span>
+            <span id="metric-eval-fraction" style="color: var(--text-secondary); font-size: 0.95rem;">(0 lançadas)</span>
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Total de avaliações processadas</div>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Equipes Cadastradas</div>
+          <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.35rem;">
+            <span id="metric-total-teams" style="font-size: 2.2rem; font-weight: 900; color: #f59e0b;">5</span>
+            <span style="color: var(--text-secondary); font-size: 0.95rem;">turmas ativas</span>
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Ensino Médio e Anos Finais</div>
+        </div>
+
+        <div class="glass-card" style="padding: 1.25rem;">
+          <div style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; font-weight: 700;">Conexão com Servidor</div>
+          <div style="margin-top: 0.6rem; font-weight: 700; font-size: 1.05rem;" id="metric-ws-status">
+            <span class="pulse-online"></span> Conectado
+          </div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.3rem;">Sincronismo WebSocket ativo</div>
+        </div>
+      </div>
+
+      <div class="glass-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Monitor de Presença dos Avaliadores</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
+              Acompanhamento contínuo dos membros da comissão julgadora conectados ao sistema.
+            </p>
+          </div>
+          <button id="btn-refresh-presence" class="btn btn-secondary" style="font-size: 0.8rem;">
+            Atualizar Status
+          </button>
+        </div>
+
+        <div id="judges-presence-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 3: MATRIZ DE RESPOSTAS (QUEM RESPONDEU OU NÃO)                      -->
+    <!-- ======================================================================= -->
+    <section id="tab-matrix" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Matriz de Avaliações por Prova e Equipe</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
+              Visão consolidada de todas as rubricas para identificar pendências de lançamento em tempo real.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <select id="matrix-filter-prova" class="form-input" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+              <option value="all">Todas as Provas</option>
+            </select>
+            <select id="matrix-filter-status" class="form-input" style="font-size: 0.85rem; padding: 0.4rem 0.75rem;">
+              <option value="all">Todos os Status</option>
+              <option value="pending">Apenas Pendentes</option>
+              <option value="complete">Apenas Concluídas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso da Matriz -->
+        <div style="margin-bottom: 1.5rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem;">
+            <span>Progresso da Matriz:</span>
+            <span id="matrix-progress-text">0 de 0 notas concluídas (0%)</span>
+          </div>
+          <div style="height: 10px; background: rgba(255,255,255,0.1); border-radius: 99px; overflow: hidden;">
+            <div id="matrix-progress-bar" style="height: 100%; width: 0%; background: #3b82f6; transition: width 0.3s ease;"></div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th style="width: 220px;">Prova / Atividade</th>
+                <th style="width: 180px;">Equipe / Turma</th>
+                <th style="width: 140px; text-align: center;">Status Geral</th>
+                <th style="width: 100px; text-align: center;">Progresso</th>
+                <th id="matrix-judges-header-cols">Detalhamento dos Avaliadores</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-table-body">
+              <!-- Renderizado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 4: AUDITORIA E HISTÓRICO DE NOTAS LANÇADAS                          -->
+    <!-- ======================================================================= -->
+    <section id="tab-audit" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Registro e Auditoria Oficial de Pontuações</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
+              Histórico detalhado de cada lançamento com possibilidade de retificação pela Coordenação Central.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <input type="text" id="audit-search-input" placeholder="Buscar por equipe, prova ou juiz..." class="form-input" style="font-size: 0.85rem; width: 260px;">
+            <button id="btn-export-audit-csv" class="btn btn-secondary" style="font-size: 0.8rem;">
+              Exportar Relatório CSV
+            </button>
+          </div>
+        </div>
+
+        <div id="audit-scores-container" style="overflow-x: auto;">
+          <!-- Tabela gerada via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 5: GESTÃO DE JUÍZES & CADASTRO DE PINS                              -->
+    <!-- ======================================================================= -->
+    <section id="tab-judges-crud" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Cadastro e Controle de Avaliadores</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
+              Cadastre novos membros da comissão julgadora, defina atribuições e redefina os PINs individuais.
+            </p>
+          </div>
+          <button id="btn-open-add-judge-modal" class="btn btn-primary" style="font-size: 0.85rem;">
+            + Cadastrar Novo Avaliador
+          </button>
+        </div>
+
+        <div id="judges-list-container">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 6: GESTÃO DE EQUIPES & TURMAS                                       -->
+    <!-- ======================================================================= -->
+    <section id="tab-teams-crud" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 800;">Gestão das Turmas e Equipes Participantes</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
+              Cadastre e gerencie turmas (Item 10 do Edital), cores institucionais, tutores e pesagem inicial.
+            </p>
+          </div>
+          <button id="btn-open-add-team-modal" class="btn btn-primary" style="font-size: 0.85rem;">
+            + Cadastrar Nova Turma
+          </button>
+        </div>
+
+        <div id="teams-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- ABA 7: CONFIGURAÇÕES DO EVENTO E PIN DO GESTOR                          -->
+    <!-- ======================================================================= -->
+    <section id="tab-config" class="gestor-tab-content hidden">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+        
+        <!-- Formulário de Dados do Painel -->
+        <div class="glass-card" style="padding: 1.5rem;">
+          <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Configurações Oficiais do Evento</h2>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Edite os parâmetros exibidos nos telões, portais móveis e relatórios da Gincana SESI.
+          </p>
+
+          <form id="form-panel-config">
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Nome Oficial do Evento:</label>
+              <input type="text" id="cfg-event-name" class="form-input" required>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Instituição / Mantenedora:</label>
+              <input type="text" id="cfg-institution" class="form-input" required>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+              <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Tema Oficial do Edital:</label>
+              <textarea id="cfg-edital-title" class="form-input" rows="2" required></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Unidade Operacional:</label>
+                <select id="cfg-selected-unit" class="form-input">
+                  <option value="SESI Escola São Gonçalo do Amarante">SESI São Gonçalo do Amarante</option>
+                  <option value="SESI Escola Mossoró">SESI Mossoró</option>
+                  <option value="SESI Escola Macau">SESI Macau</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Segmento Principal:</label>
+                <select id="cfg-selected-segment" class="form-input">
+                  <option value="Ensino Médio">Ensino Médio</option>
+                  <option value="Anos Finais">Anos Finais</option>
+                  <option value="Ambos">Ambos os Segmentos</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+              <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Turno:</label>
+                <input type="text" id="cfg-selected-shift" class="form-input">
+              </div>
+              <div>
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Datas de Realização:</label>
+                <input type="text" id="cfg-dates" class="form-input">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 800;">
+              Salvar Configurações do Evento
+            </button>
+          </form>
+        </div>
+
+        <!-- Alteração de PIN Mestre do Gestor & Ações Administrativas -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div class="glass-card" style="padding: 1.5rem;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">Redefinir PIN Mestre do Gestor</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+              Altere o código de 4 dígitos exigido para acessar este painel de controle.
+            </p>
+
+            <form id="form-update-gestor-pin">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                  <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Novo PIN (4 dígitos):</label>
+                  <input type="password" maxlength="4" id="input-new-gestor-pin" class="form-input" placeholder="••••" required style="font-size: 1.3rem; letter-spacing: 0.3em; text-align: center;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Confirmar Novo PIN:</label>
+                  <input type="password" maxlength="4" id="input-confirm-gestor-pin" class="form-input" placeholder="••••" required style="font-size: 1.3rem; letter-spacing: 0.3em; text-align: center;">
+                </div>
+              </div>
+              <button type="submit" class="btn btn-secondary" style="width: 100%; font-weight: 700;">
+                Atualizar Senha Mestre do Gestor
+              </button>
+            </form>
+          </div>
+
+          <!-- Zona de Ações Críticas -->
+          <div class="glass-card" style="padding: 1.5rem; border: 1px solid rgba(239, 68, 68, 0.3);">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #f87171; margin-bottom: 0.4rem;">Ações Administrativas Críticas</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+              Operações de reinicialização para ensaios prévios ou abertura oficial da gincana.
+            </p>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button id="btn-gestor-clear-scores" class="btn btn-outline" style="border-color: #ef4444; color: #f87171; font-size: 0.85rem; flex: 1;">
+                Limpar Apenas Notas Lançadas
+              </button>
+              <button id="btn-gestor-reset-all" class="btn btn-outline" style="border-color: #ef4444; color: #f87171; font-size: 0.85rem; flex: 1;">
+                Restaurar Padrão de Fábrica
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAIS DE OPERAÇÃO DO GESTOR                                              -->
+  <!-- ========================================================================= -->
+
+  <!-- Modal Cadastrar / Editar Juiz -->
+  <div id="modal-judge-crud" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 480px;">
+      <h3 id="modal-judge-title" style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">
+        Cadastrar Novo Avaliador
+      </h3>
+      <form id="form-judge-crud">
+        <input type="hidden" id="crud-judge-id">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Nome Completo do Avaliador:</label>
+          <input type="text" id="crud-judge-name" class="form-input" required placeholder="Ex: Prof. Roberto Silva">
+        </div>
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Função / Atribuição no Edital:</label>
+          <input type="text" id="crud-judge-role" class="form-input" required placeholder="Ex: Avaliador Artístico / Cultural">
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">PIN de Acesso Móvel (4 dígitos):</label>
+          <input type="password" maxlength="4" id="crud-judge-pin" class="form-input" required placeholder="••••" style="font-size: 1.3rem; letter-spacing: 0.3em; text-align: center;">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" id="btn-close-judge-modal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Avaliador</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Alterar PIN de Juiz Específico -->
+  <div id="modal-change-judge-pin" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 400px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">
+        Alterar PIN de Avaliador
+      </h3>
+      <p id="modal-change-pin-judge-name" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Nome do Avaliador
+      </p>
+      <form id="form-change-judge-pin">
+        <input type="hidden" id="change-pin-judge-id">
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Novo PIN de 4 Dígitos:</label>
+          <input type="password" maxlength="4" id="input-single-judge-pin" class="form-input" required placeholder="••••" style="font-size: 1.5rem; letter-spacing: 0.3em; text-align: center;">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" id="btn-close-change-pin-modal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Atualizar PIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Cadastrar / Editar Equipe -->
+  <div id="modal-team-crud" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 560px;">
+      <h3 id="modal-team-title" style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem;">
+        Cadastrar Nova Turma
+      </h3>
+      <form id="form-team-crud">
+        <input type="hidden" id="crud-team-id">
+        
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Nome da Equipe:</label>
+            <input type="text" id="crud-team-name" class="form-input" required placeholder="Ex: Cyber Fênix">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Sigla (2 letras):</label>
+            <input type="text" maxlength="3" id="crud-team-icon" class="form-input" required placeholder="CF" style="text-align: center; font-weight: 800; text-transform: uppercase;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Turma Escolar:</label>
+            <input type="text" id="crud-team-turma" class="form-input" required placeholder="Ex: 3ª Série A">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Segmento:</label>
+            <select id="crud-team-segmento" class="form-input">
+              <option value="Ensino Médio">Ensino Médio</option>
+              <option value="Anos Finais">Anos Finais (Fundamental)</option>
+              <option value="Geral">Geral</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Cor Principal:</label>
+            <input type="color" id="crud-team-color" class="form-input" value="#3b82f6" style="height: 42px; padding: 2px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Cor de Destaque:</label>
+            <input type="color" id="crud-team-color-end" class="form-input" value="#1d4ed8" style="height: 42px; padding: 2px;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Professor Tutor:</label>
+            <input type="text" id="crud-team-tutor" class="form-input" placeholder="Ex: Prof. Carlos">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Resíduos Eletrônicos (kg):</label>
+            <input type="number" step="0.01" id="crud-team-peso" class="form-input" placeholder="0.00">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Lema / Slogan Oficial:</label>
+          <input type="text" id="crud-team-slogan" class="form-input" placeholder="Ex: Inovação, tecnologia e sustentabilidade para transformar.">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" id="btn-close-team-modal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Equipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Retificar Nota de Auditoria -->
+  <div id="modal-edit-score" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 500px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem;">
+        Retificação de Pontuação
+      </h3>
+      <p id="edit-score-subtitle" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Turma: - | Prova: -
+      </p>
+      <form id="form-edit-score">
+        <input type="hidden" id="edit-score-id">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Pontuação Final Retificada (0 a 100):</label>
+          <input type="number" id="edit-score-points" class="form-input" min="0" max="100" required style="font-size: 1.2rem; font-weight: 800;">
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.35rem;">Justificativa Administrativa da Retificação:</label>
+          <textarea id="edit-score-note" class="form-input" rows="3" required placeholder="Descreva o motivo da alteração registrada pela coordenação..."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button type="button" id="btn-close-edit-score-modal" class="btn btn-secondary">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar Retificação</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container para Notificações Corporativas Não-Bloqueantes -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/sound.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/gestor.js"></script>
+</body>
+</html>

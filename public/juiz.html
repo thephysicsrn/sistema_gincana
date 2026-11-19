@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal do Juiz - SESI CONECTA 2026</title>
+  <meta name="description" content="Painel de avaliação exclusivo para comissão julgadora da Gincana SESI CONECTA 2026.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231e3a8a%22/><text x=%2250%22 y=%2265%22 font-family=%22sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffffff%22>J</text></svg>">
+  <style>
+    /* =========================================================================
+       DESIGN SYSTEM DO PORTAL DO JUIZ: RESPONSIVIDADE & ERGONOMIA
+       ========================================================================= */
+
+    body {
+      padding-bottom: 2.5rem;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+    }
+
+    /* Container Principal */
+    .judge-app-container {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1rem 1.25rem;
+    }
+
+    @media (max-width: 640px) {
+      .judge-app-container {
+        padding: 0.65rem;
+      }
+    }
+
+    /* Header Superior Fixo */
+    .mobile-header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-glass-bright);
+      padding: 0.75rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .mobile-header {
+        padding: 0.65rem 0.85rem;
+      }
+    }
+
+    /* Navegação Principal em Abas */
+    .judge-main-nav {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.35rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .judge-nav-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      user-select: none;
+    }
+
+    .judge-nav-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .judge-nav-tab-btn.active {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-color: #3b82f6;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Barra Compacta de Provas */
+    .judge-provas-card {
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .prova-tabs-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.35rem;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .prova-tabs-scroll::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .prova-tabs-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+    }
+
+    .prova-tab-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-glass);
+      color: var(--text-secondary);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .prova-tab-pill:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: #ffffff;
+    }
+
+    .prova-tab-pill.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: #ffffff;
+      border-color: #60a5fa;
+      box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+    }
+
+    .prova-tab-pill.completed {
+      border-left: 3px solid #10b981;
+    }
+
+    /* Sub-barra da Prova Ativa */
+    .active-prova-hero-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      margin-top: 0.65rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    /* =========================================================================
+       WORKSPACE GRID (2 COLUNAS LADO A LADO A PARTIR DE 820px)
+       ========================================================================= */
+    .judge-workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.15rem;
+      align-items: start;
+    }
+
+    @media (min-width: 820px) {
+      .judge-workspace-grid {
+        grid-template-columns: 340px 1fr;
+        gap: 1.25rem;
+      }
+
+      .judge-scoring-panel-sticky {
+        position: sticky;
+        top: 4.8rem;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .judge-workspace-grid {
+        grid-template-columns: 360px 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    /* Coluna 1: Painel das Turmas */
+    .judge-teams-panel {
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+    }
+
+    /* Filtros Rápidos Dark (Sem Botão Branco Estourado) */
+    .judge-filter-row {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.65rem;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-filter-status, .btn-filter-segment {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex: 1;
+      text-align: center;
+      user-select: none;
+    }
+
+    .btn-filter-status:hover, .btn-filter-segment:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-filter-status.active, .btn-filter-segment.active {
+      background: rgba(59, 130, 246, 0.25);
+      border-color: #3b82f6;
+      color: #93c5fd !important;
+      box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Lista Vertical de Turmas */
+    .team-selector-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: calc(100vh - 280px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    @media (max-width: 819px) {
+      .team-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        max-height: 220px;
+      }
+    }
+
+    .team-chip {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .team-chip:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .team-chip.selected {
+      border-color: var(--chip-color, #3b82f6) !important;
+      background: rgba(30, 41, 59, 0.95);
+      box-shadow: 0 0 14px var(--chip-glow, rgba(59, 130, 246, 0.25));
+    }
+
+    .team-chip.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--chip-color, #3b82f6);
+    }
+
+    /* Coluna 2: Painel de Avaliação da Turma Ativa */
+    .judge-scoring-col {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .judge-active-team-banner {
+      background: linear-gradient(135deg, rgba(30, 27, 75, 0.75) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1px solid var(--border-glass-bright);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .judge-scoring-box {
+      background: rgba(18, 24, 38, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+    }
+
+    /* Card do Total e Botão de Lançar */
+    .judge-submit-box {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+      border: 2px solid var(--border-glass-bright);
+      border-radius: var(--radius-md);
+      padding: 1.15rem 1.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 640px) {
+      .judge-submit-box {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* Gaveta de Histórico da Prova */
+    .judge-summary-drawer {
+      background: rgba(18, 24, 38, 0.7);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      margin-top: 1.5rem;
+      overflow: hidden;
+    }
+
+    .judge-summary-drawer summary {
+      padding: 0.85rem 1.25rem;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: #94a3b8;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .judge-summary-drawer summary:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* =========================================================================
+       ABA 2: PÓDIO E RANKING RESPONSIVOS
+       ========================================================================= */
+    .judge-podium-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      align-items: stretch;
+    }
+
+    .judge-podium-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 1.25rem 0.75rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .judge-podium-card.rank-1 {
+      border-color: rgba(250, 204, 21, 0.6);
+      background: linear-gradient(180deg, rgba(234, 179, 8, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%);
+      box-shadow: 0 10px 28px rgba(234, 179, 8, 0.2);
+    }
+
+    @media (min-width: 1024px) {
+      .judge-podium-card.rank-1 {
+        transform: translateY(-6px);
+      }
+    }
+
+    .judge-podium-card.rank-2 {
+      border-color: rgba(203, 213, 225, 0.45);
+      background: linear-gradient(180deg, rgba(203, 213, 225, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%);
+    }
+
+    .judge-podium-card.rank-3 {
+      border-color: rgba(217, 119, 6, 0.45);
+      background: linear-gradient(180deg, rgba(217, 119, 6, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%);
+    }
+
+    @media (max-width: 640px) {
+      .judge-podium-container {
+        gap: 0.35rem;
+      }
+      .judge-podium-card {
+        padding: 0.75rem 0.35rem;
+      }
+    }
+
+    .judge-ranking-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    @media (min-width: 1024px) {
+      .judge-ranking-list-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.85rem;
+      }
+    }
+
+    /* Modal do PIN */
+    .pin-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0a0e17 80%);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      overflow-y: auto;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .pin-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+    }
+
+    .pin-card {
+      background: rgba(18, 24, 38, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass-bright);
+      border-radius: var(--radius-lg);
+      padding: 2rem 1.75rem;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      margin: auto;
+    }
+
+    .pin-dots-container {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .pin-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .pin-dot.filled {
+      background: var(--color-primary);
+      border-color: #818cf8;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.7);
+      transform: scale(1.15);
+    }
+
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+    }
+
+    .key-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .key-btn:active, .key-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--color-primary);
+      transform: scale(0.96);
+    }
+
+    .key-btn.action-btn {
+      font-size: 1rem;
+      font-family: inherit;
+      color: #94a3b8;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       TELA DE LOGIN COM PIN DO JUIZ (BLOQUEIO DE SEGURANÇA)
+       ======================================================== -->
+  <div id="pin-login-overlay" class="pin-overlay">
+    <div class="pin-card" id="pin-login-card">
+      <div style="font-weight: 900; font-size: 0.8rem; letter-spacing: 2px; color: #818cf8; text-transform: uppercase; margin-bottom: 0.35rem;">SESI CONECTA</div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.2rem;">Portal do Avaliador</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Autenticação de Segurança da Comissão Julgadora
+      </p>
+
+      <!-- Seleção de Avaliador -->
+      <div style="text-align: left; margin-bottom: 1.25rem;">
+        <label class="form-label" for="login-judge-select" style="font-size: 0.78rem;">Selecione seu Perfil:</label>
+        <select id="login-judge-select" class="form-select" style="font-weight: 700;"></select>
+      </div>
+
+      <div style="font-size: 0.82rem; color: #a5b4fc; font-weight: 600;">
+        Digite o seu PIN de 4 dígitos:
+      </div>
+
+      <!-- Círculos de feedback visual do PIN -->
+      <div class="pin-dots-container">
+        <div class="pin-dot" id="dot-0"></div>
+        <div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div>
+        <div class="pin-dot" id="dot-3"></div>
+      </div>
+
+      <div id="pin-error-msg" style="min-height: 20px; font-size: 0.82rem; color: #f87171; font-weight: 600; margin-bottom: 0.5rem;"></div>
+
+      <!-- Teclado Touch Virtual -->
+      <div class="pin-keypad">
+        <button type="button" class="key-btn" data-key="1">1</button>
+        <button type="button" class="key-btn" data-key="2">2</button>
+        <button type="button" class="key-btn" data-key="3">3</button>
+        <button type="button" class="key-btn" data-key="4">4</button>
+        <button type="button" class="key-btn" data-key="5">5</button>
+        <button type="button" class="key-btn" data-key="6">6</button>
+        <button type="button" class="key-btn" data-key="7">7</button>
+        <button type="button" class="key-btn" data-key="8">8</button>
+        <button type="button" class="key-btn" data-key="9">9</button>
+        <button type="button" class="key-btn action-btn" data-key="clear">Limpar</button>
+        <button type="button" class="key-btn" data-key="0">0</button>
+        <button type="button" class="key-btn action-btn" data-key="backspace">Apagar</button>
+      </div>
+
+      <div style="margin-top: 1.25rem; font-size: 0.75rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+        <div>PIN padrão inicial da comissão: <strong>1234</strong></div>
+        <a href="gestor.html" style="color: #60a5fa; text-decoration: none; font-weight: 700; font-size: 0.8rem;">
+          Acesso da Coordenação Geral
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Header Superior com Perfil Autenticado -->
+  <header class="mobile-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+      <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #2563eb, #1d4ed8); display: flex; align-items: center; justify-content: center; font-weight: 900; font-family: 'Outfit'; color: #ffffff; font-size: 1.1rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(37,99,235,0.35);">
+        J
+      </div>
+      <div style="min-width: 0;">
+        <div class="mobile-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <span id="header-judge-name">Juiz Autenticado</span>
+        </div>
+        <div id="header-judge-role" style="font-size: 0.72rem; color: #34d399; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #34d399; box-shadow: 0 0 6px #34d399;"></span>
+          Conectado • SESI Escola RN
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; align-items: center; flex-shrink: 0;">
+      <a href="gestor.html" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.75rem; text-decoration: none;" title="Abrir Painel do Gestor">
+        Coordenação
+      </a>
+      <button id="btn-juiz-sound" class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.75rem; font-weight: 700;">Som</button>
+      <button id="btn-logout-judge" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 0.4rem 0.75rem;">
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="judge-app-container">
+    
+    <!-- Navegação Principal em Abas: Lançamentos vs Classificação Geral -->
+    <nav class="judge-main-nav">
+      <button type="button" class="judge-nav-tab-btn active" id="btn-tab-evaluations">
+        Lançar Avaliações por Prova
+      </button>
+      <button type="button" class="judge-nav-tab-btn" id="btn-tab-ranking">
+        Classificação das Equipes
+      </button>
+    </nav>
+
+    <!-- ========================================================
+         ABA 1: LANÇAMENTO DE NOTAS POR PROVA
+         ======================================================== -->
+    <section id="view-evaluations">
+      
+      <!-- Barra Superior de Navegação das Provas -->
+      <div class="judge-provas-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.8rem; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 0.5px;">
+            Provas da Gincana:
+          </span>
+          <span id="prova-counter-badge" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">10 provas</span>
+        </div>
+        
+        <!-- Pílulas Horizontais de Provas -->
+        <div class="prova-tabs-scroll" id="mobile-prova-tabs-container">
+          <!-- Pílulas de abas geradas via JS -->
+        </div>
+
+        <!-- Banner Informativo da Prova Ativa -->
+        <div class="active-prova-hero-card" id="active-prova-hero">
+          <div class="active-prova-title-box">
+            <h3 id="hero-prova-title" style="font-size: 1.05rem; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span id="hero-prova-icon" style="font-weight: 800; font-size: 0.85rem; background: rgba(255,255,255,0.1); padding: 0.15rem 0.45rem; border-radius: 4px;">P1</span>
+              <span id="hero-prova-name">Apresentação da Equipe com Paródia</span>
+            </h3>
+            <div class="active-prova-meta" style="font-size: 0.75rem; color: #94a3b8; display: flex; gap: 0.65rem; flex-wrap: wrap;">
+              <span class="active-prova-tag" id="hero-prova-category" style="background: rgba(99,102,241,0.2); color:#a5b4fc; padding: 2px 6px; border-radius: 4px;">Cultural</span>
+              <span id="hero-prova-anexo" style="color: #cbd5e1;">Anexo VI • Item 26</span>
+              <span id="hero-prova-mode" style="color: #38bdf8; font-weight: 700;">Modo: Rubrica (100 pts)</span>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn-open-criteria-modal" id="btn-open-criteria-settings" title="Configurar critérios da rubrica">
+              Critérios da Rubrica
+            </button>
+          </div>
+          <div id="hero-prova-desc" style="width: 100%; font-size: 0.78rem; color: #cbd5e1; line-height: 1.4; margin-top: 0.35rem; padding-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.06);">
+            Carregando detalhes do edital...
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKSPACE EM 2 COLUNAS (LADO A LADO) -->
+      <div class="judge-workspace-grid">
+
+        <!-- Coluna 1: Lista e Seleção de Turmas -->
+        <div class="judge-teams-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="form-label" style="margin-bottom: 0; font-size: 0.85rem; font-weight: 800;">
+              1. Selecione a Turma:
+            </label>
+            <span id="team-filtered-counter" style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">8 turmas</span>
+          </div>
+
+          <!-- Busca Rápida -->
+          <div style="margin-bottom: 0.5rem;">
+            <input type="text" id="team-search-input" class="form-input" placeholder="Filtrar turma (ex: 3ª A, 9º, Fênix)..." 
+                   style="font-size: 0.85rem; padding: 0.45rem 0.65rem; background: rgba(15,23,42,0.9);">
+          </div>
+
+          <!-- Filtro de Segmento -->
+          <div style="display: flex; gap: 0.25rem; margin-bottom: 0.5rem;">
+            <button type="button" class="btn-filter-segment active" data-segment="all">Todos</button>
+            <button type="button" class="btn-filter-segment" data-segment="Ensino Médio">Ens. Médio</button>
+            <button type="button" class="btn-filter-segment" data-segment="Anos Finais">Anos Finais</button>
+          </div>
+
+          <!-- Filtro de Status das Turmas (Sem fundo branco!) -->
+          <div class="judge-filter-row">
+            <button type="button" class="btn-filter-status active" data-status="all">
+              Todas (<span id="count-all">0</span>)
+            </button>
+            <button type="button" class="btn-filter-status" data-status="pending" style="color: #fbbf24;">
+              Pendentes (<span id="count-pending">0</span>)
+            </button>
+            <button type="button" class="btn-filter-status" data-status="scored" style="color: #34d399;">
+              Avaliadas (<span id="count-scored">0</span>)
+            </button>
+          </div>
+
+          <!-- Lista Vertical de Turmas -->
+          <div class="team-selector-grid" id="mobile-team-grid">
+            <!-- Chips gerados via JS -->
+          </div>
+        </div><!-- /judge-teams-panel -->
+
+        <!-- Coluna 2: Formulário de Notas da Turma Selecionada -->
+        <div class="judge-scoring-col judge-scoring-panel-sticky">
+          
+          <!-- Banner da Turma em Avaliação -->
+          <div class="judge-active-team-banner">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">
+                2. Avaliando Turma Selecionada:
+              </div>
+              <div id="active-team-chip-label" style="font-size: 1.05rem; font-weight: 900; color: #ffffff;">
+                Nenhuma turma selecionada
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Rubricas e Sliders -->
+          <div class="judge-scoring-box">
+            
+            <!-- Card da Soma Dinâmica das Rubricas -->
+            <div class="rubric-live-sum-card" id="mobile-rubric-sum-box" style="margin-bottom: 1rem; padding: 1rem;">
+              <div class="rubric-live-sum-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="rubric-live-title" style="font-size: 0.8rem; font-weight: 800; color: #cbd5e1; text-transform: uppercase;">
+                  <span>∑</span> Soma da Rubrica:
+                </div>
+                <div class="rubric-sum-large" id="live-rubric-sum-text" style="font-size: 2rem; font-weight: 900; color: #38bdf8;">
+                  0 <span style="font-size: 0.95rem; color: #94a3b8;">/ 100 pts</span>
+                </div>
+              </div>
+              <div class="rubric-progress-track" style="margin: 0.5rem 0;">
+                <div class="rubric-progress-fill" id="live-rubric-progress-bar" style="width: 0%;"></div>
+              </div>
+              <div class="rubric-formula-chips" id="live-rubric-formula-breakdown">
+                <!-- Chips com cada critério somando -->
+              </div>
+            </div>
+
+            <!-- Sliders e Controles Dinâmicos de Critérios -->
+            <div id="mobile-controls-container">
+              <!-- Critérios gerados dinamicamente via JS -->
+            </div>
+
+            <!-- Observações do Juiz -->
+            <div style="margin-top: 1rem;">
+              <label style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700;" for="mobile-note">Justificativa / Parecer do Avaliador (Opcional):</label>
+              <input type="text" id="mobile-note" class="form-input" placeholder="Ex: Ótima apresentação, tema abordado com profundidade...">
+            </div>
+          </div>
+
+          <!-- Card do Total Oficial e Confirmação de Envio -->
+          <div class="judge-submit-box">
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">
+                Total a Enviar para o Placar Oficial:
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 0.4rem;">
+                <span id="mobile-preview-total" style="font-family: 'Outfit'; font-size: 2.8rem; font-weight: 900; color: #facc15; line-height: 1;">0</span>
+                <span id="mobile-preview-info-sub" style="font-size: 0.8rem; color: #94a3b8;">pontos oficiais</span>
+              </div>
+            </div>
+            
+            <button id="btn-mobile-submit" class="btn btn-primary" style="padding: 0.85rem 1.75rem; font-size: 1rem; font-weight: 800; min-width: 220px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+              ✓ Lançar Nota Agora
+            </button>
+          </div>
+
+        </div><!-- /judge-scoring-col -->
+
+      </div><!-- /judge-workspace-grid -->
+
+      <!-- Gaveta Recolhível: Tabela Completa de Histórico Desta Prova -->
+      <details class="judge-summary-drawer">
+        <summary>
+          <span>Histórico: Turmas Avaliadas nesta Prova</span>
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-auto-rank-rubric" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;" title="Aplica a colocação oficial automaticamente pela nota da rubrica">
+            Ordenar por Rubrica
+          </button>
+        </summary>
+        <div style="padding: 1rem;" id="mobile-prova-eval-table-container">
+          <!-- Preenchido via JS -->
+        </div>
+      </details>
+
+    </section><!-- /view-evaluations -->
+
+    <!-- ========================================================
+         ABA 2: RANKING GERAL DAS EQUIPES ATUALIZADO EM TEMPO REAL
+         ======================================================== -->
+    <section id="view-ranking" class="hidden">
+      <div class="glass-card" style="padding: 1.5rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 1.5px; color: #60a5fa; text-transform: uppercase;">
+              CLASSIFICAÇÃO EM TEMPO REAL
+            </div>
+            <h3 style="font-size: 1.35rem; font-weight: 900; margin-top: 0.2rem;">Quadro Geral de Pontos</h3>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.2rem;">
+              Pontuação apurada com desempates oficiais (Anexos V, VI e XI)
+            </p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-refresh-judge-ranking" style="font-size: 0.8rem; padding: 0.5rem 1rem; font-weight: 700;">
+            Atualizar Placar
+          </button>
+        </div>
+
+        <!-- Pódio Compacto no Mobile / Destaque Amplo no Computador -->
+        <div id="judge-podium-view" class="judge-podium-container">
+          <!-- Renderizado via JS -->
+        </div>
+
+        <!-- Lista Completa da Classificação (Grid de 2 Colunas no Computador, Lista no Celular) -->
+        <div id="judge-ranking-list" class="judge-ranking-list-container">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Modal de Definição de Critérios e Rubricas da Prova -->
+  <div id="modal-criteria-editor" class="modal-backdrop modal-criteria-editor">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="criteria-editor-modal-title">Critérios da Rubrica</h3>
+        <button class="modal-close-btn" id="btn-close-criteria-editor">&times;</button>
+      </div>
+      
+      <div style="padding: 1.25rem; overflow-y: auto; max-height: calc(85vh - 120px);">
+        <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1rem;">
+          Configure os critérios que compõem a avaliação desta prova. A soma das rubricas definirá a nota e classificação final das turmas.
+        </p>
+
+        <!-- Modo de Pontuação da Prova -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.6); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+          <label class="form-label" style="font-size: 0.8rem;">Modo de Cálculo da Nota Oficial:</label>
+          <select id="edit-prova-scoring-type" class="form-select" style="font-size: 0.88rem;">
+            <option value="rubrica_colocacao">Colocação por Rubrica (Item 36: 1º=100, 2º=75, 3º=50, demais=25)</option>
+            <option value="soma_direta">Soma Direta das Rubricas (Nota Oficial = Soma dos Critérios)</option>
+            <option value="rubrica_elixo_mob">Mobilização E-Lixo (Soma até 100 pts com Teto de 50%)</option>
+            <option value="top3_zero">Top 3 com Zero (1º=100, 2º=75, 3º=50, demais=0)</option>
+            <option value="standard_colocacao">Colocação Direta Simples (1º=100, 2º=75, 3º=50, demais=25)</option>
+          </select>
+        </div>
+
+        <!-- Tabela de Critérios com Pesos -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">Critérios da Rubrica:</span>
+          <span id="criteria-editor-sum-badge" style="font-size: 0.85rem; font-weight: 800; color: #38bdf8;">
+            Soma Máxima: 100 pts
+          </span>
+        </div>
+
+        <div id="criteria-editor-rows-container" style="margin-top: 0.65rem;">
+          <!-- Linhas de critérios preenchidas via JS -->
+        </div>
+
+        <!-- Botões de Ação para Critérios -->
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-add-new-criterion">
+            + Adicionar Novo Critério
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-balance-criteria-100">
+            Balancear para 100 pts
+          </button>
+          <button type="button" class="btn btn-sm btn-danger" id="btn-reset-default-criteria" style="margin-left: auto;">
+            Restaurar Padrão do Edital
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-criteria-editor">Cancelar</button>
+        <button class="btn btn-success" id="btn-save-criteria-editor">Salvar Critérios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação Mobile -->
+  <div id="mobile-confirm-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmar Lançamento</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div id="mobile-modal-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-modal-cancel">Voltar</button>
+        <button id="btn-mobile-final-confirm" class="btn btn-success">Confirmar Lançamento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/sound.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/juiz.js"></script>
+</body>
+</html>

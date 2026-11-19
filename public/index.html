@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SESI CONECTA 2026 - Sistema Oficial de Pontuação</title>
+  <meta name="description" content="Sistema oficial de pontuação da Gincana SESI CONECTA 2026: Tecnologia que transforma, resíduo que ganha novo destino. SESI Escola RN.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231e3a8a%22/><text x=%2250%22 y=%2265%22 font-family=%22sans-serif%22 font-size=%2250%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffffff%22>S</text></svg>">
+</head>
+<body>
+
+  <!-- Barra de Notificações Toast Flutuantes -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="top-navbar">
+      <div class="brand-area">
+        <div class="brand-icon" style="background: linear-gradient(135deg, #059669 0%, #2563eb 100%); font-weight: 800;">S</div>
+        <div class="brand-info">
+          <h1>SESI CONECTA 2026</h1>
+          <span>SESI Escola RN • "Tecnologia que transforma, resíduo que ganha novo destino"</span>
+        </div>
+      </div>
+
+      <!-- Abas de Navegação -->
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab-btn active" data-tab="tab-placar" id="tab-btn-placar">
+          Placar Oficial
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-juiz" id="tab-btn-juiz">
+          Lançar Nota (Juiz)
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-planilha" id="tab-btn-planilha">
+          Planilha Geral (Anexo X)
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-penalidades" id="tab-btn-penalidades">
+          Penalidades (Item 37)
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-provas" id="tab-btn-provas">
+          Provas do Edital
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-equipes" id="tab-btn-equipes">
+          Turmas / Equipes
+        </button>
+      </nav>
+
+      <!-- Ações Rápidas -->
+      <div class="nav-actions">
+        <a href="gestor.html" class="btn" style="background: #1e3a8a; border: 1px solid rgba(59, 130, 246, 0.4); color: #fff; font-weight: 800; text-decoration: none;" title="Painel do Gestor da Gincana">
+          Painel do Gestor
+        </a>
+        <a href="juiz.html" target="_blank" class="btn btn-secondary" style="text-decoration: none;" title="Portal Exclusivo dos Juízes">
+          Portal do Juiz
+        </a>
+        <button id="btn-toggle-sound" class="btn btn-secondary" title="Ativar/Desativar Efeitos Sonoros" style="font-size: 0.8rem; font-weight: 700;">
+          Áudio
+        </button>
+        <a href="telao.html" target="_blank" class="btn btn-telao" title="Abrir telão em tela cheia para projetor ou TV">
+          Modo Telão
+        </a>
+      </div>
+    </header>
+
+    <!-- ========================================================
+         ABA 1: PLACAR OFICIAL & PÓDIO
+         ======================================================== -->
+    <main id="tab-placar" class="tab-content active">
+      <!-- Banner com Indicador Ao Vivo -->
+      <section class="hero-banner" style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%); border-color: rgba(5, 150, 105, 0.4);">
+        <div class="hero-text">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            AO VIVO • SINCRONIZADO SESI ESCOLA RN
+          </div>
+          <h2 style="margin-top: 0.6rem;">Classificação Geral das Equipes</h2>
+          <p>
+            Total apurado considerando as Provas Regulares, Campanha do E-Lixo limitada ao teto de 50%, Penalidades do Item 37 e Nota Escolar (Item 39).
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-secondary" onclick="window.gincanaConfetti.celebrate()">
+            Efeito Festivo (Confetes)
+          </button>
+        </div>
+      </section>
+
+      <!-- Pódio dos Três Primeiros Lugares -->
+      <section class="podium-container" id="podium-view">
+        <!-- Renderizado dinamicamente via app.js -->
+      </section>
+
+      <!-- Tabela / Lista Geral -->
+      <section class="leaderboard-section">
+        <div class="section-header">
+          <div class="section-title">
+            <span style="font-weight: 800; font-size: 0.85rem; background: rgba(59,130,246,0.2); color: #60a5fa; padding: 0.2rem 0.5rem; border-radius: 4px; border: 1px solid rgba(59,130,246,0.4);">TABELA</span>
+            <h3>Quadro Geral de Pontos • Critérios de Desempate (Anexo XI)</h3>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary);">
+            Atualização instantânea entre avaliadores e telão
+          </div>
+        </div>
+
+        <div class="leaderboard-list" id="leaderboard-list">
+          <!-- Renderizado dinamicamente via app.js -->
+        </div>
+      </section>
+    </main>
+
+    <!-- ========================================================
+         ABA 2: ÁREA DO JUIZ (LANÇAMENTO DE NOTAS CONFORME EDITAL)
+         ======================================================== -->
+    <section id="tab-juiz" class="tab-content" style="display: none;">
+      <div class="judge-container">
+        
+        <!-- Formulário do Juiz -->
+        <div class="judge-form-card">
+          <div class="section-title" style="margin-bottom: 1.25rem;">
+            <h3>Lançamento de Avaliação (Comissão Julgadora)</h3>
+          </div>
+
+          <div class="judge-instructions">
+            <div>
+              Selecione o <strong>Avaliador</strong>, a <strong>Equipe</strong> e a <strong>Prova Oficial</strong>. Para provas com rubrica (Paródia, Recicla-Tech, Vídeo), atribua os pontos por critério. O sistema converterá a média na pontuação oficial do Item 36 (1º=100, 2º=75, 3º=50, demais=25).
+            </div>
+          </div>
+
+          <!-- Identificação do Juiz -->
+          <div class="form-group">
+            <label class="form-label" for="judge-select">1. Avaliador / Membro da Comissão:</label>
+            <select id="judge-select" class="form-select"></select>
+          </div>
+
+          <!-- ========================================================
+               ABAS POR PROVA (SELEÇÃO RÁPIDA E DIRETA)
+               ======================================================== -->
+          <div class="prova-tabs-wrapper" style="margin-top: 1.25rem;">
+            <div class="prova-tabs-header-info">
+              <span class="prova-tabs-title">Escolha a Prova (Aba por Prova):</span>
+              <span id="desktop-prova-counter-badge" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">10 provas</span>
+            </div>
+            <div class="prova-tabs-scroll" id="desktop-prova-tabs-container">
+              <!-- Abas por prova geradas dinamicamente -->
+            </div>
+          </div>
+
+          <!-- Info Hero Box da Prova Ativa com Acesso aos Critérios -->
+          <div class="active-prova-hero-card" id="desktop-active-prova-hero" style="margin-bottom: 1.25rem;">
+            <div class="active-prova-title-box">
+              <h3 id="desktop-hero-prova-title">
+                <span id="desktop-hero-prova-icon" style="font-weight: 800; font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 0.2rem 0.4rem; border-radius: 4px;">P1</span>
+                <span id="desktop-hero-prova-name">Apresentação da Equipe com Paródia</span>
+              </h3>
+              <div class="active-prova-meta">
+                <span class="active-prova-tag" id="desktop-hero-prova-category">Cultural & Artística</span>
+                <span id="desktop-hero-prova-anexo" style="color: #cbd5e1; font-weight: 600;">Anexo VI • Item 26</span>
+                <span id="desktop-hero-prova-mode" style="color: #38bdf8; font-weight: 600;">Modo: Rubrica (100 pts)</span>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn-open-criteria-modal" id="btn-desktop-open-criteria" title="Definir os critérios e pesos da soma da rubrica">
+                Critérios da Rubrica
+              </button>
+            </div>
+            <div id="desktop-hero-prova-desc" style="width: 100%; font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; margin-top: 0.4rem; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.08);">
+              Carregando detalhes do edital...
+            </div>
+          </div>
+
+          <!-- Seleção da Equipe com Organização Avançada para Muitas Turmas -->
+          <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <label class="form-label" style="margin-bottom: 0;">2. Escolha a Turma / Equipe Avaliada:</label>
+              <span id="desktop-team-filtered-counter" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">8 turmas</span>
+            </div>
+
+            <!-- Busca Rápida -->
+            <div style="position: relative; margin-bottom: 0.65rem;">
+              <input type="text" id="desktop-team-search" class="form-input" placeholder="Filtrar equipe ou turma (ex: 3ª A, 9º, Fênix)..." 
+                     style="font-size: 0.88rem; background: rgba(15,23,42,0.9);">
+            </div>
+
+            <!-- Filtro por Segmento (Item 10) -->
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-desktop-filter-segment active" data-segment="all">Todos os Segmentos</button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-segment" data-segment="Ensino Médio">Ensino Médio</button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-segment" data-segment="Anos Finais">Anos Finais</button>
+            </div>
+
+            <!-- Abas de Status da Prova -->
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.85rem; background: rgba(0,0,0,0.35); padding: 4px; border-radius: 8px;">
+              <button type="button" class="btn btn-sm btn-desktop-filter-status active" data-status="all" style="flex: 1;">
+                Todas (<span id="desktop-count-all">0</span>)
+              </button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-status" data-status="pending" style="flex: 1; color: #fbbf24;">
+                Pendentes (<span id="desktop-count-pending">0</span>)
+              </button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-status" data-status="scored" style="flex: 1; color: #34d399;">
+                Avaliadas (<span id="desktop-count-scored">0</span>)
+              </button>
+            </div>
+
+            <div class="team-selector-grid" id="team-selector-grid" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+              <!-- Cards gerados via JS -->
+            </div>
+          </div>
+
+          <!-- Controles Dinâmicos de Pontuação (Rubricas Oficiais) -->
+          <div id="prova-controls-container">
+            <!-- Gerado dinamicamente via JS -->
+          </div>
+
+          <!-- Observações do Juiz -->
+          <div class="form-group" style="margin-top: 1.5rem;">
+            <label class="form-label" for="input-judge-note">Justificativa / Parecer do Avaliador (Opcional):</label>
+            <textarea id="input-judge-note" class="form-textarea" rows="2" placeholder="Descreva observações sobre os critérios atendidos..."></textarea>
+          </div>
+        </div>
+
+        <!-- Card Lateral de Resumo e Confirmação -->
+        <div class="judge-summary-card">
+          <div class="summary-score-display">
+            <div class="summary-total-num" id="preview-total-number">0</div>
+            <div class="summary-total-label">Pontos a Lançar na Gincana</div>
+          </div>
+
+          <div class="summary-details-list">
+            <div class="summary-detail-row">
+              <span>Equipe:</span>
+              <span id="preview-team-name">Nenhuma</span>
+            </div>
+            <div class="summary-detail-row">
+              <span>Prova:</span>
+              <span id="preview-prova-title">Nenhuma</span>
+            </div>
+            <div class="summary-detail-row">
+              <span>Avaliador:</span>
+              <span id="preview-judge-name">Não selecionado</span>
+            </div>
+          </div>
+
+          <button id="btn-submit-judge-score" class="btn-submit-score">
+            <span>✓</span> Lançar Nota Oficial
+          </button>
+          
+          <div style="text-align: center; margin-top: 1rem; font-size: 0.75rem; color: var(--text-muted);">
+            Sistema auditado conforme os parâmetros do Edital SESI CONECTA 2026.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ABA 3: PLANILHA GERAL DE APURAÇÃO (ANEXO X)
+         ======================================================== -->
+    <section id="tab-planilha" class="tab-content" style="display: none;">
+      <div id="planilha-geral-table-container">
+        <!-- Preenchido via app.js -->
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ABA 4: PENALIDADES DO ITEM 37
+         ======================================================== -->
+    <section id="tab-penalidades" class="tab-content" style="display: none;">
+      <div id="penalidades-container">
+        <!-- Preenchido via app.js -->
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ABA 5: PROVAS DO EDITAL
+         ======================================================== -->
+    <section id="tab-provas" class="tab-content" style="display: none;">
+      <div class="history-card">
+        <div class="section-header">
+          <div class="section-title">
+            <h3>Quadro Prévio de Provas (Item 23 do Edital)</h3>
+          </div>
+        </div>
+        <div id="provas-admin-list"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ABA 6: TURMAS / EQUIPES
+         ======================================================== -->
+    <section id="tab-equipes" class="tab-content" style="display: none;">
+      <div class="history-card">
+        <div class="section-header">
+          <div class="section-title">
+            <h3>Turmas e Equipes Participantes (Anexo I)</h3>
+          </div>
+        </div>
+        <div id="teams-admin-list"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Modal de Definição de Critérios e Rubricas da Prova (Admin / Juiz) -->
+  <div id="modal-criteria-editor" class="modal-backdrop modal-criteria-editor">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="criteria-editor-modal-title">Critérios da Rubrica</h3>
+        <button class="modal-close-btn" id="btn-close-criteria-editor">&times;</button>
+      </div>
+      
+      <div style="padding: 1.25rem; overflow-y: auto; max-height: calc(85vh - 120px);">
+        <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 1rem;">
+          Configure os critérios que compõem a avaliação desta prova. A soma das rubricas definirá a nota e classificação final das turmas.
+        </p>
+
+        <!-- Modo de Pontuação da Prova -->
+        <div class="form-group" style="background: rgba(15, 23, 42, 0.6); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-glass);">
+          <label class="form-label" style="font-size: 0.8rem;">Modo de Cálculo da Nota Oficial:</label>
+          <select id="edit-prova-scoring-type" class="form-select" style="font-size: 0.88rem;">
+            <option value="rubrica_colocacao">Colocação por Rubrica (Item 36: 1º=100, 2º=75, 3º=50, demais=25)</option>
+            <option value="soma_direta">Soma Direta das Rubricas (Nota Oficial = Soma dos Critérios)</option>
+            <option value="rubrica_elixo_mob">Mobilização E-Lixo (Soma até 100 pts com Teto de 50%)</option>
+            <option value="top3_zero">Top 3 com Zero (1º=100, 2º=75, 3º=50, demais=0)</option>
+            <option value="standard_colocacao">Colocação Direta Simples (1º=100, 2º=75, 3º=50, demais=25)</option>
+          </select>
+        </div>
+
+        <!-- Tabela de Critérios com Pesos -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1;">Critérios da Rubrica:</span>
+          <span id="criteria-editor-sum-badge" style="font-size: 0.85rem; font-weight: 800; color: #38bdf8;">
+            Soma Máxima: 100 pts
+          </span>
+        </div>
+
+        <div id="criteria-editor-rows-container" style="margin-top: 0.65rem;">
+          <!-- Linhas de critérios preenchidas via JS -->
+        </div>
+
+        <!-- Botões de Ação para Critérios -->
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-add-new-criterion">
+            + Adicionar Novo Critério
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" id="btn-balance-criteria-100">
+            Balancear para 100 pts
+          </button>
+          <button type="button" class="btn btn-sm btn-danger" id="btn-reset-default-criteria" style="margin-left: auto;">
+            Restaurar Padrão do Edital
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-criteria-editor">Cancelar</button>
+        <button class="btn btn-success" id="btn-save-criteria-editor">Salvar Critérios</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação do Lançamento do Juiz -->
+  <div id="confirm-score-modal" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirmação de Lançamento SESI CONECTA</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div id="confirm-modal-body"></div>
+      <div class="form-group" style="margin: 1rem 0; text-align: left; background: rgba(15,23,42,0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-glass);">
+        <label class="form-label" for="input-confirm-pin" style="font-size: 0.8rem; color: #a5b4fc;">
+          Digite o PIN de Autorização do Avaliador:
+        </label>
+        <input type="password" maxlength="4" id="input-confirm-pin" class="form-input" placeholder="••••" style="text-align: center; font-size: 1.6rem; letter-spacing: 0.3em; font-weight: 800; color: #fbbf24;">
+        <div id="pin-modal-error" style="color: #f87171; font-size: 0.8rem; font-weight: 600; margin-top: 6px; min-height: 18px;"></div>
+        <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 4px;">PIN padrão da comissão: <strong>1234</strong></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-modal-cancel">Corrigir Dados</button>
+        <button id="btn-modal-confirm-score" class="btn btn-success">Validar PIN e Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/sound.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-content').forEach(c => {
+          c.style.display = c.id === tabId ? 'block' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
