@@ -1444,6 +1444,20 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   border-left: 3px solid #34d399;
 }
 
+.prova-tab-pill.unavailable {
+  opacity: 0.55;
+  cursor: not-allowed !important;
+  border: 1px dashed rgba(239, 68, 68, 0.45);
+  background: rgba(15, 23, 42, 0.7);
+}
+
+.prova-tab-pill.unavailable:hover {
+  background: rgba(15, 23, 42, 0.7) !important;
+  color: var(--text-secondary) !important;
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  transform: none !important;
+}
+
 .prova-tab-pill .tab-badge-eval {
   font-size: 0.7rem;
   font-weight: 800;

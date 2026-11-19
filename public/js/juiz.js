@@ -293,6 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const allProvas = getAllAvailableProvas();
     const allTeams = state.getTeams();
     const totalTurmas = allTeams.length;
+    const currentJudge = state.getLoggedInJudge();
+    const judges = state.getJudges();
 
     if (provaCounterBadge) {
       provaCounterBadge.innerText = `${allProvas.length} provas`;
@@ -303,13 +305,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const scores = state.getProvaScores(p.id);
       const evaluatedCount = scores.length;
       const isComplete = evaluatedCount >= totalTurmas && totalTurmas > 0;
+      const isMulti = state.isMultiJudgeProva(p.id);
+      const assignedJudge = judges.find(j => j.assignedProvaId === p.id);
+      const isUnavailable = !isMulti && assignedJudge && (!currentJudge || currentJudge.id !== assignedJudge.id);
 
       let badgeText = `${evaluatedCount}/${totalTurmas}`;
       if (isComplete) badgeText = `Concluída (${evaluatedCount})`;
+      if (isUnavailable) badgeText = `🔒 Indisponível (${assignedJudge.name})`;
 
       return `
-        <button type="button" class="prova-tab-pill ${isActive ? 'active' : ''} ${isComplete ? 'completed' : ''}" 
-                data-prova-id="${p.id}" id="tab-pill-${p.id}">
+        <button type="button" class="prova-tab-pill ${isActive ? 'active' : ''} ${isComplete ? 'completed' : ''} ${isUnavailable ? 'unavailable' : ''}" 
+                data-prova-id="${p.id}" data-assigned-judge="${assignedJudge ? assignedJudge.name : ''}" id="tab-pill-${p.id}"
+                title="${isUnavailable ? `Prova atribuída exclusivamente a ${assignedJudge.name}` : ''}">
           <span style="font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">${p.icon || 'P'}</span>
           <span>${p.shortTitle || p.title}</span>
           <span class="tab-badge-eval" title="${evaluatedCount} de ${totalTurmas} turmas avaliadas">${badgeText}</span>
@@ -320,6 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Adiciona listener de clique em cada aba
     provaTabsContainer.querySelectorAll('.prova-tab-pill').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (btn.classList.contains('unavailable')) {
+          sound.playBuzzer();
+          alert(`Esta prova é de responsabilidade exclusiva do(a) ${btn.dataset.assignedJudge || 'outro avaliador'}. Apenas ele(a) pode lançar as notas desta prova.`);
+          return;
+        }
+
         const targetId = btn.dataset.provaId;
         if (form.provaId === targetId) return;
 

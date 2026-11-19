@@ -1504,6 +1504,11 @@ class GincanaState {
     return false;
   }
 
+  getAssignedJudgeForProva(provaId) {
+    if (!Array.isArray(this.data.judges)) return null;
+    return this.data.judges.find((j) => j.assignedProvaId === provaId) || null;
+  }
+
   // =========================================================================
   // GESTÃO DE EQUIPES / TURMAS (CADASTRO / EDIÇÃO / EXCLUSÃO)
   // =========================================================================

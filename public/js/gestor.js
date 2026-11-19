@@ -970,10 +970,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Modal Juiz (Novo / Editar)
   function openJudgeModal(judgeData = null) {
     const provas = state.getProvas();
+    const judges = state.getJudges();
+
     if (crudJudgeProva) {
       crudJudgeProva.innerHTML = `
         <option value="">-- Acesso Geral / Todas as Provas --</option>
-        ${provas.map(p => `<option value="${p.id}">${p.title} (${state.isMultiJudgeProva(p.id) ? 'Banca' : 'Juiz Único'})</option>`).join('')}
+        ${provas.map(p => {
+          const isMulti = state.isMultiJudgeProva(p.id);
+          // Procura se outro juiz já está atribuído a esta prova de juiz único
+          const existingJudge = !isMulti ? judges.find(j => j.assignedProvaId === p.id && (!judgeData || j.id !== judgeData.id)) : null;
+
+          if (existingJudge) {
+            return `<option value="${p.id}" disabled style="color: #64748b; background: #0b1120;">⛔ ${p.title} (Indisponível - Juiz: ${existingJudge.name})</option>`;
+          }
+          return `<option value="${p.id}">${p.title} (${isMulti ? 'Banca' : 'Juiz Único'})</option>`;
+        }).join('')}
       `;
     }
 

@@ -233,6 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const allProvas = getAllDesktopProvas();
     const allTeams = state.getTeams();
     const totalTurmas = allTeams.length;
+    const judges = state.getJudges();
+    const currentJudgeName = judgeFormState.selectedJudge;
+    const currentJudge = currentJudgeName ? judges.find(j => j.name === currentJudgeName) : null;
 
     if (badgeCounter) {
       badgeCounter.innerText = `${allProvas.length} provas`;
@@ -243,13 +246,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const scores = state.getProvaScores(p.id);
       const evaluatedCount = scores.length;
       const isComplete = evaluatedCount >= totalTurmas && totalTurmas > 0;
+      const isMulti = state.isMultiJudgeProva(p.id);
+      const assignedJudge = judges.find(j => j.assignedProvaId === p.id);
+      const isUnavailable = !isMulti && assignedJudge && currentJudge && currentJudge.id !== assignedJudge.id;
 
       let badgeText = `${evaluatedCount}/${totalTurmas}`;
       if (isComplete) badgeText = `✓ ${evaluatedCount}`;
+      if (isUnavailable) badgeText = `🔒 Indisponível (${assignedJudge.name})`;
 
       return `
-        <button type="button" class="prova-tab-pill ${isActive ? 'active' : ''} ${isComplete ? 'completed' : ''}" 
-                data-prova-id="${p.id}" id="desktop-tab-${p.id}">
+        <button type="button" class="prova-tab-pill ${isActive ? 'active' : ''} ${isComplete ? 'completed' : ''} ${isUnavailable ? 'unavailable' : ''}" 
+                data-prova-id="${p.id}" data-assigned-judge="${assignedJudge ? assignedJudge.name : ''}" id="desktop-tab-${p.id}"
+                title="${isUnavailable ? `Prova atribuída exclusivamente a ${assignedJudge.name}` : ''}">
           <span style="font-size: 0.75rem; font-weight: 800; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">${p.icon || 'P'}</span>
           <span>${p.shortTitle || p.title}</span>
           <span class="tab-badge-eval" title="${evaluatedCount} de ${totalTurmas} turmas avaliadas">${badgeText}</span>
@@ -259,6 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabsContainer.querySelectorAll('.prova-tab-pill').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (btn.classList.contains('unavailable')) {
+          sound.playBuzzer();
+          showToast(`Esta prova é de responsabilidade exclusiva do(a) ${btn.dataset.assignedJudge || 'outro avaliador'}.`, 'toast-warning');
+          return;
+        }
+
         const targetId = btn.dataset.provaId;
         if (judgeFormState.selectedProvaId === targetId) return;
 
@@ -1162,9 +1176,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputPin = document.getElementById('input-judge-pin');
 
     const provas = state.getProvas();
+    const judges = state.getJudges();
+
     selectProva.innerHTML = `
       <option value="">-- Acesso Geral / Todas as Provas --</option>
-      ${provas.map(p => `<option value="${p.id}">${p.title} (${state.isMultiJudgeProva(p.id) ? 'Banca' : 'Juiz Único'})</option>`).join('')}
+      ${provas.map(p => {
+        const isMulti = state.isMultiJudgeProva(p.id);
+        const existingJudge = !isMulti ? judges.find(j => j.assignedProvaId === p.id && (!judge || j.id !== judge.id)) : null;
+
+        if (existingJudge) {
+          return `<option value="${p.id}" disabled style="color: #64748b; background: #0b1120;">⛔ ${p.title} (Indisponível - Juiz: ${existingJudge.name})</option>`;
+        }
+        return `<option value="${p.id}">${p.title} (${isMulti ? 'Banca' : 'Juiz Único'})</option>`;
+      }).join('')}
     `;
 
     if (judge) {
