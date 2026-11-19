@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const crudJudgeId = document.getElementById('crud-judge-id');
   const crudJudgeName = document.getElementById('crud-judge-name');
   const crudJudgeRole = document.getElementById('crud-judge-role');
+  const crudJudgeProva = document.getElementById('crud-judge-prova');
   const crudJudgePin = document.getElementById('crud-judge-pin');
   const btnCloseJudgeModal = document.getElementById('btn-close-judge-modal');
 
@@ -741,8 +742,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderJudgesCrud() {
     const judges = state.getJudgesWithPresence();
+    const provas = state.getProvas();
 
     judgesListContainer.innerHTML = judges.map((j) => {
+      const assigned = j.assignedProvaId ? provas.find(p => p.id === j.assignedProvaId) : null;
+      const respBadge = assigned
+        ? `<span class="badge" style="background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.4); font-size: 0.75rem; padding: 0.15rem 0.45rem; border-radius: 4px;">📌 Resp: <strong>${assigned.title}</strong></span>`
+        : `<span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.75rem; padding: 0.15rem 0.45rem; border-radius: 4px;">🌐 Geral / Todas</span>`;
+
       return `
         <div class="glass-card" style="padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
           <div>
@@ -750,8 +757,10 @@ document.addEventListener('DOMContentLoaded', () => {
               ${j.name}
               ${j.isOnline ? '<span class="pulse-online" title="Online"></span>' : '<span class="dot-offline" title="Offline"></span>'}
             </div>
-            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.15rem;">
-              ${j.role} • Avaliações submetidas: <strong>${j.totalEvaluations}</strong>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span>${j.role}</span>
+              ${respBadge}
+              <span>• Avaliações submetidas: <strong>${j.totalEvaluations}</strong></span>
             </div>
           </div>
 
@@ -764,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div style="display: flex; gap: 0.4rem;">
-              <button class="btn btn-secondary btn-edit-judge" data-id="${j.id}" data-name="${j.name}" data-role="${j.role}" data-pin="${j.pin || '1234'}" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;">
+              <button class="btn btn-secondary btn-edit-judge" data-id="${j.id}" data-name="${j.name}" data-role="${j.role}" data-pin="${j.pin || '1234'}" data-assigned="${j.assignedProvaId || ''}" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;">
                 Editar
               </button>
               <button class="btn btn-outline btn-delete-judge" data-id="${j.id}" style="padding: 0.4rem 0.65rem; font-size: 0.8rem; border-color: #ef4444; color: #f87171;">
@@ -783,7 +792,8 @@ document.addEventListener('DOMContentLoaded', () => {
           id: btn.dataset.id,
           name: btn.dataset.name,
           role: btn.dataset.role,
-          pin: btn.dataset.pin
+          pin: btn.dataset.pin,
+          assignedProvaId: btn.dataset.assigned || null
         });
       });
     });
@@ -959,18 +969,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Modal Juiz (Novo / Editar)
   function openJudgeModal(judgeData = null) {
+    const provas = state.getProvas();
+    if (crudJudgeProva) {
+      crudJudgeProva.innerHTML = `
+        <option value="">-- Acesso Geral / Todas as Provas --</option>
+        ${provas.map(p => `<option value="${p.id}">${p.title} (${state.isMultiJudgeProva(p.id) ? 'Banca' : 'Juiz Único'})</option>`).join('')}
+      `;
+    }
+
     if (judgeData) {
       modalJudgeTitle.innerText = 'Editar Registro de Avaliador';
       crudJudgeId.value = judgeData.id;
       crudJudgeName.value = judgeData.name;
       crudJudgeRole.value = judgeData.role;
       crudJudgePin.value = judgeData.pin || '1234';
+      if (crudJudgeProva) crudJudgeProva.value = judgeData.assignedProvaId || '';
     } else {
       modalJudgeTitle.innerText = 'Cadastro de Avaliador';
       crudJudgeId.value = '';
       crudJudgeName.value = '';
       crudJudgeRole.value = 'Avaliador Oficial';
       crudJudgePin.value = '1234';
+      if (crudJudgeProva) crudJudgeProva.value = '';
     }
     modalJudgeCrud.classList.remove('hidden');
   }
@@ -985,11 +1005,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = crudJudgeName.value.trim();
       const role = crudJudgeRole.value.trim();
       const pin = crudJudgePin.value.trim();
+      const assignedProvaId = crudJudgeProva ? (crudJudgeProva.value || null) : null;
 
       if (id) {
-        state.updateJudge(id, { name, role, pin });
+        state.updateJudge(id, { name, role, pin, assignedProvaId });
       } else {
-        state.addJudge({ name, role, pin });
+        state.addJudge({ name, role, pin, assignedProvaId });
       }
 
       sound.playScoreDing();
