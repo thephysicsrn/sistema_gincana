@@ -1570,6 +1570,88 @@ class GincanaState {
     return false;
   }
 
+  importTeams(teamsList, replaceExisting = false) {
+    if (!Array.isArray(teamsList) || teamsList.length === 0) return 0;
+
+    const COLOR_PALETTE = [
+      { color: '#DC2626', colorEnd: '#991B1B', accentColor: '#FECACA' }, // Vermelho
+      { color: '#2563EB', colorEnd: '#1E40AF', accentColor: '#BFDBFE' }, // Azul
+      { color: '#059669', colorEnd: '#065F46', accentColor: '#A7F3D0' }, // Verde
+      { color: '#D97706', colorEnd: '#92400E', accentColor: '#FDE68A' }, // Dourado
+      { color: '#7C3AED', colorEnd: '#5B21B6', accentColor: '#DDD6FE' }, // Roxo
+      { color: '#DB2777', colorEnd: '#9D174D', accentColor: '#FBCFE8' }, // Rosa
+      { color: '#0D9488', colorEnd: '#115E59', accentColor: '#99F6E4' }, // Ciano
+      { color: '#EA580C', colorEnd: '#9A3412', accentColor: '#FED7AA' }  // Laranja
+    ];
+
+    const COLOR_NAMES = {
+      'vermelho': '#DC2626', 'vermelha': '#DC2626', 'red': '#DC2626',
+      'azul': '#2563EB', 'blue': '#2563EB',
+      'verde': '#059669', 'green': '#059669',
+      'amarelo': '#D97706', 'amarela': '#D97706', 'dourado': '#D97706', 'yellow': '#D97706',
+      'roxo': '#7C3AED', 'roxa': '#7C3AED', 'violeta': '#7C3AED', 'purple': '#7C3AED',
+      'rosa': '#DB2777', 'pink': '#DB2777',
+      'laranja': '#EA580C', 'orange': '#EA580C',
+      'ciano': '#0D9488', 'turquesa': '#0D9488', 'cyan': '#0D9488'
+    };
+
+    if (replaceExisting) {
+      this.data.teams = [];
+      this.data.scores = [];
+    }
+
+    if (!Array.isArray(this.data.teams)) this.data.teams = [];
+
+    let count = 0;
+    teamsList.forEach((raw, idx) => {
+      const name = String(raw.name || raw['Nome'] || raw['Nome da Equipe'] || raw['Equipe'] || raw['Turma/Equipe'] || '').trim();
+      if (!name) return;
+
+      const palette = COLOR_PALETTE[(this.data.teams.length) % COLOR_PALETTE.length];
+      let chosenColor = String(raw.color || raw['Cor'] || '').trim().toLowerCase();
+      if (COLOR_NAMES[chosenColor]) {
+        chosenColor = COLOR_NAMES[chosenColor];
+      } else if (!chosenColor.startsWith('#') || chosenColor.length < 4) {
+        chosenColor = palette.color;
+      }
+
+      const turma = String(raw.turma || raw['Turma'] || raw['Série'] || raw['Série / Ano'] || raw['Ano'] || 'Turma').trim();
+      const segmento = String(raw.segmento || raw['Segmento'] || 'Ensino Médio').trim();
+      const turno = String(raw.turno || raw['Turno'] || 'Matutino').trim();
+      const tutor = String(raw.tutor || raw['Tutor'] || raw['Professor'] || raw['Orientador'] || '').trim();
+      const representatives = String(raw.representatives || raw['Representantes'] || raw['Líderes'] || raw['Líder'] || '').trim();
+      const slogan = String(raw.slogan || raw['Slogan'] || raw['Grito de Guerra'] || '').trim();
+
+      const id = 't_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4) + '_' + idx;
+      const initials = name.split(/\s+/).filter(w => w.length > 2).map(w => w[0].toUpperCase()).slice(0, 2).join('') || name.substring(0, 2).toUpperCase();
+
+      const newTeam = {
+        id,
+        name,
+        shortName: (raw.shortName || name.substring(0, 7)).toUpperCase().trim(),
+        turma,
+        segmento,
+        turno,
+        color: chosenColor,
+        colorEnd: palette.colorEnd,
+        accentColor: palette.accentColor,
+        icon: initials,
+        className: `${turma} • ${turno}`,
+        tutor,
+        representatives,
+        slogan,
+        pesoELixoKg: Number(raw.pesoELixoKg || raw['E-Lixo (kg)'] || 0),
+        penalties: []
+      };
+
+      this.data.teams.push(newTeam);
+      count++;
+    });
+
+    this.saveToStorage(true, { action: 'IMPORT_TEAMS', count });
+    return count;
+  }
+
   // =========================================================================
   // MATRIZ DE RESPOSTAS DOS JUÍZES, AUDITORIA E PENDÊNCIAS
   // =========================================================================
@@ -1715,4 +1797,10 @@ class GincanaState {
   }
 }
 
-window.gincanaState = new GincanaState();
+if (typeof window !== 'undefined') {
+  window.gincanaState = new GincanaState();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = GincanaState;
+}

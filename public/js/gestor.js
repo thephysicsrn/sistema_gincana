@@ -840,6 +840,46 @@ document.addEventListener('DOMContentLoaded', () => {
   // 8. ABA 5: GESTÃO DE EQUIPES / TURMAS
   // =========================================================================
 
+  // Planilha de Turmas (Download Modelo e Upload / Importação em Lote)
+  const btnGestorDownloadTemplate = document.getElementById('btn-gestor-download-teams-template');
+  const btnGestorTriggerImport = document.getElementById('btn-gestor-trigger-teams-import');
+  const inputGestorTeamsFile = document.getElementById('input-gestor-teams-file');
+
+  if (btnGestorDownloadTemplate) {
+    btnGestorDownloadTemplate.addEventListener('click', () => {
+      if (window.PlanilhaTurmas) {
+        window.PlanilhaTurmas.downloadPlanilhaModelo();
+      }
+    });
+  }
+
+  if (btnGestorTriggerImport && inputGestorTeamsFile) {
+    btnGestorTriggerImport.addEventListener('click', () => {
+      inputGestorTeamsFile.value = '';
+      inputGestorTeamsFile.click();
+    });
+
+    inputGestorTeamsFile.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      try {
+        const parsed = await window.PlanilhaTurmas.parseFile(file);
+        window.PlanilhaTurmas.showImportPreviewModal(parsed, file.name, (teamsToImport, replace) => {
+          const count = state.importTeams(teamsToImport, replace);
+          sound.playScoreDing();
+          alert(`🎉 Sucesso! ${count} turmas foram importadas para o sistema.`);
+          renderTeamsCrud();
+          renderMatrix();
+          updateMetrics();
+        });
+      } catch (err) {
+        sound.playBuzzer();
+        alert(err.message || 'Erro ao processar arquivo de planilha.');
+      }
+    });
+  }
+
   function renderTeamsCrud() {
     const teams = state.getTeams();
 

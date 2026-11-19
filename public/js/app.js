@@ -1028,6 +1028,47 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   }
 
+  function setupPlanilhaTurmasApp() {
+    const btnDownload = document.getElementById('btn-download-teams-template');
+    const btnTrigger = document.getElementById('btn-trigger-teams-import');
+    const fileInput = document.getElementById('input-file-teams-import');
+
+    if (btnDownload) {
+      btnDownload.addEventListener('click', () => {
+        if (window.PlanilhaTurmas) {
+          window.PlanilhaTurmas.downloadPlanilhaModelo();
+          showToast('Planilha modelo baixada com sucesso!', 'toast-success');
+        }
+      });
+    }
+
+    if (btnTrigger && fileInput) {
+      btnTrigger.addEventListener('click', () => {
+        fileInput.value = '';
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        try {
+          const parsed = await window.PlanilhaTurmas.parseFile(file);
+          window.PlanilhaTurmas.showImportPreviewModal(parsed, file.name, (teamsToImport, replace) => {
+            const count = state.importTeams(teamsToImport, replace);
+            sound.playScoreDing();
+            showToast(`🎉 ${count} turmas importadas com sucesso!`, 'toast-success');
+            renderTeamsManagement();
+            renderPlacar();
+          });
+        } catch (err) {
+          sound.playBuzzer();
+          showToast(err.message || 'Erro ao processar planilha.', 'toast-error');
+        }
+      });
+    }
+  }
+
   function renderTeamsManagement() {
     const teams = state.getTeams();
     const listEl = document.getElementById('teams-admin-list');
@@ -1283,11 +1324,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activeTab && activeTab.dataset.tab === 'tab-planilha') renderPlanilhaGeral();
     if (activeTab && activeTab.dataset.tab === 'tab-penalidades') renderPenalidades();
     if (activeTab && activeTab.dataset.tab === 'tab-provas') renderProvasAdmin();
-    if (activeTab && activeTab.dataset.tab === 'tab-equipes') renderTeamsAdmin();
+    if (activeTab && activeTab.dataset.tab === 'tab-equipes') renderTeamsManagement();
     if (activeTab && activeTab.dataset.tab === 'tab-admin-professores') renderProfessoresAdmin();
   });
 
   setupProfessoresAdminEvents();
+  setupPlanilhaTurmasApp();
 
   // Render inicial
   renderPlacar();

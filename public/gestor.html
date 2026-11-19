@@ -640,16 +640,25 @@
     <!-- ======================================================================= -->
     <section id="tab-teams-crud" class="gestor-tab-content hidden">
       <div class="glass-card" style="padding: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h2 style="font-size: 1.25rem; font-weight: 800;">Gestão das Turmas e Equipes Participantes</h2>
             <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.2rem;">
-              Cadastre e gerencie turmas (Item 10 do Edital), cores institucionais, tutores e pesagem inicial.
+              Cadastre e gerencie turmas (Item 10 do Edital), cores institucionais, tutores e importação em massa via planilha (.xlsx / .csv).
             </p>
           </div>
-          <button id="btn-open-add-team-modal" class="btn btn-primary" style="font-size: 0.85rem;">
-            + Cadastrar Nova Turma
-          </button>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button id="btn-gestor-download-teams-template" class="btn btn-secondary" style="font-size: 0.85rem; font-weight: 700; white-space: nowrap;">
+              📥 Baixar Planilha Modelo
+            </button>
+            <button id="btn-gestor-trigger-teams-import" class="btn btn-primary" style="font-size: 0.85rem; font-weight: 700; white-space: nowrap;">
+              📤 Importar Planilha
+            </button>
+            <input type="file" id="input-gestor-teams-file" accept=".xlsx,.xls,.csv,.txt" style="display: none;">
+            <button id="btn-open-add-team-modal" class="btn btn-secondary" style="font-size: 0.85rem; white-space: nowrap;">
+              + Nova Turma
+            </button>
+          </div>
         </div>
 
         <div id="teams-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem;">
@@ -935,8 +944,10 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="js/sound.js"></script>
   <script src="js/state.js"></script>
+  <script src="js/planilha-turmas.js"></script>
   <script src="js/gestor.js"></script>
 </body>
 </html>
