@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   const teamFilterState = {
-    segment: 'all',
+    turno: 'all',
     status: 'all',
     search: ''
   };
@@ -618,10 +618,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    document.querySelectorAll('.btn-filter-segment').forEach((btn) => {
+    document.querySelectorAll('.btn-filter-turno').forEach((btn) => {
       btn.addEventListener('click', () => {
-        teamFilterState.segment = btn.dataset.segment;
-        document.querySelectorAll('.btn-filter-segment').forEach((b) => b.classList.remove('active'));
+        teamFilterState.turno = btn.dataset.turno;
+        document.querySelectorAll('.btn-filter-turno').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         sound.playClick();
         renderTeams();
@@ -660,15 +660,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cScor) cScor.innerText = countScored;
 
     const filteredTeams = allTeams.filter((t) => {
-      if (teamFilterState.segment !== 'all' && t.segmento !== teamFilterState.segment) {
+      if (teamFilterState.turno !== 'all' && t.turno !== teamFilterState.turno) {
         return false;
       }
       if (teamFilterState.search) {
         const query = teamFilterState.search;
         const matchName = (t.name || '').toLowerCase().includes(query);
         const matchTurma = (t.turma || '').toLowerCase().includes(query);
+        const matchMascote = (t.mascote || '').toLowerCase().includes(query);
         const matchShort = (t.shortName || '').toLowerCase().includes(query);
-        if (!matchName && !matchTurma && !matchShort) return false;
+        if (!matchName && !matchTurma && !matchMascote && !matchShort) return false;
       }
       const score = state.getTeamScore(t.id, form.provaId);
       if (teamFilterState.status === 'pending' && score !== null) return false;
@@ -749,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
           <div style="margin-top: 0.4rem; padding-top: 0.3rem; border-top: 1px solid rgba(255,255,255,0.08); width: 100%; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.68rem; color: #818cf8; font-weight: 600;">${t.segmento === 'Ensino Médio' ? 'EM' : 'EF'} • ${t.turno ? t.turno.substring(0,3) : ''}</span>
+            <span style="font-size: 0.68rem; color: #818cf8; font-weight: 600;">${t.turno}</span>
             ${statusBadge}
           </div>
         </div>

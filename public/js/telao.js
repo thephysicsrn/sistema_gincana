@@ -59,18 +59,71 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // =========================================================================
-  // 1. SINCRONIZAÇÃO DO MODO DO TELÃO (STANDBY vs RESULTADOS)
+  // 1. SINCRONIZAÇÃO DO MODO DO TELÃO (STANDBY vs RESULTADOS) & TURNO
   // =========================================================================
+
+  function updateTelaoTurnoButtons(currentTurno) {
+    const btnMat = document.getElementById('btn-telao-turno-matutino');
+    const btnVesp = document.getElementById('btn-telao-turno-vespertino');
+    if (!btnMat || !btnVesp) return;
+
+    if (currentTurno === 'Matutino') {
+      btnMat.classList.add('active');
+      btnMat.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+      btnMat.style.color = '#ffffff';
+      btnMat.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.5)';
+      btnVesp.classList.remove('active');
+      btnVesp.style.background = 'transparent';
+      btnVesp.style.color = '#94a3b8';
+      btnVesp.style.boxShadow = 'none';
+    } else {
+      btnVesp.classList.add('active');
+      btnVesp.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+      btnVesp.style.color = '#ffffff';
+      btnVesp.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.5)';
+      btnMat.classList.remove('active');
+      btnMat.style.background = 'transparent';
+      btnMat.style.color = '#94a3b8';
+      btnMat.style.boxShadow = 'none';
+    }
+  }
+
+  function setupTelaoTurnoControls() {
+    const btnMat = document.getElementById('btn-telao-turno-matutino');
+    const btnVesp = document.getElementById('btn-telao-turno-vespertino');
+    if (btnMat && !btnMat.dataset.bound) {
+      btnMat.dataset.bound = 'true';
+      btnMat.addEventListener('click', () => {
+        state.setTelaoTurno('Matutino');
+        updateTelaoTurnoButtons('Matutino');
+        sound.playClick();
+        renderTelao();
+      });
+    }
+    if (btnVesp && !btnVesp.dataset.bound) {
+      btnVesp.dataset.bound = 'true';
+      btnVesp.addEventListener('click', () => {
+        state.setTelaoTurno('Vespertino');
+        updateTelaoTurnoButtons('Vespertino');
+        sound.playClick();
+        renderTelao();
+      });
+    }
+  }
 
   function syncTelaoMode(forcedMode = null) {
     const config = (state && typeof state.getConfig === 'function') ? state.getConfig() : ((state && state.data && state.data.config) || {});
     const mode = forcedMode || (state && typeof state.getTelaoMode === 'function' ? state.getTelaoMode() : 'standby');
+    const currentTurno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
+
+    setupTelaoTurnoControls();
+    updateTelaoTurnoButtons(currentTurno);
 
     // Atualiza títulos institucionais
-    if (standbyEventTitle) standbyEventTitle.innerText = config.eventName || 'SESI CONECTA 2026';
-    if (standbyEventSub) standbyEventSub.innerText = config.editalTitle || 'Tecnologia que transforma, resíduo que ganha novo destino';
-    if (telaoEventTitle) telaoEventTitle.innerText = config.eventName || 'SESI CONECTA 2026';
-    if (telaoEventSub) telaoEventSub.innerText = `${config.editalTitle || 'Gincana Escolar'} • ${config.selectedUnit || 'SESI Escola'}`;
+    if (standbyEventTitle) standbyEventTitle.innerText = `${config.eventName || 'SESI CONECTA 2026'}`;
+    if (standbyEventSub) standbyEventSub.innerText = `${config.editalTitle || 'Tecnologia que transforma, resíduo que ganha novo destino'} • Gincana ${currentTurno}`;
+    if (telaoEventTitle) telaoEventTitle.innerText = `${config.eventName || 'SESI CONECTA 2026'}`;
+    if (telaoEventSub) telaoEventSub.innerText = `${config.editalTitle || 'Gincana Escolar'} • ${config.selectedUnit || 'SESI Escola'} (Gincana ${currentTurno})`;
 
     if (mode === 'standby') {
       isRevealing = false;
@@ -152,7 +205,8 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => confetti.celebrate(), 1500);
           setTimeout(() => confetti.celebrate(), 3000);
 
-          const rankings = state.getTeamRankings();
+          const currentTurno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
+          const rankings = state.getTeamRankings(currentTurno);
           if (rankings.length > 0 && rankings[0].totalPoints > 0) {
             triggerVictoryAnnouncement(rankings[0]);
           }
@@ -261,7 +315,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderTelao(withSuspense = false) {
-    const rankings = state.getTeamRankings();
+    const currentTurno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
+    updateTelaoTurnoButtons(currentTurno);
+    const rankings = state.getTeamRankings(currentTurno);
     if (rankings.length === 0) return;
 
     const leader = rankings[0];
@@ -369,6 +425,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Normaliza os parâmetros para aceitar tanto (data, meta) quanto (meta)
     const eventInfo = (meta && typeof meta === 'object') ? meta : (data && data.source ? data : {});
     const source = eventInfo.source;
+
+    // Mudança de Turno transmitido no telão
+    if (source === 'telao_turno_change') {
+      const currentTurno = eventInfo.turno || state.getTelaoTurno();
+      updateTelaoTurnoButtons(currentTurno);
+      syncTelaoMode();
+      if (state.getTelaoMode() === 'results' && !isRevealing) {
+        renderTelao();
+      }
+      return;
+    }
 
     // 1. Comando explícito para disparar a cerimônia animada de revelação
     if (source === 'telao_trigger_reveal') {

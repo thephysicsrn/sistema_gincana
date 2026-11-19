@@ -92,6 +92,19 @@
         </div>
       </section>
 
+      <!-- Seletor de Turno: Matutino vs Vespertino (Gincanas Independentes) -->
+      <div class="turno-selector-wrapper" style="margin-bottom: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8;">Gincana Oficial:</span>
+        <div style="background: rgba(15, 23, 42, 0.85); padding: 4px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.35rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+          <button type="button" class="btn-turno-placar active" data-turno="Matutino" id="btn-turno-placar-matutino" style="padding: 0.6rem 1.4rem; border-radius: 999px; font-weight: 800; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.25s ease; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #ffffff; box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);">
+            ☀️ Gincana Matutino (8 Turmas)
+          </button>
+          <button type="button" class="btn-turno-placar" data-turno="Vespertino" id="btn-turno-placar-vespertino" style="padding: 0.6rem 1.4rem; border-radius: 999px; font-weight: 800; font-size: 0.9rem; cursor: pointer; border: none; transition: all 0.25s ease; background: transparent; color: #94a3b8;">
+            🌙 Gincana Vespertino (8 Turmas)
+          </button>
+        </div>
+      </div>
+
       <!-- Pódio dos Três Primeiros Lugares -->
       <section class="podium-container" id="podium-view">
         <!-- Renderizado dinamicamente via app.js -->
@@ -188,11 +201,11 @@
                      style="font-size: 0.88rem; background: rgba(15,23,42,0.9);">
             </div>
 
-            <!-- Filtro por Segmento (Item 10) -->
+            <!-- Filtro por Turno / Gincana -->
             <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-sm btn-desktop-filter-segment active" data-segment="all">Todos os Segmentos</button>
-              <button type="button" class="btn btn-sm btn-desktop-filter-segment" data-segment="Ensino Médio">Ensino Médio</button>
-              <button type="button" class="btn btn-sm btn-desktop-filter-segment" data-segment="Anos Finais">Anos Finais</button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-turno active" data-turno="all">Todos os Turnos (16)</button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-turno" data-turno="Matutino">☀️ Matutino (8)</button>
+              <button type="button" class="btn btn-sm btn-desktop-filter-turno" data-turno="Vespertino">🌙 Vespertino (8)</button>
             </div>
 
             <!-- Abas de Status da Prova -->
@@ -263,6 +276,22 @@
          ABA 3: PLANILHA GERAL DE APURAÇÃO (ANEXO X)
          ======================================================== -->
     <section id="tab-planilha" class="tab-content" style="display: none;">
+      <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <span style="font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Turno da Apuração:</span>
+          <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+            <button type="button" class="btn-turno-planilha active" data-turno="Matutino" id="btn-planilha-turno-matutino" style="padding: 0.45rem 1.15rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+              ☀️ Gincana Matutino (8 Turmas)
+            </button>
+            <button type="button" class="btn-turno-planilha" data-turno="Vespertino" id="btn-planilha-turno-vespertino" style="padding: 0.45rem 1.15rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+              🌙 Gincana Vespertino (8 Turmas)
+            </button>
+          </div>
+        </div>
+        <button id="btn-export-planilha-csv" class="btn btn-secondary btn-sm" style="font-weight: 700;">
+          📥 Exportar Planilha Oficial (.CSV)
+        </button>
+      </div>
       <div id="planilha-geral-table-container">
         <!-- Preenchido via app.js -->
       </div>

@@ -46,10 +46,62 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
+  // ESTADO DE SELEÇÃO DE TURNO (GINCANAS INDEPENDENTES)
+  // ==========================================
+  let activePlacarTurno = 'Matutino';
+  let activePlanilhaTurno = 'Matutino';
+
+  // Configuração dos Botões de Alternância de Turno do Placar
+  function setupTurnoPlacarButtons() {
+    const btnMat = document.getElementById('btn-turno-placar-matutino');
+    const btnVesp = document.getElementById('btn-turno-placar-vespertino');
+    if (!btnMat || !btnVesp) return;
+
+    function updateStyles() {
+      if (activePlacarTurno === 'Matutino') {
+        btnMat.classList.add('active');
+        btnMat.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btnMat.style.color = '#ffffff';
+        btnMat.style.boxShadow = '0 2px 10px rgba(37, 99, 235, 0.5)';
+        btnVesp.classList.remove('active');
+        btnVesp.style.background = 'transparent';
+        btnVesp.style.color = '#94a3b8';
+        btnVesp.style.boxShadow = 'none';
+      } else {
+        btnVesp.classList.add('active');
+        btnVesp.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btnVesp.style.color = '#ffffff';
+        btnVesp.style.boxShadow = '0 2px 10px rgba(37, 99, 235, 0.5)';
+        btnMat.classList.remove('active');
+        btnMat.style.background = 'transparent';
+        btnMat.style.color = '#94a3b8';
+        btnMat.style.boxShadow = 'none';
+      }
+    }
+
+    btnMat.onclick = () => {
+      activePlacarTurno = 'Matutino';
+      updateStyles();
+      sound.playClick();
+      renderPlacar();
+    };
+
+    btnVesp.onclick = () => {
+      activePlacarTurno = 'Vespertino';
+      updateStyles();
+      sound.playClick();
+      renderPlacar();
+    };
+
+    updateStyles();
+  }
+
+  // ==========================================
   // RENDERIZAÇÃO DO PLACAR & PÓDIO
   // ==========================================
   function renderPlacar() {
-    const rankings = state.getTeamRankings();
+    setupTurnoPlacarButtons();
+    const rankings = state.getTeamRankings(activePlacarTurno);
     if (rankings.length === 0) return;
 
     // Pódio dos 3 Primeiros
@@ -74,12 +126,12 @@ document.addEventListener('DOMContentLoaded', () => {
               ${team.icon || team.name.substring(0, 2).toUpperCase()}
             </div>
             <h3 class="podium-team-name" style="color: ${team.color}">${team.name}</h3>
-            <p class="podium-team-class">${team.turma || team.className}</p>
+            <p class="podium-team-class">${team.turma || team.className} • ${team.turno}</p>
             <div class="podium-score-box">
               <div class="podium-score-val">${team.totalPoints.toLocaleString('pt-BR')}</div>
               <div class="podium-score-label">Pontos Oficiais</div>
               <div style="margin-top: 0.4rem; font-size: 0.78rem; color: #a7f3d0; font-weight: 700;">
-                Nota Escolar (Item 39): ${team.notaEscolar} pts
+                Mascote: ${team.mascote || '-'}
               </div>
             </div>
           </div>
@@ -99,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (team.rank === 2) rankBadgeClass = 'silver';
         else if (team.rank === 3) rankBadgeClass = 'bronze';
 
-        const diffText = team.rank === 1 ? 'Líder Geral' : `-${team.diffToLeader} pts`;
+        const diffText = team.rank === 1 ? 'Líder da Gincana' : `-${team.diffToLeader} pts`;
 
         return `
           <div class="team-row-card" style="--team-color: ${team.color}">
@@ -112,11 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${team.name}
                 <span class="team-tag" style="color:${team.color}; background:${team.color}18;">${team.shortName}</span>
                 <span style="font-size: 0.75rem; color: #a7f3d0; background: rgba(16,185,129,0.15); padding: 2px 8px; border-radius: 99px;">
-                  Nota: ${team.notaEscolar}
+                  ${team.turno}
                 </span>
               </div>
               <div class="team-class-sub">
-                ${team.turma} • Tutor: ${team.tutor || '-'} • E-Lixo: <strong>${team.stats.pesoKg} kg</strong> (+${team.stats.elixoComTeto} pts)
+                ${team.turma} • Mascote: <strong>${team.mascote || '-'}</strong> • E-Lixo: <strong>${team.stats.pesoKg} kg</strong> (+${team.stats.elixoComTeto} pts)
               </div>
             </div>
             <div class="progress-bar-wrap">
@@ -189,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Filtro e Busca para a Grade de Equipes no Desktop
     if (!window.desktopTeamFiltersInit) {
       window.desktopTeamFiltersInit = true;
-      window.desktopFilterState = { segment: 'all', status: 'all', search: '' };
+      window.desktopFilterState = { turno: 'all', status: 'all', search: '' };
 
       const searchInp = document.getElementById('desktop-team-search');
       if (searchInp) {
@@ -199,10 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      document.querySelectorAll('.btn-desktop-filter-segment').forEach((btn) => {
+      document.querySelectorAll('.btn-desktop-filter-turno').forEach((btn) => {
         btn.addEventListener('click', () => {
-          window.desktopFilterState.segment = btn.dataset.segment;
-          document.querySelectorAll('.btn-desktop-filter-segment').forEach((b) => b.classList.remove('active'));
+          window.desktopFilterState.turno = btn.dataset.turno;
+          document.querySelectorAll('.btn-desktop-filter-turno').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
           sound.playClick();
           renderDesktopTeamGrid();
@@ -519,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allTeams = state.getTeams();
     const provaId = judgeFormState.selectedProvaId;
     const isPesagem = provaId === 'prova_elixo_pesagem';
-    const filter = window.desktopFilterState || { segment: 'all', status: 'all', search: '' };
+    const filter = window.desktopFilterState || { turno: 'all', status: 'all', search: '' };
 
     // Contadores de status
     let countPending = 0;
@@ -540,11 +592,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Filtra equipes
     const filtered = allTeams.filter((t) => {
-      if (filter.segment !== 'all' && t.segmento !== filter.segment) return false;
+      if (filter.turno !== 'all' && t.turno !== filter.turno) return false;
       if (filter.search) {
         const q = filter.search;
         const match = (t.name || '').toLowerCase().includes(q) ||
                       (t.turma || '').toLowerCase().includes(q) ||
+                      (t.mascote || '').toLowerCase().includes(q) ||
                       (t.shortName || '').toLowerCase().includes(q);
         if (!match) return false;
       }
@@ -614,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
           <div style="margin-top: 0.4rem; padding-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.08); width: 100%; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.7rem; color: #818cf8; font-weight: 600;">${t.segmento}</span>
+            <span style="font-size: 0.7rem; color: #818cf8; font-weight: 600;">${t.turno}</span>
             ${badge}
           </div>
         </div>
@@ -787,21 +840,62 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // PLANILHA GERAL DE APURAÇÃO (ANEXO X)
   // ==========================================
+  function setupTurnoPlanilhaButtons() {
+    const btnMat = document.getElementById('btn-planilha-turno-matutino');
+    const btnVesp = document.getElementById('btn-planilha-turno-vespertino');
+    if (!btnMat || !btnVesp) return;
+
+    function updateStyles() {
+      if (activePlanilhaTurno === 'Matutino') {
+        btnMat.classList.add('active');
+        btnMat.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btnMat.style.color = '#ffffff';
+        btnVesp.classList.remove('active');
+        btnVesp.style.background = 'transparent';
+        btnVesp.style.color = '#94a3b8';
+      } else {
+        btnVesp.classList.add('active');
+        btnVesp.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btnVesp.style.color = '#ffffff';
+        btnMat.classList.remove('active');
+        btnMat.style.background = 'transparent';
+        btnMat.style.color = '#94a3b8';
+      }
+    }
+
+    btnMat.onclick = () => {
+      activePlanilhaTurno = 'Matutino';
+      updateStyles();
+      sound.playClick();
+      renderPlanilhaGeral();
+    };
+
+    btnVesp.onclick = () => {
+      activePlanilhaTurno = 'Vespertino';
+      updateStyles();
+      sound.playClick();
+      renderPlanilhaGeral();
+    };
+
+    updateStyles();
+  }
+
   function renderPlanilhaGeral() {
+    setupTurnoPlanilhaButtons();
     const container = document.getElementById('planilha-geral-table-container');
     if (!container) return;
 
-    const teams = state.getTeams();
+    const teams = state.getTeams(activePlanilhaTurno);
     const provas = state.getProvas();
-    const rankings = state.getTeamRankings();
+    const rankings = state.getTeamRankings(activePlanilhaTurno);
 
     container.innerHTML = `
       <div style="background: rgba(15,23,42,0.85); border: 1px solid var(--border-glass-bright); border-radius: 12px; padding: 1.5rem; overflow-x: auto;">
         <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <h4 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">Planilha Geral de Pontuação Oficial</h4>
+            <h4 style="font-size: 1.25rem; font-weight: 800; color: #f8fafc;">Planilha Geral de Pontuação Oficial • Gincana ${activePlanilhaTurno}</h4>
             <span style="font-size: 0.85rem; color: #94a3b8;">
-              Acompanhamento oficial de notas das 10 provas e apuração em tempo real.
+              Acompanhamento oficial de notas das 10 provas e apuração exclusiva das 8 turmas do turno ${activePlanilhaTurno}.
             </span>
           </div>
           <button id="btn-export-anexo-x" class="btn btn-secondary btn-sm">Exportar Planilha (CSV)</button>
@@ -880,9 +974,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnExp) {
       btnExp.addEventListener('click', () => {
         const csv = state.exportCSV();
-        downloadFile(csv, 'planilha_geral_gincana.csv', 'text/csv;charset=utf-8;');
-        showToast('Planilha da Gincana exportada!', 'toast-success');
+        downloadFile(csv, `planilha_geral_gincana_${activePlanilhaTurno.toLowerCase()}.csv`, 'text/csv;charset=utf-8;');
+        showToast(`Planilha da Gincana ${activePlanilhaTurno} exportada!`, 'toast-success');
       });
+    }
+
+    const btnExpTop = document.getElementById('btn-export-planilha-csv');
+    if (btnExpTop) {
+      btnExpTop.onclick = () => {
+        const csv = state.exportCSV();
+        downloadFile(csv, `planilha_geral_gincana_${activePlanilhaTurno.toLowerCase()}.csv`, 'text/csv;charset=utf-8;');
+        showToast(`Planilha da Gincana ${activePlanilhaTurno} exportada!`, 'toast-success');
+      };
     }
   }
 
@@ -1070,26 +1173,52 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderTeamsManagement() {
-    const teams = state.getTeams();
     const listEl = document.getElementById('teams-admin-list');
     if (!listEl) return;
 
-    listEl.innerHTML = teams.map((t) => `
-      <div class="team-row-card" style="grid-template-columns: 50px 1fr auto; --team-color: ${t.color}; margin-bottom: 0.75rem;">
-        <div class="team-icon-circle" style="background: ${t.color}22; border: 1px solid ${t.color};">
-          ${t.icon}
+    const matTeams = state.getTeams('Matutino');
+    const vespTeams = state.getTeams('Vespertino');
+
+    function renderTeamItem(t) {
+      return `
+        <div class="team-row-card" style="grid-template-columns: 50px 1fr auto; --team-color: ${t.color}; margin-bottom: 0.75rem;">
+          <div class="team-icon-circle" style="background: ${t.color}22; border: 1px solid ${t.color};">
+            ${t.icon || t.turma}
+          </div>
+          <div>
+            <div style="font-weight: 800; font-size: 1.15rem; color: ${t.color};">${t.name} (${t.shortName})</div>
+            <div style="font-size: 0.85rem; color: #94a3b8;">Turma: <strong>${t.turma}</strong> • Mascote: <strong>${t.mascote || '-'}</strong></div>
+            <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Representantes: ${t.representatives || '-'} • Contato: ${t.contato1 || '-'}</div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-weight: 800; color: #34d399; font-size: 1.1rem;">${t.pesoELixoKg || 0} kg</span>
+            <div style="font-size: 0.75rem; color: #94a3b8;">E-Lixo arrecadado</div>
+          </div>
         </div>
-        <div>
-          <div style="font-weight: 800; font-size: 1.15rem; color: ${t.color};">${t.name} (${t.shortName})</div>
-          <div style="font-size: 0.85rem; color: #94a3b8;">Turma: ${t.turma} • Tutor: ${t.tutor || '-'}</div>
-          <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Representantes: ${t.representatives || '-'} • Slogan: "${t.slogan || '-'}"</div>
+      `;
+    }
+
+    listEl.innerHTML = `
+      <div style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h4 style="font-size: 1.1rem; font-weight: 800; color: #60a5fa; display: flex; align-items: center; gap: 0.5rem;">
+            ☀️ Gincana Matutino (${matTeams.length} Turmas)
+          </h4>
+          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Competição Exclusiva do Turno Matutino</span>
         </div>
-        <div style="text-align: right;">
-          <span style="font-weight: 800; color: #34d399; font-size: 1.1rem;">${t.pesoELixoKg || 0} kg</span>
-          <div style="font-size: 0.75rem; color: #94a3b8;">E-Lixo arrecadado</div>
-        </div>
+        ${matTeams.map(renderTeamItem).join('')}
       </div>
-    `).join('');
+
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+          <h4 style="font-size: 1.1rem; font-weight: 800; color: #c084fc; display: flex; align-items: center; gap: 0.5rem;">
+            🌙 Gincana Vespertino (${vespTeams.length} Turmas)
+          </h4>
+          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Competição Exclusiva do Turno Vespertino</span>
+        </div>
+        ${vespTeams.map(renderTeamItem).join('')}
+      </div>
+    `;
   }
 
   // ==========================================

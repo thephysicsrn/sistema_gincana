@@ -408,6 +408,24 @@
           </div>
         </div>
 
+        <!-- Seletor do Turno / Gincana a Transmitir no Telão -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass-bright); border-radius: 12px; padding: 1rem 1.5rem; margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;">Gincana Projetada no Telão:</span>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-top: 2px;">
+              Escolha qual competição independente exibir no telão da quadra
+            </div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.8); padding: 4px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.35rem;">
+            <button type="button" class="btn-gestor-telao-turno active" data-turno="Matutino" id="btn-gestor-turno-matutino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+              ☀️ Gincana Matutino (8 Turmas)
+            </button>
+            <button type="button" class="btn-gestor-telao-turno" data-turno="Vespertino" id="btn-gestor-turno-vespertino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+              🌙 Gincana Vespertino (8 Turmas)
+            </button>
+          </div>
+        </div>
+
         <!-- Painel de Ações Rápidas do Telão -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
           

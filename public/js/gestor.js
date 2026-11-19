@@ -309,16 +309,60 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTelaoStatusBadge();
   }
 
+  function updateGestorTelaoTurnoButtons() {
+    const btnMat = document.getElementById('btn-gestor-turno-matutino');
+    const btnVesp = document.getElementById('btn-gestor-turno-vespertino');
+    if (!btnMat || !btnVesp) return;
+    const currentTurno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
+
+    if (currentTurno === 'Matutino') {
+      btnMat.classList.add('active');
+      btnMat.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+      btnMat.style.color = '#ffffff';
+      btnVesp.classList.remove('active');
+      btnVesp.style.background = 'transparent';
+      btnVesp.style.color = '#94a3b8';
+    } else {
+      btnVesp.classList.add('active');
+      btnVesp.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+      btnVesp.style.color = '#ffffff';
+      btnMat.classList.remove('active');
+      btnMat.style.background = 'transparent';
+      btnMat.style.color = '#94a3b8';
+    }
+  }
+
   function updateTelaoStatusBadge() {
     if (!telaoStatusBadge) return;
     const mode = state.getTelaoMode();
+    const turno = (state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino';
+    updateGestorTelaoTurnoButtons();
     if (mode === 'standby') {
       telaoStatusBadge.className = 'broadcast-status-badge broadcast-standby';
-      telaoStatusBadge.innerHTML = '<span class="dot-offline" style="background:#fbbf24;"></span> MODO ESPERA (LOGO SESI NO TELÃO • RESULTADOS OCULTOS)';
+      telaoStatusBadge.innerHTML = `<span class="dot-offline" style="background:#fbbf24;"></span> MODO ESPERA (LOGO SESI NO TELÃO • GINCANA ${turno.toUpperCase()})`;
     } else {
       telaoStatusBadge.className = 'broadcast-status-badge broadcast-live';
-      telaoStatusBadge.innerHTML = '<span class="pulse-online"></span> TRANSMISSÃO ATIVA (RESULTADOS LIBERADOS NO TELÃO)';
+      telaoStatusBadge.innerHTML = `<span class="pulse-online"></span> TRANSMISSÃO ATIVA (RESULTADOS LIBERADOS • GINCANA ${turno.toUpperCase()})`;
     }
+  }
+
+  const btnGestorMat = document.getElementById('btn-gestor-turno-matutino');
+  const btnGestorVesp = document.getElementById('btn-gestor-turno-vespertino');
+  if (btnGestorMat) {
+    btnGestorMat.addEventListener('click', () => {
+      state.setTelaoTurno('Matutino');
+      updateTelaoStatusBadge();
+      sound.playClick();
+      showToast('Telão da Quadra alterado para: Gincana Matutino (8 turmas)', 'toast-info');
+    });
+  }
+  if (btnGestorVesp) {
+    btnGestorVesp.addEventListener('click', () => {
+      state.setTelaoTurno('Vespertino');
+      updateTelaoStatusBadge();
+      sound.playClick();
+      showToast('Telão da Quadra alterado para: Gincana Vespertino (8 turmas)', 'toast-info');
+    });
   }
 
   // Utilitário de Notificações Toast Não-Bloqueantes

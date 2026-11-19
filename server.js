@@ -250,6 +250,11 @@ if (WebSocket) {
           if (!lastKnownState.config) lastKnownState.config = {};
           lastKnownState.config.telaoMode = data.mode;
           saveStateToDisk();
+        } else if (data.type === 'TELAO_TURNO_CHANGE') {
+          if (!lastKnownState) lastKnownState = { config: {} };
+          if (!lastKnownState.config) lastKnownState.config = {};
+          lastKnownState.config.telaoTurno = data.turno;
+          saveStateToDisk();
         } else if (data.type === 'TELAO_TRIGGER_REVEAL') {
           if (!lastKnownState) lastKnownState = { config: {} };
           if (!lastKnownState.config) lastKnownState.config = {};
