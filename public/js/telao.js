@@ -75,11 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mode === 'standby') {
       isRevealing = false;
       if (revealOverlay) revealOverlay.classList.add('hidden');
+      if (bannerEl) bannerEl.classList.remove('show');
       if (standbyScreen) standbyScreen.classList.remove('hidden');
       if (resultsScreen) resultsScreen.style.display = 'none';
     } else if (mode === 'results') {
       if (!isRevealing) {
         if (revealOverlay) revealOverlay.classList.add('hidden');
+        if (bannerEl) bannerEl.classList.remove('show');
         if (standbyScreen) standbyScreen.classList.add('hidden');
         if (resultsScreen) resultsScreen.style.display = 'block';
         renderTelao();
@@ -151,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => confetti.celebrate(), 3000);
 
           const rankings = state.getTeamRankings();
-          if (rankings.length > 0) {
+          if (rankings.length > 0 && rankings[0].totalPoints > 0) {
             triggerVictoryAnnouncement(rankings[0]);
           }
 
@@ -387,16 +389,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Sincronização vinda do servidor ou socket ou storage
     const currentMode = state.getTelaoMode();
     if (currentMode !== lastKnownTelaoMode) {
-      const transitionedToResults = (lastKnownTelaoMode === 'standby' && currentMode === 'results');
       lastKnownTelaoMode = currentMode;
-
-      if (transitionedToResults) {
-        // O gestor liberou os resultados enquanto o telão estava em espera
-        runRevealAnimation();
-        return;
-      } else {
-        syncTelaoMode();
-      }
+      syncTelaoMode();
     } else {
       syncTelaoMode();
     }
@@ -469,12 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const currentMode = state.getTelaoMode();
       if (currentMode !== lastKnownTelaoMode) {
-        const transitionedToResults = (lastKnownTelaoMode === 'standby' && currentMode === 'results');
         lastKnownTelaoMode = currentMode;
-        if (transitionedToResults) {
-          runRevealAnimation();
-          return;
-        }
+        syncTelaoMode();
       }
 
       // 4. Sincroniza o modo de exibição (Standby vs Resultados)
