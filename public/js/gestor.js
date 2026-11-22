@@ -263,6 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'tab-telao-control':
         updateTelaoStatusBadge();
         break;
+      case 'tab-admin-lancamentos':
+        renderAdminLancamentos();
+        break;
       case 'tab-online-judges':
         renderOnlineJudges();
         break;
@@ -289,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMetrics();
     renderOnlineJudges();
     populateMatrixProvaFilter();
+    renderAdminLancamentos();
     renderMatrix();
     renderAudit();
     renderJudgesCrud();
@@ -440,6 +444,271 @@ document.addEventListener('DOMContentLoaded', () => {
       metricWsStatus.innerHTML = '<span class="dot-offline"></span> Modo Local / Storage';
       metricWsStatus.style.color = '#94a3b8';
     }
+  }
+
+  // =========================================================================
+  // 3.5. LANÇAMENTOS DO ADMIN (E-LIXO, XADREZ E PING PONG)
+  // =========================================================================
+  let adminCurrentSubtab = 'elixo';
+  let adminTurnoElixo = 'Matutino';
+  let adminTurnoXadrez = 'Matutino';
+  let adminTurnoPingPong = 'Matutino';
+  let adminSubtabsInitialized = false;
+
+  function setupAdminLancamentosSubtabs() {
+    if (adminSubtabsInitialized) return;
+    adminSubtabsInitialized = true;
+
+    // Subabas: E-Lixo, Xadrez, Ping Pong
+    const subtabButtons = document.querySelectorAll('.btn-admin-subtab');
+    subtabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const sub = btn.dataset.subtab;
+        adminCurrentSubtab = sub;
+        subtabButtons.forEach((b) => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#94a3b8';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'rgba(245, 158, 11, 0.2)';
+        btn.style.color = '#f59e0b';
+
+        const cElixo = document.getElementById('admin-subcontent-elixo');
+        const cXadrez = document.getElementById('admin-subcontent-xadrez');
+        const cPingpong = document.getElementById('admin-subcontent-pingpong');
+        if (cElixo) cElixo.style.display = sub === 'elixo' ? 'block' : 'none';
+        if (cXadrez) cXadrez.style.display = sub === 'xadrez' ? 'block' : 'none';
+        if (cPingpong) cPingpong.style.display = sub === 'pingpong' ? 'block' : 'none';
+
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminLancamentos();
+      });
+    });
+
+    // Seletor de Turno para E-Lixo
+    document.querySelectorAll('.btn-admin-turno-elixo').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminTurnoElixo = btn.dataset.turno;
+        document.querySelectorAll('.btn-admin-turno-elixo').forEach((b) => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#94a3b8';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btn.style.color = '#fff';
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminElixo();
+      });
+    });
+
+    // Seletor de Turno para Xadrez
+    document.querySelectorAll('.btn-admin-turno-xadrez').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminTurnoXadrez = btn.dataset.turno;
+        document.querySelectorAll('.btn-admin-turno-xadrez').forEach((b) => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#94a3b8';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btn.style.color = '#fff';
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminXadrez();
+      });
+    });
+
+    // Seletor de Turno para Ping Pong
+    document.querySelectorAll('.btn-admin-turno-pingpong').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminTurnoPingPong = btn.dataset.turno;
+        document.querySelectorAll('.btn-admin-turno-pingpong').forEach((b) => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#94a3b8';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btn.style.color = '#fff';
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminPingPong();
+      });
+    });
+  }
+
+  function renderAdminLancamentos() {
+    setupAdminLancamentosSubtabs();
+    if (adminCurrentSubtab === 'elixo') {
+      renderAdminElixo();
+    } else if (adminCurrentSubtab === 'xadrez') {
+      renderAdminXadrez();
+    } else if (adminCurrentSubtab === 'pingpong') {
+      renderAdminPingPong();
+    }
+  }
+
+  function renderAdminElixo() {
+    const container = document.getElementById('admin-elixo-grid');
+    if (!container) return;
+    const teams = state.getTeams().filter((t) => !adminTurnoElixo || t.turno === adminTurnoElixo);
+
+    container.innerHTML = teams.map((team) => {
+      const pesoAtual = team.pesoELixoKg || 0;
+      return `
+        <div class="glass-card" style="padding: 1.25rem; border-top: 3px solid #10b981; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                ${team.icon || team.name.substring(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-weight: 800; font-size: 1rem; color: #fff;">${team.name}</div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">${team.turma || ''} • ${team.turno || ''}</div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Peso Atual</div>
+              <div style="font-weight: 900; font-size: 1.15rem; color: #10b981;">${pesoAtual} <span style="font-size: 0.75rem; color: #94a3b8;">kg</span></div>
+            </div>
+          </div>
+
+          <div style="background: rgba(15, 23, 42, 0.5); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.4rem; text-transform: uppercase;">
+              Registrar Peso de Resíduo (kg):
+            </label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input type="number" step="0.01" min="0" class="form-input" id="input-admin-elixo-${team.id}" value="${pesoAtual}" style="font-size: 1.1rem; font-weight: 900; text-align: center; width: 120px; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass-bright); color: #10b981; border-radius: 8px; padding: 0.45rem;">
+              <button type="button" class="btn btn-sm btn-save-admin-elixo" data-team="${team.id}" style="flex: 1; padding: 0.55rem 0.75rem; font-weight: 800; font-size: 0.82rem; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                <span>💾</span> Salvar Peso
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.btn-save-admin-elixo').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const teamId = btn.dataset.team;
+        const input = document.getElementById(`input-admin-elixo-${teamId}`);
+        const val = parseFloat(input ? input.value : 0);
+        if (isNaN(val) || val < 0) {
+          alert('Informe um peso válido em kg.');
+          return;
+        }
+        state.updateTeamELixoWeight(teamId, val);
+        if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+        const team = state.getTeam(teamId);
+        showToast(`Peso do E-Lixo salvo: ${val} kg para ${team ? team.name : teamId}`, 'toast-success');
+        renderAdminElixo();
+      });
+    });
+  }
+
+  function saveScoreForAdmin(teamId, provaId, points, provaName) {
+    const team = state.getTeam(teamId);
+    state.addScore({
+      teamId,
+      provaId,
+      judgeId: 'admin_central',
+      judgeName: 'Coordenação / Admin',
+      points: points,
+      note: `Lançado oficialmente pelo Painel do Admin (${provaName})`
+    });
+    if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+    showToast(`Pontuação de ${provaName} salva: ${points} pts para ${team ? team.name : teamId}`, 'toast-success');
+    if (provaId === 'p_xadrez') renderAdminXadrez();
+    if (provaId === 'p_pingpong') renderAdminPingPong();
+  }
+
+  function renderAdminTournament(provaId, provaName, containerId, currentTurno) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const teams = state.getTeams().filter((t) => !currentTurno || t.turno === currentTurno);
+    const scores = state.getScores().filter((s) => s.provaId === provaId);
+
+    container.innerHTML = teams.map((team) => {
+      const scoreObj = scores.find((s) => s.teamId === team.id);
+      const currentPts = scoreObj ? scoreObj.points : null;
+      return `
+        <div class="glass-card" style="padding: 1.25rem; border-top: 3px solid ${team.color}; display: flex; flex-direction: column; justify-content: space-between; gap: 0.85rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: ${team.color}22; border: 1px solid ${team.color}; color: ${team.color}; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                ${team.icon || team.name.substring(0, 2).toUpperCase()}
+              </div>
+              <div>
+                <div style="font-weight: 800; font-size: 1rem; color: #fff;">${team.name}</div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">${team.turma || ''} • ${team.turno || ''}</div>
+              </div>
+            </div>
+            <div>
+              ${currentPts !== null ? `
+                <span style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #10b981; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.85rem;">
+                  ${currentPts} pts
+                </span>
+              ` : `
+                <span style="background: rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.25); color: #94a3b8; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem;">
+                  Pendente
+                </span>
+              `}
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.35rem; font-weight: 700; text-transform: uppercase;">
+              Colocação Rápida:
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.5rem;">
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="100" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 100 ? '#10b981' : 'rgba(16, 185, 129, 0.15)'}; color: ${currentPts === 100 ? '#fff' : '#10b981'}; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 6px; cursor: pointer;">1º (100)</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="75" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 75 ? '#3b82f6' : 'rgba(59, 130, 246, 0.15)'}; color: ${currentPts === 75 ? '#fff' : '#60a5fa'}; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 6px; cursor: pointer;">2º (75)</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="50" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 50 ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)'}; color: ${currentPts === 50 ? '#fff' : '#fbbf24'}; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 6px; cursor: pointer;">3º (50)</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="25" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 25 ? '#a855f7' : 'rgba(168, 85, 247, 0.15)'}; color: ${currentPts === 25 ? '#fff' : '#c084fc'}; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 6px; cursor: pointer;">4º (25)</button>
+            </div>
+            <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <input type="number" min="0" max="100" class="form-input input-custom-score" id="input-${provaId}-${team.id}" placeholder="0" value="${currentPts !== null ? currentPts : ''}" style="width: 70px; text-align: center; font-weight: 800; font-size: 0.9rem; padding: 0.35rem; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass-bright); border-radius: 6px; color: #fff;">
+              <button type="button" class="btn btn-sm btn-save-custom-score" data-team="${team.id}" style="flex: 1; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 800; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-glass-bright); color: #fff; border-radius: 6px; cursor: pointer;">
+                💾 Salvar Nota
+              </button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="0" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; font-weight: 800; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 6px; cursor: pointer;">
+                0 pts
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.querySelectorAll('.btn-quick-place').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const teamId = btn.dataset.team;
+        const pts = Number(btn.dataset.pts);
+        saveScoreForAdmin(teamId, provaId, pts, provaName);
+      });
+    });
+
+    container.querySelectorAll('.btn-save-custom-score').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const teamId = btn.dataset.team;
+        const input = document.getElementById(`input-${provaId}-${teamId}`);
+        const pts = parseFloat(input ? input.value : 0);
+        if (isNaN(pts) || pts < 0 || pts > 100) {
+          alert('Informe uma pontuação entre 0 e 100 pontos.');
+          return;
+        }
+        saveScoreForAdmin(teamId, provaId, pts, provaName);
+      });
+    });
+  }
+
+  function renderAdminXadrez() {
+    renderAdminTournament('p_xadrez', 'Xadrez', 'admin-xadrez-grid', adminTurnoXadrez);
+  }
+
+  function renderAdminPingPong() {
+    renderAdminTournament('p_pingpong', 'Ping Pong', 'admin-pingpong-grid', adminTurnoPingPong);
   }
 
   // =========================================================================
@@ -1245,6 +1514,7 @@ document.addEventListener('DOMContentLoaded', () => {
   state.subscribe((event) => {
     updateMetrics();
     updateTelaoStatusBadge();
+    if (currentActiveTab === 'tab-admin-lancamentos') renderAdminLancamentos();
     if (currentActiveTab === 'tab-online-judges') renderOnlineJudges();
     if (currentActiveTab === 'tab-matrix') renderMatrix();
     if (currentActiveTab === 'tab-audit') renderAudit();

@@ -361,6 +361,9 @@
       <button class="gestor-tab-btn active" data-tab="tab-telao-control">
         <span class="tab-index-badge">1</span> Controle do Telão
       </button>
+      <button class="gestor-tab-btn" data-tab="tab-admin-lancamentos" style="border-color: rgba(245, 158, 11, 0.4);">
+        <span class="tab-index-badge" style="background:#f59e0b; color:#0f172a; font-weight: 900;">⚡</span> Lançamentos do Admin
+      </button>
       <button class="gestor-tab-btn" data-tab="tab-online-judges">
         <span class="tab-index-badge">2</span> Status dos Avaliadores
       </button>
@@ -490,8 +493,115 @@
     </section>
 
     <!-- ======================================================================= -->
-    <!-- ABA 2: MONITOR DE PRESENÇA DOS AVALIADORES                              -->
+    <!-- ABA: LANÇAMENTOS DO ADMIN (E-LIXO, XADREZ & PING PONG)                  -->
     <!-- ======================================================================= -->
+    <section id="tab-admin-lancamentos" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.75rem; margin-bottom: 1.5rem; border-left: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 0.3rem 0.85rem; border-radius: 99px; margin-bottom: 0.5rem;">
+              <span style="color: #f59e0b; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">Painel de Controle Exclusivo</span>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 900; margin: 0;">Lançamentos Oficiais da Coordenação (Admin)</h2>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.35rem; max-width: 780px;">
+              Lançamento exclusivo de <strong>Resíduo Eletrônico (E-Lixo)</strong> e pontuações oficiais dos torneios de <strong>Xadrez</strong> e <strong>Ping Pong</strong>. Os avaliadores nos celulares não têm acesso a essas provas, garantindo controle total da comissão organizadora.
+            </p>
+          </div>
+        </div>
+
+        <!-- Seletor de Sub-Módulo do Admin -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 4px; background: rgba(15, 23, 42, 0.8); border-radius: 10px; border: 1px solid var(--border-glass-bright); width: fit-content;">
+          <button type="button" class="btn btn-sm btn-admin-subtab active" data-subtab="elixo" id="btn-subtab-admin-elixo" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px;">
+            ⚖️ Resíduo Eletrônico (E-Lixo)
+          </button>
+          <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="xadrez" id="btn-subtab-admin-xadrez" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #94a3b8;">
+            ♟️ Torneio de Xadrez (100 pts)
+          </button>
+          <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="pingpong" id="btn-subtab-admin-pingpong" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #94a3b8;">
+            🏓 Torneio de Ping Pong (100 pts)
+          </button>
+        </div>
+
+        <!-- Conteúdo 1: Lançamento de E-Lixo -->
+        <div id="admin-subcontent-elixo" class="admin-subcontent">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #10b981; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>⚖️</span> Lançamento de Peso de E-Lixo por Turma
+              </h3>
+              <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
+                Digite o peso arrecadado (em kg) para cada turma. O cálculo dos pontos e bônus no ranking é atualizado em tempo real.
+              </p>
+            </div>
+            <!-- Seletor de Turno -->
+            <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+              <button type="button" class="btn-admin-turno-elixo active" data-turno="Matutino" id="btn-admin-turno-elixo-mat" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+                ☀️ Matutino (8 Turmas)
+              </button>
+              <button type="button" class="btn-admin-turno-elixo" data-turno="Vespertino" id="btn-admin-turno-elixo-vesp" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+                🌙 Vespertino (8 Turmas)
+              </button>
+            </div>
+          </div>
+          <div id="admin-elixo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            <!-- Preenchido via gestor.js -->
+          </div>
+        </div>
+
+        <!-- Conteúdo 2: Lançamento de Xadrez -->
+        <div id="admin-subcontent-xadrez" class="admin-subcontent" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #60a5fa; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>♟️</span> Pontuação do Torneio de Xadrez (Máx: 100 pts)
+              </h3>
+              <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
+                Atribua a pontuação oficial do torneio de xadrez para cada turma. Use os atalhos de colocação rápida ou digite a nota.
+              </p>
+            </div>
+            <!-- Seletor de Turno -->
+            <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+              <button type="button" class="btn-admin-turno-xadrez active" data-turno="Matutino" id="btn-admin-turno-xadrez-mat" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+                ☀️ Matutino (8 Turmas)
+              </button>
+              <button type="button" class="btn-admin-turno-xadrez" data-turno="Vespertino" id="btn-admin-turno-xadrez-vesp" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+                🌙 Vespertino (8 Turmas)
+              </button>
+            </div>
+          </div>
+          <div id="admin-xadrez-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            <!-- Preenchido via gestor.js -->
+          </div>
+        </div>
+
+        <!-- Conteúdo 3: Lançamento de Ping Pong -->
+        <div id="admin-subcontent-pingpong" class="admin-subcontent" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #f43f5e; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>🏓</span> Pontuação do Torneio de Ping Pong (Máx: 100 pts)
+              </h3>
+              <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
+                Atribua a pontuação oficial do torneio de tênis de mesa / ping pong para cada turma.
+              </p>
+            </div>
+            <!-- Seletor de Turno -->
+            <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+              <button type="button" class="btn-admin-turno-pingpong active" data-turno="Matutino" id="btn-admin-turno-pingpong-mat" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+                ☀️ Matutino (8 Turmas)
+              </button>
+              <button type="button" class="btn-admin-turno-pingpong" data-turno="Vespertino" id="btn-admin-turno-pingpong-vesp" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+                🌙 Vespertino (8 Turmas)
+              </button>
+            </div>
+          </div>
+          <div id="admin-pingpong-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            <!-- Preenchido via gestor.js -->
+          </div>
+        </div>
+
+      </div>
+    </section>
     <section id="tab-online-judges" class="gestor-tab-content hidden">
       <!-- Métricas Rápidas -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">

@@ -1190,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderTeamItem(t) {
       return `
-        <div class="team-row-card" style="grid-template-columns: 50px 1fr auto; --team-color: ${t.color}; margin-bottom: 0.75rem;">
+        <div class="team-row-card" style="grid-template-columns: 50px 1fr auto; --team-color: ${t.color}; margin-bottom: 0.75rem; align-items: center;">
           <div class="team-icon-circle" style="background: ${t.color}22; border: 1px solid ${t.color};">
             ${t.icon || t.turma}
           </div>
@@ -1199,9 +1199,14 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="font-size: 0.85rem; color: #94a3b8;">Turma: <strong>${t.turma}</strong> • Mascote: <strong>${t.mascote || '-'}</strong></div>
             <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Representantes: ${t.representatives || '-'} • Contato: ${t.contato1 || '-'}</div>
           </div>
-          <div style="text-align: right;">
-            <span style="font-weight: 800; color: #34d399; font-size: 1.1rem;">${t.pesoELixoKg || 0} kg</span>
-            <div style="font-size: 0.75rem; color: #94a3b8;">E-Lixo arrecadado</div>
+          <div style="text-align: right; display: flex; align-items: center; gap: 0.5rem;">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Peso E-Lixo (kg)</div>
+              <input type="number" step="0.01" min="0" class="input-app-elixo" id="input-app-elixo-${t.id}" value="${t.pesoELixoKg || 0}" style="width: 85px; font-weight: 800; font-size: 0.95rem; text-align: center; color: #34d399; background: rgba(15,23,42,0.85); border: 1px solid var(--border-glass-bright); border-radius: 6px; padding: 0.3rem;">
+            </div>
+            <button type="button" class="btn btn-sm btn-save-app-elixo" data-team="${t.id}" style="padding: 0.45rem 0.65rem; font-size: 0.78rem; font-weight: 800; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; border-radius: 6px; cursor: pointer; align-self: flex-end;">
+              Salvar
+            </button>
           </div>
         </div>
       `;
@@ -1228,6 +1233,23 @@ document.addEventListener('DOMContentLoaded', () => {
         ${vespTeams.map(renderTeamItem).join('')}
       </div>
     `;
+
+    listEl.querySelectorAll('.btn-save-app-elixo').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const teamId = btn.dataset.team;
+        const input = document.getElementById(`input-app-elixo-${teamId}`);
+        const val = parseFloat(input ? input.value : 0);
+        if (isNaN(val) || val < 0) {
+          alert('Informe um peso válido em kg.');
+          return;
+        }
+        state.updateTeamELixoWeight(teamId, val);
+        if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+        const team = state.getTeam(teamId);
+        showToast(`Peso do E-Lixo salvo: ${val} kg para ${team ? team.name : teamId}`, 'toast-success');
+        renderTeamsManagement();
+      });
+    });
   }
 
   // ==========================================

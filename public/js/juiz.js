@@ -265,12 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function getAllAvailableProvas() {
-    return state.getProvas();
+    // Provas de Xadrez e Ping Pong são de responsabilidade e lançamento exclusivo do Admin / Coordenação
+    return state.getProvas().filter((p) => p.id !== 'p_xadrez' && p.id !== 'p_pingpong');
   }
 
   function initScoringForm() {
     const allProvas = getAllAvailableProvas();
-    if (!form.provaId && allProvas.length > 0) {
+    if ((!form.provaId || form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong') && allProvas.length > 0) {
       form.provaId = allProvas[0].id;
     }
 
@@ -1281,6 +1282,11 @@ document.addEventListener('DOMContentLoaded', () => {
         sound.playScoreDing();
         alert(`${form.pesoInput} kg registrados com sucesso para ${state.getTeam(form.teamId).name}.`);
       } else {
+        if (form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong') {
+          alert('As provas de Xadrez e Ping Pong são lançadas exclusivamente pela Coordenação / Admin.');
+          return;
+        }
+
         const total = calculateScore();
         const rubricTotal = calculateRubricSum();
 
