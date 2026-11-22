@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sound.playBuzzer();
       if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
       pinCard.classList.add('shake-animation');
-      pinErrorMsg.innerText = 'PIN incorreto. Tente novamente (padrão: 1234)';
+      pinErrorMsg.innerText = 'PIN incorreto. Tente novamente.';
       setTimeout(() => {
         pinCard.classList.remove('shake-animation');
         enteredPin = '';
