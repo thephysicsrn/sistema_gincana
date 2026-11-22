@@ -279,9 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="sliding-segmento-text">${team.segmento || ''} • ${team.turno || ''}</span>
           </div>
           <div class="sliding-metrics-row">
+            ${team.mascote ? `
             <span class="sliding-metric-pill">
-              <strong style="color: #34d399;">Nota Escolar:</strong> ${team.notaEscolar || 0} pts
-            </span>
+              <strong style="color: #34d399;">Mascote:</strong> ${team.mascote}
+            </span>` : ''}
             <span class="sliding-metric-pill">
               <strong style="color: #f59e0b;">E-Lixo:</strong> ${team.stats ? team.stats.pesoKg : 0} kg
             </span>

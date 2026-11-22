@@ -1390,9 +1390,6 @@ document.addEventListener('DOMContentLoaded', () => {
           <div style="font-size: 1.15rem; font-family: 'Outfit'; font-weight: 900; color: #facc15;">
             ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.65rem; color: #94a3b8;">pts</span>
           </div>
-          <div style="font-size: 0.65rem; color: #34d399; font-weight: 700; margin-top: 0.2rem;">
-            Nota: ${team.notaEscolar} pts
-          </div>
         </div>
       `;
     }).join('');
@@ -1434,9 +1431,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <div style="text-align: right; flex-shrink: 0;">
               <div style="font-family: 'Outfit'; font-weight: 900; font-size: 1.15rem; color: #facc15;">
                 ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.7rem; color: #94a3b8;">pts</span>
-              </div>
-              <div style="font-size: 0.7rem; color: #34d399; font-weight: 700;">
-                Escolar: ${team.notaEscolar} pts
               </div>
             </div>
           </div>
