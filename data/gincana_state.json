@@ -7,28 +7,39 @@
   },
   "judges": [
     {
-      "id": "j1",
-      "name": "Comissão Julgadora 1",
-      "role": "Avaliador Artístico/Cultural",
-      "pin": "1234"
+      "id": "j_artuane",
+      "name": "Artuane",
+      "role": "Avaliador(a) Oficial • Fundamental Manhã",
+      "assignedProvaId": null,
+      "pin": "1001"
     },
     {
-      "id": "j2",
-      "name": "Comissão Julgadora 2",
-      "role": "Avaliador Técnico/Sustentabilidade",
-      "pin": "1234"
+      "id": "j_micarla",
+      "name": "Micarla",
+      "role": "Avaliador(a) Oficial • Fundamental Manhã",
+      "assignedProvaId": null,
+      "pin": "1002"
     },
     {
-      "id": "j3",
-      "name": "Comissão Julgadora 3",
-      "role": "Avaliador Pedagógico",
-      "pin": "1234"
+      "id": "j_aparecida",
+      "name": "Aparecida",
+      "role": "Avaliador(a) Oficial • Fundamental Manhã",
+      "assignedProvaId": null,
+      "pin": "1003"
     },
     {
-      "id": "j4",
-      "name": "Comissão Esportiva & Dinâmicas",
-      "role": "Juiz de Quadra",
-      "pin": "1234"
+      "id": "j_palhares",
+      "name": "Palhares",
+      "role": "Avaliador(a) Oficial • Fundamental Manhã",
+      "assignedProvaId": null,
+      "pin": "1004"
+    },
+    {
+      "id": "j_rebeca",
+      "name": "Rebeca",
+      "role": "Avaliador(a) Oficial • Fundamental Manhã",
+      "assignedProvaId": null,
+      "pin": "1005"
     }
   ],
   "teams": [

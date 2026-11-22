@@ -212,10 +212,11 @@ class GincanaState {
         telaoMode: 'standby' // 'standby' (apenas Logo em destaque) ou 'results' (Resultados liberados)
       },
       judges: [
-        { id: 'j1', name: 'Comissão Julgadora 1', role: 'Avaliador Artístico/Cultural', pin: '1234' },
-        { id: 'j2', name: 'Comissão Julgadora 2', role: 'Avaliador Técnico/Sustentabilidade', pin: '1234' },
-        { id: 'j3', name: 'Comissão Julgadora 3', role: 'Avaliador Pedagógico', pin: '1234' },
-        { id: 'j4', name: 'Comissão de Pesagem E-Lixo', role: 'Conferente Oficial', pin: '1234' }
+        { id: 'j_artuane', name: 'Artuane', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1001' },
+        { id: 'j_micarla', name: 'Micarla', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1002' },
+        { id: 'j_aparecida', name: 'Aparecida', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1003' },
+        { id: 'j_palhares', name: 'Palhares', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1004' },
+        { id: 'j_rebeca', name: 'Rebeca', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1005' }
       ],
       // Turmas participantes configuradas como equipes (Item 10 do Edital)
       teams: [
@@ -775,8 +776,12 @@ class GincanaState {
       if (!this.data.config) this.data.config = {};
       if (!this.data.config.gestorPin) this.data.config.gestorPin = '9999';
       if (!this.data.config.gestorTitle) this.data.config.gestorTitle = 'Coordenação Geral da Gincana';
-      if (!Array.isArray(this.data.judges) || this.data.judges.length === 0) {
+      const hasOldDummyJudges = !Array.isArray(this.data.judges) || 
+                                this.data.judges.length === 0 || 
+                                this.data.judges.some(j => j.id === 'j1' && j.name === 'Comissão Julgadora 1');
+      if (hasOldDummyJudges) {
         this.data.judges = this.getDefaultData().judges;
+        this.saveToStorage(false);
       }
       if (!Array.isArray(this.data.teams) || this.data.teams.length === 0) {
         this.data.teams = this.getDefaultData().teams;
