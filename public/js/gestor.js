@@ -1360,6 +1360,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  const btnClearVespertino = document.getElementById('btn-clear-vespertino-scores');
+  if (btnClearVespertino) {
+    btnClearVespertino.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja zerar TODOS os lançamentos da TARDE (Vespertino)? As notas da manhã ficarão intactas.')) {
+        state.clearTurnoScores('Vespertino');
+        renderAuditScores();
+        renderMatrix();
+        alert('Lançamentos da Tarde (Vespertino) zerados com sucesso! Notas da Manhã preservadas.');
+      }
+    });
+  }
+
   // =========================================================================
   // 7. ABA 4: GESTÃO DE JUÍZES E ALTERAÇÃO DE PINS
   // =========================================================================

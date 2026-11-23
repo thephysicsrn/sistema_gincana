@@ -433,7 +433,7 @@ class GincanaState {
   getDefaultData() {
     return {
       config: {
-        eventName: 'Gincana SESI Escola/RN 2026',
+        eventName: 'Gincana SESI ESCOLA 2026',
         editalTitle: 'SESI CONECTA: TECNOLOGIA QUE TRANSFORMA, RESÍDUO QUE GANHA NOVO DESTINO',
         institution: 'SESI Escola / Sistema FIERN',
         units: ['SESI Escola Macau', 'SESI Escola Mossoró', 'SESI Escola São Gonçalo do Amarante'],
@@ -1105,6 +1105,9 @@ class GincanaState {
       if ((this.data.scores && this.data.scores.length > 0) || (this.data.penalties && this.data.penalties.length > 0)) {
         this.updateArchive(this.data.scores || [], this.data.penalties || []);
       }
+
+      // Separação estrita de turnos: impede contaminação de notas entre manhã e tarde
+      this.cleanTurnoMismatchScores();
     }
 
     if (initial) {
@@ -1113,6 +1116,77 @@ class GincanaState {
         this.lastLeaderId = rankings[0].id;
       }
     }
+  }
+
+  cleanTurnoMismatchScores() {
+    if (!this.data || !Array.isArray(this.data.scores)) return 0;
+    const initialCount = this.data.scores.length;
+
+    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
+    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
+    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
+    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+
+    this.data.scores = this.data.scores.filter((s) => {
+      if (!s || !s.teamId) return false;
+      const team = this.getTeam(s.teamId);
+      if (!team) return false;
+
+      const jId = String(s.judgeId || '').trim();
+      const jName = String(s.judgeName || '').toLowerCase().trim();
+
+      // Equipes do Vespertino NÃO PODEM ter notas de jurados da Manhã
+      if (team.turno === 'Vespertino') {
+        if (morningJudges.has(jId)) return false;
+        if (morningNames.some(n => jName.includes(n))) return false;
+      }
+
+      // Equipes do Matutino NÃO PODEM ter notas de jurados da Tarde
+      if (team.turno === 'Matutino') {
+        if (afternoonJudges.has(jId)) return false;
+        if (afternoonNames.some(n => jName.includes(n))) return false;
+      }
+
+      return true;
+    });
+
+    const removed = initialCount - this.data.scores.length;
+    if (removed > 0) {
+      console.log(`[Turno Cleaner] Removidas ${removed} nota(s) que cruzavam turnos indevidamente.`);
+      this.updateArchive(this.data.scores || [], this.data.penalties || []);
+    }
+    return removed;
+  }
+
+  clearTurnoScores(targetTurno) {
+    if (!targetTurno) return;
+    const turnoNorm = targetTurno.toLowerCase().trim();
+    const teamsInTurno = new Set(this.getTeams(targetTurno).map(t => t.id));
+
+    if (this.data && Array.isArray(this.data.scores)) {
+      this.data.scores = this.data.scores.filter(s => !teamsInTurno.has(s.teamId));
+    }
+    if (this.data && Array.isArray(this.data.penalties)) {
+      this.data.penalties = this.data.penalties.filter(p => !teamsInTurno.has(p.teamId));
+    }
+    (this.data.teams || []).forEach(t => {
+      if ((t.turno || '').toLowerCase().trim() === turnoNorm) {
+        t.pesoELixoKg = 0;
+      }
+    });
+
+    this.updateArchive(this.data.scores || [], this.data.penalties || []);
+    this.saveToStorage(true, { action: 'CLEAR_TURNO_SCORES', turno: targetTurno });
+
+    if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'CLEAR_TURNO_SCORES', turno: targetTurno })
+      }).catch(() => {});
+    }
+
+    this.notifyListeners({ source: 'clear_turno_scores', turno: targetTurno });
   }
 
   saveToStorage(broadcast = true, customPayload = null) {
@@ -1243,7 +1317,28 @@ class GincanaState {
       return null;
     }
 
-    const scores = (this.data.scores || []).filter((s) => s.teamId === teamId && s.provaId === provaId);
+    const team = this.getTeam(teamId);
+    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
+    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
+    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
+    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+
+    const scores = (this.data.scores || []).filter((s) => {
+      if (s.teamId !== teamId || s.provaId !== provaId) return false;
+      // Separação estrita e absoluta: juízes da manhã não pontuam tarde e vice-versa
+      if (team && team.turno) {
+        const jId = String(s.judgeId || '').trim();
+        const jName = String(s.judgeName || '').toLowerCase().trim();
+        if (team.turno === 'Vespertino') {
+          if (morningJudges.has(jId)) return false;
+          if (morningNames.some(n => jName.includes(n))) return false;
+        } else if (team.turno === 'Matutino') {
+          if (afternoonJudges.has(jId)) return false;
+          if (afternoonNames.some(n => jName.includes(n))) return false;
+        }
+      }
+      return true;
+    });
     if (scores.length === 0) return null;
 
     if (specificJudge) {
@@ -1664,6 +1759,28 @@ class GincanaState {
   addScore({ teamId, provaId, judgeId = null, judgeName, points, criteriaDetails = {}, rubricScore = 0, placeInProva = null, note = '' }) {
     if (!teamId || !provaId) {
       throw new Error('Equipe e Prova são obrigatórios.');
+    }
+
+    const team = this.getTeam(teamId);
+    if (!team) throw new Error('Turma / Equipe não encontrada: ' + teamId);
+
+    // Validação estrita de separação de turnos (Manhã e Tarde 100% isolados)
+    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
+    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
+    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
+    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+
+    const jId = String(judgeId || '').trim();
+    const jName = String(judgeName || '').toLowerCase().trim();
+
+    if (team.turno === 'Vespertino') {
+      if (morningJudges.has(jId) || morningNames.some(n => jName.includes(n))) {
+        throw new Error('Avaliador do turno Matutino não pode lançar notas para turmas do Vespertino.');
+      }
+    } else if (team.turno === 'Matutino') {
+      if (afternoonJudges.has(jId) || afternoonNames.some(n => jName.includes(n))) {
+        throw new Error('Avaliador do turno Vespertino não pode lançar notas para turmas do Matutino.');
+      }
     }
 
     const calculatedPoints = Math.round(Number(points || 0) * 10) / 10;

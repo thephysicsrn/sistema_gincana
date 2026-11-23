@@ -37,6 +37,31 @@ if (!fs.existsSync(DATA_DIR)) {
 
 let lastKnownState = null;
 
+const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
+const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
+const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
+const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+
+const vespertinoTeamIds = new Set(['t_6av', 't_6bv', 't_7av', 't_7bv', 't_8av', 't_8bv', 't_9av', 't_9bv']);
+const matutinoTeamIds = new Set(['t_6am', 't_6bm', 't_7am', 't_7bm', 't_8am', 't_8bm', 't_9am', 't_9bm']);
+
+function isTurnoMismatch(s) {
+  if (!s || !s.teamId) return false;
+  const teamId = String(s.teamId || '');
+  const jId = String(s.judgeId || '').trim();
+  const jName = String(s.judgeName || '').toLowerCase().trim();
+
+  if (vespertinoTeamIds.has(teamId)) {
+    if (morningJudges.has(jId)) return true;
+    if (morningNames.some(n => jName.includes(n))) return true;
+  }
+  if (matutinoTeamIds.has(teamId)) {
+    if (afternoonJudges.has(jId)) return true;
+    if (afternoonNames.some(n => jName.includes(n))) return true;
+  }
+  return false;
+}
+
 function getScoreKey(s) {
   if (!s) return '';
   const teamId = String(s.teamId || '');
@@ -55,13 +80,13 @@ function mergeScoreLists(baseList, incomingList) {
   const listB = Array.isArray(incomingList) ? incomingList : [];
 
   listA.forEach(s => {
-    if (s && s.teamId && s.provaId) {
+    if (s && s.teamId && s.provaId && !isTurnoMismatch(s)) {
       map.set(getScoreKey(s), s);
     }
   });
 
   listB.forEach(s => {
-    if (s && s.teamId && s.provaId) {
+    if (s && s.teamId && s.provaId && !isTurnoMismatch(s)) {
       const key = getScoreKey(s);
       const existing = map.get(key);
       if (!existing) {
@@ -227,6 +252,31 @@ const server = http.createServer((req, res) => {
             saveStateToDisk();
             broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
           }
+        } else if (parsed.action === 'CLEAR_TURNO_SCORES' && parsed.turno) {
+          const turnoNorm = parsed.turno.toLowerCase().trim();
+          if (lastKnownState) {
+            const teamsInTurno = new Set(
+              ((lastKnownState.teams || []).filter(t => (t.turno || '').toLowerCase().trim() === turnoNorm)).map(t => t.id)
+            );
+            if (turnoNorm === 'vespertino') {
+              vespertinoTeamIds.forEach(id => teamsInTurno.add(id));
+            } else if (turnoNorm === 'matutino') {
+              matutinoTeamIds.forEach(id => teamsInTurno.add(id));
+            }
+            if (Array.isArray(lastKnownState.scores)) {
+              lastKnownState.scores = lastKnownState.scores.filter(s => !teamsInTurno.has(s.teamId));
+            }
+            if (Array.isArray(lastKnownState.penalties)) {
+              lastKnownState.penalties = lastKnownState.penalties.filter(p => !teamsInTurno.has(p.teamId));
+            }
+            (lastKnownState.teams || []).forEach(t => {
+              if ((t.turno || '').toLowerCase().trim() === turnoNorm) {
+                t.pesoELixoKg = 0;
+              }
+            });
+            saveStateToDisk();
+            broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
+          }
         } else if (parsed.action === 'DELETE_SCORE_BY_GESTOR' && parsed.scoreId) {
           if (lastKnownState && Array.isArray(lastKnownState.scores)) {
             lastKnownState.scores = lastKnownState.scores.filter(s => s.id !== parsed.scoreId);
@@ -317,7 +367,12 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-    res.writeHead(200, { 'Content-Type': contentType });
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     fs.createReadStream(filePath).pipe(res);
   });
 });
@@ -405,6 +460,31 @@ if (WebSocket) {
             if (lastKnownState) {
               lastKnownState.scores = [];
               lastKnownState.penalties = [];
+              saveStateToDisk();
+            }
+          } else if (action === 'CLEAR_TURNO_SCORES' && (data.customPayload.turno || (data.payload && data.payload.turno))) {
+            const turno = data.customPayload.turno || data.payload.turno;
+            const turnoNorm = turno.toLowerCase().trim();
+            if (lastKnownState) {
+              const teamsInTurno = new Set(
+                ((lastKnownState.teams || []).filter(t => (t.turno || '').toLowerCase().trim() === turnoNorm)).map(t => t.id)
+              );
+              if (turnoNorm === 'vespertino') {
+                vespertinoTeamIds.forEach(id => teamsInTurno.add(id));
+              } else if (turnoNorm === 'matutino') {
+                matutinoTeamIds.forEach(id => teamsInTurno.add(id));
+              }
+              if (Array.isArray(lastKnownState.scores)) {
+                lastKnownState.scores = lastKnownState.scores.filter(s => !teamsInTurno.has(s.teamId));
+              }
+              if (Array.isArray(lastKnownState.penalties)) {
+                lastKnownState.penalties = lastKnownState.penalties.filter(p => !teamsInTurno.has(p.teamId));
+              }
+              (lastKnownState.teams || []).forEach(t => {
+                if ((t.turno || '').toLowerCase().trim() === turnoNorm) {
+                  t.pesoELixoKg = 0;
+                }
+              });
               saveStateToDisk();
             }
           } else if (action === 'DELETE_SCORE_BY_GESTOR' && data.customPayload && data.customPayload.scoreId) {

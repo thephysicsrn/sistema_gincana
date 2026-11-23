@@ -156,16 +156,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     headerJudgeRole.innerText = `${judge.role}${respText} • Autenticado`;
 
-    // Filtra automaticamente o turno do juiz logado para agilizar o lançamento
+    // Filtra automaticamente e bloqueia o turno do juiz logado para isolar 100% Manhã e Tarde
     if (judge.role && (judge.role.includes('Tarde') || judge.role.includes('Vespertino'))) {
       teamFilterState.turno = 'Vespertino';
       document.querySelectorAll('.btn-filter-turno').forEach((b) => {
-        b.classList.toggle('active', b.dataset.turno === 'Vespertino');
+        if (b.dataset.turno === 'Vespertino') {
+          b.classList.add('active');
+          b.style.display = 'inline-block';
+          b.innerText = '🌙 Turno Vespertino (8 Equipes)';
+        } else {
+          b.style.display = 'none';
+        }
       });
     } else if (judge.role && (judge.role.includes('Manhã') || judge.role.includes('Matutino'))) {
       teamFilterState.turno = 'Matutino';
       document.querySelectorAll('.btn-filter-turno').forEach((b) => {
-        b.classList.toggle('active', b.dataset.turno === 'Matutino');
+        if (b.dataset.turno === 'Matutino') {
+          b.classList.add('active');
+          b.style.display = 'inline-block';
+          b.innerText = '☀️ Turno Matutino (8 Equipes)';
+        } else {
+          b.style.display = 'none';
+        }
       });
     }
 
@@ -646,6 +658,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.btn-filter-turno').forEach((btn) => {
       btn.addEventListener('click', () => {
+        const currentJudge = state.getLoggedInJudge();
+        if (currentJudge && currentJudge.role) {
+          if (currentJudge.role.includes('Tarde') || currentJudge.role.includes('Vespertino')) {
+            teamFilterState.turno = 'Vespertino';
+            renderTeams();
+            return;
+          } else if (currentJudge.role.includes('Manhã') || currentJudge.role.includes('Matutino')) {
+            teamFilterState.turno = 'Matutino';
+            renderTeams();
+            return;
+          }
+        }
         teamFilterState.turno = btn.dataset.turno;
         document.querySelectorAll('.btn-filter-turno').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
@@ -1348,12 +1372,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       modal.classList.remove('active');
-      renderProvaTabs();
-      renderTeams();
-      renderControls();
-      updateTotal();
-      renderProvaEvalSummary();
-      renderJudgeRanking();
+      try { renderProvaTabs(); } catch (err) { console.warn(err); }
+      try { renderTeams(); } catch (err) { console.warn(err); }
+      try { renderControls(); } catch (err) { console.warn(err); }
+      try { updateTotal(); } catch (err) { console.warn(err); }
+      try { renderProvaEvalSummary(); } catch (err) { console.warn(err); }
+      try { renderJudgeRanking(); } catch (err) { console.warn(err); }
     } catch (e) {
       alert('Erro ao confirmar nota: ' + e.message);
     }
@@ -1392,106 +1416,118 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderJudgeRanking() {
-    if (!judgePodiumView || !judgeRankingList) return;
+    try {
+      if (!judgePodiumView || !judgeRankingList) return;
 
-    const rankings = state.getTeamRankings();
-    if (!rankings || rankings.length === 0) {
-      judgePodiumView.innerHTML = '';
-      judgeRankingList.innerHTML = `
-        <div style="text-align: center; padding: 2rem; background: rgba(15,23,42,0.6); border-radius: 8px; color: var(--text-muted); font-size: 0.85rem;">
-          Nenhuma equipe cadastrada no sistema.
-        </div>
-      `;
-      return;
-    }
-
-    // Top 3 Pódio
-    const top3 = [
-      rankings[1] || null, // 2º Lugar
-      rankings[0] || null, // 1º Lugar
-      rankings[2] || null  // 3º Lugar
-    ];
-
-    judgePodiumView.innerHTML = top3.map((team, idx) => {
-      if (!team) return '<div></div>';
-      const rankNum = idx === 1 ? 1 : idx === 0 ? 2 : 3;
-      const rankClass = `rank-${rankNum}`;
-      const badgeLabel = rankNum === 1 ? '1º LUGAR' : rankNum === 2 ? '2º LUGAR' : '3º LUGAR';
-      const badgeColor = rankNum === 1 ? '#facc15' : rankNum === 2 ? '#cbd5e1' : '#f97316';
-
-      return `
-        <div class="judge-podium-card ${rankClass}">
-          <span style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.4); margin-bottom: 0.4rem;">
-            ${badgeLabel}
-          </span>
-          <div style="width: 38px; height: 38px; border-radius: 50%; background: ${team.color || '#3b82f6'}22; border: 2px solid ${team.color || '#3b82f6'}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: ${team.color || '#3b82f6'}; margin-bottom: 0.35rem;">
-            ${team.icon || team.name.substring(0, 2).toUpperCase()}
-          </div>
-          <div style="font-weight: 800; font-size: 0.82rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-            ${team.name}
-          </div>
-          <div style="font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.35rem;">
-            ${team.turma || team.className || team.serie || ''}
-          </div>
-          <div style="font-size: 1.15rem; font-family: 'Outfit'; font-weight: 900; color: #facc15;">
-            ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.65rem; color: #94a3b8;">pts</span>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    // Lista Geral de Todas as Equipes
-    const leaderPoints = (rankings[0] && rankings[0].totalPoints) ? rankings[0].totalPoints : 0;
-
-    judgeRankingList.innerHTML = rankings.map((team) => {
-      const isLeader = team.rank === 1;
-      const rankBadgeColor = team.rank === 1 ? '#facc15' : team.rank === 2 ? '#cbd5e1' : team.rank === 3 ? '#f97316' : '#64748b';
-      const rankBadgeBg = team.rank === 1 ? 'rgba(234,179,8,0.15)' : team.rank === 2 ? 'rgba(203,213,225,0.15)' : team.rank === 3 ? 'rgba(249,115,22,0.15)' : 'rgba(100,116,139,0.15)';
-
-      const percent = (leaderPoints > 0 && team.totalPoints > 0)
-        ? Math.min(100, Math.max(5, Math.round((team.totalPoints / leaderPoints) * 100)))
-        : 0;
-
-      let diffText = '';
-      if (leaderPoints === 0 && team.totalPoints === 0) {
-        diffText = 'Aguardando notas';
-      } else if (isLeader || team.totalPoints === leaderPoints) {
-        diffText = isLeader ? 'Líder do Placar' : 'Empatada na liderança';
-      } else {
-        diffText = `-${team.diffToLeader} pts do líder`;
+      const judge = state.getLoggedInJudge();
+      let targetTurno = null;
+      if (judge && judge.role) {
+        if (judge.role.includes('Tarde') || judge.role.includes('Vespertino')) targetTurno = 'Vespertino';
+        else if (judge.role.includes('Manhã') || judge.role.includes('Matutino')) targetTurno = 'Matutino';
       }
 
-      return `
-        <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid ${team.color || '#3b82f6'}; border-radius: 8px; padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 0.45rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
-              <span style="font-family: 'Outfit'; font-weight: 900; font-size: 0.95rem; min-width: 28px; height: 28px; border-radius: 6px; background: ${rankBadgeBg}; color: ${rankBadgeColor}; display: flex; align-items: center; justify-content: center;">
-                #${team.rank}
-              </span>
-              <div style="min-width: 0;">
-                <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  ${team.name}
+      const rankings = state.getTeamRankings(targetTurno);
+      if (!rankings || rankings.length === 0) {
+        judgePodiumView.innerHTML = '';
+        judgeRankingList.innerHTML = `
+          <div style="text-align: center; padding: 2rem; background: rgba(15,23,42,0.6); border-radius: 8px; color: var(--text-muted); font-size: 0.85rem;">
+            Nenhuma equipe cadastrada no sistema.
+          </div>
+        `;
+        return;
+      }
+
+      // Top 3 Pódio
+      const top3 = [
+        rankings[1] || null, // 2º Lugar
+        rankings[0] || null, // 1º Lugar
+        rankings[2] || null  // 3º Lugar
+      ];
+
+      judgePodiumView.innerHTML = top3.map((team, idx) => {
+        if (!team) return '<div></div>';
+        const rankNum = idx === 1 ? 1 : idx === 0 ? 2 : 3;
+        const rankClass = `rank-${rankNum}`;
+        const badgeLabel = rankNum === 1 ? '1º LUGAR' : rankNum === 2 ? '2º LUGAR' : '3º LUGAR';
+        const badgeColor = rankNum === 1 ? '#facc15' : rankNum === 2 ? '#cbd5e1' : '#f97316';
+
+        return `
+          <div class="judge-podium-card ${rankClass}">
+            <span style="font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.4); margin-bottom: 0.4rem;">
+              ${badgeLabel}
+            </span>
+            <div style="width: 38px; height: 38px; border-radius: 50%; background: ${team.color || '#3b82f6'}22; border: 2px solid ${team.color || '#3b82f6'}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: ${team.color || '#3b82f6'}; margin-bottom: 0.35rem;">
+              ${team.icon || team.name.substring(0, 2).toUpperCase()}
+            </div>
+            <div style="font-weight: 800; font-size: 0.82rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+              ${team.name}
+            </div>
+            <div style="font-size: 0.68rem; color: #94a3b8; margin-bottom: 0.35rem;">
+              ${team.turma || team.className || team.serie || ''}
+            </div>
+            <div style="font-size: 1.15rem; font-family: 'Outfit'; font-weight: 900; color: #facc15;">
+              ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.65rem; color: #94a3b8;">pts</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Lista Geral de Todas as Equipes
+      const leaderPoints = (rankings[0] && rankings[0].totalPoints) ? rankings[0].totalPoints : 0;
+
+      judgeRankingList.innerHTML = rankings.map((team) => {
+        const isLeader = team.rank === 1;
+        const rankBadgeColor = team.rank === 1 ? '#facc15' : team.rank === 2 ? '#cbd5e1' : team.rank === 3 ? '#f97316' : '#64748b';
+        const rankBadgeBg = team.rank === 1 ? 'rgba(234,179,8,0.15)' : team.rank === 2 ? 'rgba(203,213,225,0.15)' : team.rank === 3 ? 'rgba(249,115,22,0.15)' : 'rgba(100,116,139,0.15)';
+
+        var percent = 0;
+        if (leaderPoints > 0 && team.totalPoints > 0) {
+          percent = Math.min(100, Math.max(5, Math.round((team.totalPoints / leaderPoints) * 100)));
+        }
+
+        let diffText = '';
+        if (leaderPoints === 0 && team.totalPoints === 0) {
+          diffText = 'Aguardando notas';
+        } else if (isLeader || team.totalPoints === leaderPoints) {
+          diffText = isLeader ? 'Líder do Placar' : 'Empatada na liderança';
+        } else {
+          diffText = `-${team.diffToLeader} pts do líder`;
+        }
+
+        return `
+          <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid ${team.color || '#3b82f6'}; border-radius: 8px; padding: 0.75rem 0.85rem; display: flex; flex-direction: column; gap: 0.45rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+                <span style="font-family: 'Outfit'; font-weight: 900; font-size: 0.95rem; min-width: 28px; height: 28px; border-radius: 6px; background: ${rankBadgeBg}; color: ${rankBadgeColor}; display: flex; align-items: center; justify-content: center;">
+                  #${team.rank}
+                </span>
+                <div style="min-width: 0;">
+                  <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    ${team.name}
+                  </div>
+                  <div style="font-size: 0.72rem; color: #94a3b8;">
+                    ${team.turma || team.className || team.serie || ''} • <span style="color: #cbd5e1;">${diffText}</span>
+                  </div>
                 </div>
-                <div style="font-size: 0.72rem; color: #94a3b8;">
-                  ${team.turma || team.className || team.serie || ''} • <span style="color: #cbd5e1;">${diffText}</span>
+              </div>
+
+              <div style="text-align: right; flex-shrink: 0;">
+                <div style="font-family: 'Outfit'; font-weight: 900; font-size: 1.15rem; color: #facc15;">
+                  ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.7rem; color: #94a3b8;">pts</span>
                 </div>
               </div>
             </div>
 
-            <div style="text-align: right; flex-shrink: 0;">
-              <div style="font-family: 'Outfit'; font-weight: 900; font-size: 1.15rem; color: #facc15;">
-                ${team.totalPoints.toLocaleString('pt-BR')} <span style="font-size: 0.7rem; color: #94a3b8;">pts</span>
-              </div>
+            <!-- Barra de progresso comparativa -->
+            <div style="background: rgba(0,0,0,0.4); border-radius: 999px; height: 5px; width: 100%; overflow: hidden;">
+              <div style="height: 100%; width: ${percent}%; background: linear-gradient(90deg, ${team.color || '#3b82f6'}, #38bdf8); border-radius: 999px;"></div>
             </div>
           </div>
-
-          <!-- Barra de progresso comparativa -->
-          <div style="background: rgba(0,0,0,0.4); border-radius: 999px; height: 5px; width: 100%; overflow: hidden;">
-            <div style="height: 100%; width: ${percent}%; background: linear-gradient(90deg, ${team.color || '#3b82f6'}, #38bdf8); border-radius: 999px;"></div>
-          </div>
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    } catch (err) {
+      console.warn('Erro ao atualizar ranking do juiz:', err);
+    }
   }
 
   // Listeners de alternância de abas do juiz

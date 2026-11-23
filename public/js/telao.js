@@ -149,10 +149,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTelaoTurnoButtons(currentTurno);
 
     // Atualiza títulos institucionais
-    if (standbyEventTitle) standbyEventTitle.innerText = `${config.eventName || 'SESI CONECTA 2026'}`;
+    if (standbyEventTitle) standbyEventTitle.innerText = 'Gincana SESI ESCOLA 2026';
     if (standbyEventSub) standbyEventSub.innerText = `${config.editalTitle || 'Tecnologia que transforma, resíduo que ganha novo destino'} • Gincana ${currentTurno}`;
-    if (telaoEventTitle) telaoEventTitle.innerText = `${config.eventName || 'SESI CONECTA 2026'}`;
-    if (telaoEventSub) telaoEventSub.innerText = `${config.editalTitle || 'Gincana Escolar'} • ${config.selectedUnit || 'SESI Escola'} (Gincana ${currentTurno})`;
+    if (telaoEventTitle) telaoEventTitle.innerText = 'Gincana SESI ESCOLA 2026';
+    if (telaoEventSub) {
+      telaoEventSub.style.display = 'none';
+      telaoEventSub.innerText = '';
+    }
 
     if (mode === 'standby') {
       isRevealing = false;
