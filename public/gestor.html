@@ -523,6 +523,9 @@
           <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="empreendedorismo" id="btn-subtab-admin-empreendedorismo" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #94a3b8;">
             💡 Feira de Empreendedorismo (100 pts)
           </button>
+          <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="customprovas" id="btn-subtab-admin-customprovas" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #c084fc;">
+            ✨ Provas Personalizadas (+ Criar Prova)
+          </button>
         </div>
 
         <!-- Conteúdo 1: Lançamento de E-Lixo -->
@@ -625,6 +628,42 @@
             </div>
           </div>
           <div id="admin-empreendedorismo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            <!-- Preenchido via gestor.js -->
+          </div>
+        </div>
+
+        <!-- Conteúdo 5: Provas Personalizadas Criadas pelo Admin -->
+        <div id="admin-subcontent-customprovas" class="admin-subcontent" style="display: none;">
+          <!-- Card de Criação de Nova Prova -->
+          <div class="glass-card" style="padding: 1.25rem; margin-bottom: 1.5rem; background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.3rem;">✨</span>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #c084fc;">Criar Nova Prova Oficial</h3>
+                  <p style="margin: 0; font-size: 0.8rem; color: #94a3b8;">Crie uma prova extra exclusiva do Admin e defina a pontuação de cada equipe manualmente.</p>
+                </div>
+              </div>
+            </div>
+            <form id="form-create-custom-prova" style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;">
+              <div style="flex: 2; min-width: 240px;">
+                <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.25rem;">Nome da Prova:</label>
+                <input type="text" id="input-custom-prova-title" class="form-input" placeholder="Ex: Grito de Paz, Dança das Cadeiras, Vôlei..." required style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.55rem 0.85rem; color: #fff; width: 100%;">
+              </div>
+              <div style="width: 140px;">
+                <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.25rem;">Pontuação Máxima:</label>
+                <input type="number" id="input-custom-prova-max" class="form-input" value="100" min="1" max="1000" style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.55rem 0.85rem; color: #facc15; font-weight: 800; text-align: center; width: 100%;">
+              </div>
+              <div>
+                <button type="submit" class="btn btn-sm btn-primary" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>➕</span> Criar Prova
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Área Dinâmica da Prova Personalizada Selecionada -->
+          <div id="admin-custom-workspace">
             <!-- Preenchido via gestor.js -->
           </div>
         </div>

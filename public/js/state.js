@@ -1036,6 +1036,56 @@ class GincanaState {
   }
 
   /**
+   * Adiciona uma nova prova criada pelo Admin
+   */
+  addCustomProva({ title, shortTitle, maxScore = 100, category = 'Extra / Coordenação', description = '' }) {
+    if (!title || !title.trim()) {
+      throw new Error('O nome da prova é obrigatório.');
+    }
+    const cleanTitle = title.trim();
+    const cleanShort = (shortTitle || cleanTitle).trim();
+    const id = 'p_custom_' + Date.now();
+    const count = (this.data.provas || []).length + 1;
+
+    const newProva = {
+      id,
+      title: cleanTitle,
+      shortTitle: cleanShort,
+      icon: `P${count}`,
+      category: (category || 'Extra / Coordenação').trim(),
+      anexo: 'Coordenação',
+      itemEdital: `Extra ${count}`,
+      description: (description || `Prova criada pela Coordenação.`).trim(),
+      type: 'standard_colocacao',
+      maxScore: Math.max(1, Number(maxScore || 100)),
+      status: 'active',
+      isCustomAdmin: true,
+      criteria: []
+    };
+
+    if (!Array.isArray(this.data.provas)) this.data.provas = [];
+    this.data.provas.push(newProva);
+    this.saveToStorage(true, { action: 'ADD_CUSTOM_PROVA', prova: newProva });
+    return newProva;
+  }
+
+  /**
+   * Remove uma prova personalizada criada pelo Admin
+   */
+  deleteCustomProva(provaId) {
+    if (!provaId) return false;
+    const idx = (this.data.provas || []).findIndex((p) => p.id === provaId);
+    if (idx === -1) return false;
+
+    const removed = this.data.provas.splice(idx, 1)[0];
+    if (Array.isArray(this.data.scores)) {
+      this.data.scores = this.data.scores.filter((s) => s.provaId !== provaId);
+    }
+    this.saveToStorage(true, { action: 'DELETE_CUSTOM_PROVA', provaId, removed });
+    return true;
+  }
+
+  /**
    * Restaura os critérios padrão do Edital para uma prova
    */
   resetProvaCriteria(provaId) {

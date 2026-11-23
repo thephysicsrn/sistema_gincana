@@ -454,13 +454,15 @@ document.addEventListener('DOMContentLoaded', () => {
   let adminTurnoXadrez = 'Matutino';
   let adminTurnoPingPong = 'Matutino';
   let adminTurnoEmpreendedorismo = 'Matutino';
+  let adminTurnoCustom = 'Matutino';
+  let adminSelectedCustomProvaId = null;
   let adminSubtabsInitialized = false;
 
   function setupAdminLancamentosSubtabs() {
     if (adminSubtabsInitialized) return;
     adminSubtabsInitialized = true;
 
-    // Subabas: E-Lixo, Xadrez, Ping Pong, Feira de Empreendedorismo
+    // Subabas: E-Lixo, Xadrez, Ping Pong, Feira de Empreendedorismo, Provas Personalizadas
     const subtabButtons = document.querySelectorAll('.btn-admin-subtab');
     subtabButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -479,15 +481,43 @@ document.addEventListener('DOMContentLoaded', () => {
         const cXadrez = document.getElementById('admin-subcontent-xadrez');
         const cPingpong = document.getElementById('admin-subcontent-pingpong');
         const cEmpreend = document.getElementById('admin-subcontent-empreendedorismo');
+        const cCustom = document.getElementById('admin-subcontent-customprovas');
         if (cElixo) cElixo.style.display = sub === 'elixo' ? 'block' : 'none';
         if (cXadrez) cXadrez.style.display = sub === 'xadrez' ? 'block' : 'none';
         if (cPingpong) cPingpong.style.display = sub === 'pingpong' ? 'block' : 'none';
         if (cEmpreend) cEmpreend.style.display = sub === 'empreendedorismo' ? 'block' : 'none';
+        if (cCustom) cCustom.style.display = sub === 'customprovas' ? 'block' : 'none';
 
         if (window.sound && typeof sound.playClick === 'function') sound.playClick();
         renderAdminLancamentos();
       });
     });
+
+    // Form para criar nova prova personalizada
+    const formCreateCustom = document.getElementById('form-create-custom-prova');
+    if (formCreateCustom) {
+      formCreateCustom.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputTitle = document.getElementById('input-custom-prova-title');
+        const inputMax = document.getElementById('input-custom-prova-max');
+        const title = (inputTitle?.value || '').trim();
+        const maxScore = Number(inputMax?.value || 100);
+        if (!title) {
+          alert('Por favor, digite o nome da nova prova.');
+          return;
+        }
+        try {
+          const newProva = state.addCustomProva({ title, maxScore });
+          adminSelectedCustomProvaId = newProva.id;
+          inputTitle.value = '';
+          if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+          showToast(`Prova "${newProva.title}" criada! Agora você pode lançar as notas abaixo.`, 'toast-success');
+          renderAdminCustomProvas();
+        } catch (err) {
+          alert(err.message || 'Erro ao criar prova.');
+        }
+      });
+    }
 
     // Seletor de Turno para E-Lixo
     document.querySelectorAll('.btn-admin-turno-elixo').forEach((btn) => {
@@ -568,6 +598,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderAdminPingPong();
     } else if (adminCurrentSubtab === 'empreendedorismo') {
       renderAdminEmpreendedorismo();
+    } else if (adminCurrentSubtab === 'customprovas') {
+      renderAdminCustomProvas();
     }
   }
 
@@ -644,13 +676,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (provaId === 'p_xadrez') renderAdminXadrez();
     if (provaId === 'p_pingpong') renderAdminPingPong();
     if (provaId === 'p_empreendedorismo') renderAdminEmpreendedorismo();
+    if (provaId.startsWith('p_custom_')) renderAdminCustomProvas();
   }
 
-  function renderAdminTournament(provaId, provaName, containerId, currentTurno) {
+  function renderAdminTournament(provaId, provaName, containerId, currentTurno, customMax = null) {
     const container = document.getElementById(containerId);
     if (!container) return;
     const teams = state.getTeams().filter((t) => !currentTurno || t.turno === currentTurno);
     const scores = state.getScores().filter((s) => s.provaId === provaId);
+    const provaObj = state.getProva(provaId);
+    const maxVal = customMax || (provaObj ? Number(provaObj.maxScore || 100) : 100);
+
+    const p1 = maxVal;
+    const p2 = Math.round(maxVal * 0.75 * 10) / 10;
+    const p3 = Math.round(maxVal * 0.5 * 10) / 10;
+    const p4 = Math.round(maxVal * 0.25 * 10) / 10;
 
     container.innerHTML = teams.map((team) => {
       const scoreObj = scores.find((s) => s.teamId === team.id);
@@ -685,13 +725,13 @@ document.addEventListener('DOMContentLoaded', () => {
               Colocação Rápida:
             </div>
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; margin-bottom: 0.5rem;">
-              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="100" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 100 ? '#10b981' : 'rgba(16, 185, 129, 0.15)'}; color: ${currentPts === 100 ? '#fff' : '#10b981'}; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 6px; cursor: pointer;">1º (100)</button>
-              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="75" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 75 ? '#3b82f6' : 'rgba(59, 130, 246, 0.15)'}; color: ${currentPts === 75 ? '#fff' : '#60a5fa'}; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 6px; cursor: pointer;">2º (75)</button>
-              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="50" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 50 ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)'}; color: ${currentPts === 50 ? '#fff' : '#fbbf24'}; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 6px; cursor: pointer;">3º (50)</button>
-              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="25" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === 25 ? '#a855f7' : 'rgba(168, 85, 247, 0.15)'}; color: ${currentPts === 25 ? '#fff' : '#c084fc'}; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 6px; cursor: pointer;">4º (25)</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="${p1}" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === p1 ? '#10b981' : 'rgba(16, 185, 129, 0.15)'}; color: ${currentPts === p1 ? '#fff' : '#10b981'}; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 6px; cursor: pointer;">1º (${p1})</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="${p2}" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === p2 ? '#3b82f6' : 'rgba(59, 130, 246, 0.15)'}; color: ${currentPts === p2 ? '#fff' : '#60a5fa'}; border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 6px; cursor: pointer;">2º (${p2})</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="${p3}" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === p3 ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)'}; color: ${currentPts === p3 ? '#fff' : '#fbbf24'}; border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 6px; cursor: pointer;">3º (${p3})</button>
+              <button type="button" class="btn btn-sm btn-quick-place" data-team="${team.id}" data-pts="${p4}" style="padding: 0.3rem 0; font-size: 0.75rem; font-weight: 800; background: ${currentPts === p4 ? '#a855f7' : 'rgba(168, 85, 247, 0.15)'}; color: ${currentPts === p4 ? '#fff' : '#c084fc'}; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 6px; cursor: pointer;">4º (${p4})</button>
             </div>
             <div style="display: flex; gap: 0.35rem; align-items: center;">
-              <input type="number" min="0" max="100" class="form-input input-custom-score" id="input-${provaId}-${team.id}" placeholder="0" value="${currentPts !== null ? currentPts : ''}" style="width: 70px; text-align: center; font-weight: 800; font-size: 0.9rem; padding: 0.35rem; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass-bright); border-radius: 6px; color: #fff;">
+              <input type="number" min="0" max="${maxVal}" step="0.5" class="form-input input-custom-score" id="input-${provaId}-${team.id}" placeholder="0" value="${currentPts !== null ? currentPts : ''}" style="width: 70px; text-align: center; font-weight: 800; font-size: 0.9rem; padding: 0.35rem; background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-glass-bright); border-radius: 6px; color: #fff;">
               <button type="button" class="btn btn-sm btn-save-custom-score" data-team="${team.id}" style="flex: 1; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 800; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-glass-bright); color: #fff; border-radius: 6px; cursor: pointer;">
                 💾 Salvar Nota
               </button>
@@ -717,8 +757,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const teamId = btn.dataset.team;
         const input = document.getElementById(`input-${provaId}-${teamId}`);
         const pts = parseFloat(input ? input.value : 0);
-        if (isNaN(pts) || pts < 0 || pts > 100) {
-          alert('Informe uma pontuação entre 0 e 100 pontos.');
+        if (isNaN(pts) || pts < 0 || pts > maxVal) {
+          alert(`Informe uma pontuação entre 0 e ${maxVal} pontos.`);
           return;
         }
         saveScoreForAdmin(teamId, provaId, pts, provaName);
@@ -736,6 +776,111 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderAdminEmpreendedorismo() {
     renderAdminTournament('p_empreendedorismo', 'Feira de Empreendedorismo', 'admin-empreendedorismo-grid', adminTurnoEmpreendedorismo);
+  }
+
+  function renderAdminCustomProvas() {
+    const workspace = document.getElementById('admin-custom-workspace');
+    if (!workspace) return;
+    const customProvas = state.getProvas().filter((p) => p.isCustomAdmin || p.id.startsWith('p_custom_'));
+
+    if (customProvas.length === 0) {
+      workspace.innerHTML = `
+        <div class="glass-card" style="text-align: center; padding: 3rem 1.5rem; color: #94a3b8; border-radius: 12px;">
+          <div style="font-size: 2.8rem; margin-bottom: 0.75rem;">📋</div>
+          <h4 style="font-size: 1.15rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.35rem;">Nenhuma prova personalizada criada ainda</h4>
+          <p style="font-size: 0.85rem; max-width: 500px; margin: 0 auto; color: #94a3b8;">
+            Utilize o formulário roxo acima para criar uma prova (ex: <em>Grito de Paz, Dança das Cadeiras, Vôlei</em>). Ela aparecerá aqui para você definir a pontuação de cada equipe manualmente!
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    if (!adminSelectedCustomProvaId || !customProvas.some((p) => p.id === adminSelectedCustomProvaId)) {
+      adminSelectedCustomProvaId = customProvas[0].id;
+    }
+
+    const activeProva = customProvas.find((p) => p.id === adminSelectedCustomProvaId) || customProvas[0];
+
+    workspace.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+          <span style="font-size: 0.8rem; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Provas Criadas:</span>
+          ${customProvas.map((p) => `
+            <button type="button" class="btn btn-sm btn-select-custom-prova" data-id="${p.id}" style="padding: 0.45rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.85rem; border: 1px solid ${p.id === activeProva.id ? '#a855f7' : 'var(--border-glass-bright)'}; background: ${p.id === activeProva.id ? 'rgba(168, 85, 247, 0.25)' : 'rgba(15, 23, 42, 0.6)'}; color: ${p.id === activeProva.id ? '#c084fc' : '#94a3b8'}; cursor: pointer;">
+              ${p.title} (${p.maxScore} pts)
+            </button>
+          `).join('')}
+        </div>
+        <div>
+          <button type="button" class="btn btn-sm btn-delete-custom-prova" data-id="${activeProva.id}" style="padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); color: #f87171; cursor: pointer;">
+            🗑️ Excluir esta Prova
+          </button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #c084fc; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span>✨</span> Lançamento de Notas: ${activeProva.title} (Máx: ${activeProva.maxScore} pts)
+          </h3>
+          <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
+            Defina a nota de cada turma para esta prova. O ranking geral e o telão atualizam em tempo real.
+          </p>
+        </div>
+        <!-- Seletor de Turno -->
+        <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+          <button type="button" class="btn-admin-turno-custom ${adminTurnoCustom === 'Matutino' ? 'active' : ''}" data-turno="Matutino" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: ${adminTurnoCustom === 'Matutino' ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : 'transparent'}; color: ${adminTurnoCustom === 'Matutino' ? '#fff' : '#94a3b8'};">
+            ☀️ Matutino (8 Turmas)
+          </button>
+          <button type="button" class="btn-admin-turno-custom ${adminTurnoCustom === 'Vespertino' ? 'active' : ''}" data-turno="Vespertino" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: ${adminTurnoCustom === 'Vespertino' ? 'linear-gradient(135deg, #2563eb, #7c3aed)' : 'transparent'}; color: ${adminTurnoCustom === 'Vespertino' ? '#fff' : '#94a3b8'};">
+            🌙 Vespertino (8 Turmas)
+          </button>
+        </div>
+      </div>
+
+      <div id="admin-custom-prova-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+      </div>
+    `;
+
+    // Eventos de seleção de prova
+    workspace.querySelectorAll('.btn-select-custom-prova').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminSelectedCustomProvaId = btn.dataset.id;
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminCustomProvas();
+      });
+    });
+
+    // Evento de exclusão de prova
+    const btnDelete = workspace.querySelector('.btn-delete-custom-prova');
+    if (btnDelete) {
+      btnDelete.addEventListener('click', () => {
+        const idToDelete = btnDelete.dataset.id;
+        const provaObj = state.getProva(idToDelete);
+        const name = provaObj ? provaObj.title : 'esta prova';
+        if (confirm(`Tem certeza que deseja excluir a prova "${name}" e todas as suas notas?`)) {
+          state.deleteCustomProva(idToDelete);
+          adminSelectedCustomProvaId = null;
+          if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+          showToast(`Prova "${name}" excluída com sucesso.`, 'toast-info');
+          renderAdminCustomProvas();
+        }
+      });
+    }
+
+    // Eventos de troca de turno
+    workspace.querySelectorAll('.btn-admin-turno-custom').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminTurnoCustom = btn.dataset.turno;
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminCustomProvas();
+      });
+    });
+
+    // Renderiza o grid de equipes para a prova selecionada
+    renderAdminTournament(activeProva.id, activeProva.title, 'admin-custom-prova-grid', adminTurnoCustom, activeProva.maxScore);
+  }
   }
 
   // =========================================================================

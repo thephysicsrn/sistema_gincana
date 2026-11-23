@@ -265,13 +265,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function getAllAvailableProvas() {
-    // Provas de Xadrez, Ping Pong e Feira de Empreendedorismo são de responsabilidade e lançamento exclusivo do Admin / Coordenação
-    return state.getProvas().filter((p) => p.id !== 'p_xadrez' && p.id !== 'p_pingpong' && p.id !== 'p_empreendedorismo');
+    // Provas de Xadrez, Ping Pong, Feira de Empreendedorismo e Provas Personalizadas do Admin são exclusivas da Coordenação
+    return state.getProvas().filter((p) => 
+      p.id !== 'p_xadrez' && 
+      p.id !== 'p_pingpong' && 
+      p.id !== 'p_empreendedorismo' && 
+      !p.isCustomAdmin && 
+      !p.id.startsWith('p_custom_')
+    );
   }
 
   function initScoringForm() {
     const allProvas = getAllAvailableProvas();
-    if ((!form.provaId || form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong' || form.provaId === 'p_empreendedorismo') && allProvas.length > 0) {
+    const isRestricted = !form.provaId || 
+      form.provaId === 'p_xadrez' || 
+      form.provaId === 'p_pingpong' || 
+      form.provaId === 'p_empreendedorismo' || 
+      form.provaId.startsWith('p_custom_');
+    if (isRestricted && allProvas.length > 0) {
       form.provaId = allProvas[0].id;
     }
 
@@ -1283,8 +1294,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sound.playScoreDing();
         alert(`${form.pesoInput} kg registrados com sucesso para ${state.getTeam(form.teamId).name}.`);
       } else {
-        if (form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong' || form.provaId === 'p_empreendedorismo') {
-          alert('As provas de Xadrez, Ping Pong e Feira de Empreendedorismo são lançadas exclusivamente pela Coordenação / Admin.');
+        if (form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong' || form.provaId === 'p_empreendedorismo' || form.provaId.startsWith('p_custom_')) {
+          alert('Esta prova é lançada exclusivamente pela Coordenação / Admin.');
           return;
         }
 
