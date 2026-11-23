@@ -168,10 +168,10 @@ function validateScore(score) {
   return true;
 }
 
-const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
-const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
-const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
-const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+const morningJudges = new Set(['j_artuane', 'j_sheyla', 'j_joaovictor', 'j_adriel', 'j_helena']);
+const morningNames = ['artuane', 'sheyla', 'sheyla de paula', 'joão victor', 'joao victor', 'adriel', 'helena'];
+const afternoonJudges = new Set(['j_ericka', 'j_micael', 'j_rebeca', 'j_smith', 'j_kemila']);
+const afternoonNames = ['ericka', 'micael', 'rebeca', 'smith', 'kemila'];
 
 const vespertinoTeamIds = new Set([
   't_1av', 't_1bv', 't_2av', 't_2bv', 't_3av', 't_3bv',

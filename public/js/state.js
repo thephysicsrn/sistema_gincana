@@ -474,16 +474,16 @@ class GincanaState {
         telaoMode: 'standby' // 'standby' (apenas Logo em destaque) ou 'results' (Resultados liberados)
       },
       judges: [
-        { id: 'j_artuane', name: 'Artuane', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1001' },
-        { id: 'j_micarla', name: 'Micarla', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1002' },
-        { id: 'j_aparecida', name: 'Aparecida', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1003' },
-        { id: 'j_palhares', name: 'Palhares', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1004' },
-        { id: 'j_rebeca', name: 'Rebeca', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1005' },
-        { id: 'j_diego', name: 'Diego', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2001' },
-        { id: 'j_helena', name: 'Helena', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2002' },
-        { id: 'j_joaovictor', name: 'João Victor', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2003' },
-        { id: 'j_joserodrigues', name: 'José Rodrigues', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2004' },
-        { id: 'j_micael', name: 'Micael', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2005' }
+        { id: 'j_artuane', name: 'Artuane', role: 'Avaliador(a) Oficial • Ensino Médio Manhã', assignedProvaId: null, pin: '1001' },
+        { id: 'j_sheyla', name: 'Sheyla de Paula', role: 'Avaliador(a) Oficial • Ensino Médio Manhã', assignedProvaId: null, pin: '1002' },
+        { id: 'j_joaovictor', name: 'João Victor', role: 'Avaliador(a) Oficial • Ensino Médio Manhã', assignedProvaId: null, pin: '1003' },
+        { id: 'j_adriel', name: 'Adriel', role: 'Avaliador(a) Oficial • Ensino Médio Manhã', assignedProvaId: null, pin: '1004' },
+        { id: 'j_helena', name: 'Helena', role: 'Avaliador(a) Oficial • Ensino Médio Manhã', assignedProvaId: null, pin: '1005' },
+        { id: 'j_ericka', name: 'Ericka', role: 'Avaliador(a) Oficial • Ensino Médio Tarde', assignedProvaId: null, pin: '2001' },
+        { id: 'j_micael', name: 'Micael', role: 'Avaliador(a) Oficial • Ensino Médio Tarde', assignedProvaId: null, pin: '2002' },
+        { id: 'j_rebeca', name: 'Rebeca', role: 'Avaliador(a) Oficial • Ensino Médio Tarde', assignedProvaId: null, pin: '2003' },
+        { id: 'j_smith', name: 'Smith', role: 'Avaliador(a) Oficial • Ensino Médio Tarde', assignedProvaId: null, pin: '2004' },
+        { id: 'j_kemila', name: 'Kemila', role: 'Avaliador(a) Oficial • Ensino Médio Tarde', assignedProvaId: null, pin: '2005' }
       ],
       // Turmas participantes configuradas como equipes (Item 10 do Edital)
       teams: [
@@ -1125,10 +1125,10 @@ class GincanaState {
     if (!this.data || !Array.isArray(this.data.scores)) return 0;
     const initialCount = this.data.scores.length;
 
-    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
-    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
-    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
-    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+    const morningJudges = new Set(['j_artuane', 'j_sheyla', 'j_joaovictor', 'j_adriel', 'j_helena']);
+    const morningNames = ['artuane', 'sheyla', 'sheyla de paula', 'joão victor', 'joao victor', 'adriel', 'helena'];
+    const afternoonJudges = new Set(['j_ericka', 'j_micael', 'j_rebeca', 'j_smith', 'j_kemila']);
+    const afternoonNames = ['ericka', 'micael', 'rebeca', 'smith', 'kemila'];
 
     this.data.scores = this.data.scores.filter((s) => {
       if (!s || !s.teamId) return false;
@@ -1346,10 +1346,10 @@ class GincanaState {
     }
 
     const team = this.getTeam(teamId);
-    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
-    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
-    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
-    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+    const morningJudges = new Set(['j_artuane', 'j_sheyla', 'j_joaovictor', 'j_adriel', 'j_helena']);
+    const morningNames = ['artuane', 'sheyla', 'sheyla de paula', 'joão victor', 'joao victor', 'adriel', 'helena'];
+    const afternoonJudges = new Set(['j_ericka', 'j_micael', 'j_rebeca', 'j_smith', 'j_kemila']);
+    const afternoonNames = ['ericka', 'micael', 'rebeca', 'smith', 'kemila'];
 
     const scores = (this.data.scores || []).filter((s) => {
       if (s.teamId !== teamId || s.provaId !== provaId) return false;
@@ -1793,10 +1793,10 @@ class GincanaState {
     if (!team) throw new Error('Turma / Equipe não encontrada: ' + teamId);
 
     // Validação estrita de separação de turnos (Manhã e Tarde 100% isolados)
-    const morningJudges = new Set(['j_artuane', 'j_micarla', 'j_aparecida', 'j_palhares', 'j_rebeca']);
-    const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
-    const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
-    const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
+    const morningJudges = new Set(['j_artuane', 'j_sheyla', 'j_joaovictor', 'j_adriel', 'j_helena']);
+    const morningNames = ['artuane', 'sheyla', 'sheyla de paula', 'joão victor', 'joao victor', 'adriel', 'helena'];
+    const afternoonJudges = new Set(['j_ericka', 'j_micael', 'j_rebeca', 'j_smith', 'j_kemila']);
+    const afternoonNames = ['ericka', 'micael', 'rebeca', 'smith', 'kemila'];
 
     const jId = String(judgeId || '').trim();
     const jName = String(judgeName || '').toLowerCase().trim();
