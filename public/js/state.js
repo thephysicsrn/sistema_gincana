@@ -1998,6 +1998,17 @@ class GincanaState {
   // MATRIZ DE RESPOSTAS DOS JUÍZES, AUDITORIA E PENDÊNCIAS
   // =========================================================================
 
+  getActivities() {
+    return (this.data.provas || []).map((p) => ({
+      id: p.id,
+      name: p.title || p.shortTitle,
+      shortTitle: p.shortTitle || p.title,
+      category: p.category || 'Geral',
+      maxPoints: Number(p.maxScore || 100),
+      ...p
+    }));
+  }
+
   /**
    * Retorna a matriz de avaliações cruzando [Equipe x Prova x Juiz]
    * para o gestor acompanhar exatamente quem respondeu ou não.
@@ -2017,7 +2028,9 @@ class GincanaState {
       teams.forEach((team) => {
         const judgeResponses = judges.map((judge) => {
           const score = scores.find(
-            (s) => s.activityId === activity.id && s.teamId === team.id && s.judgeId === judge.id
+            (s) => (s.provaId === activity.id || s.activityId === activity.id) &&
+                   s.teamId === team.id &&
+                   (s.judgeId === judge.id || s.judgeName === judge.name)
           );
 
           if (score) totalCompleted++;
@@ -2082,7 +2095,8 @@ class GincanaState {
       .map((score) => {
         const judge = judgesMap[score.judgeId] || { name: score.judgeName || 'Desconhecido', role: 'Avaliador' };
         const team = teamsMap[score.teamId] || { name: 'Equipe não encontrada', turma: '-', color: '#666', icon: 'EQ' };
-        const activity = activitiesMap[score.activityId] || { name: 'Prova não encontrada', maxPoints: 100 };
+        const provaId = score.provaId || score.activityId;
+        const activity = activitiesMap[provaId] || { name: 'Prova não encontrada', maxPoints: 100 };
 
         return {
           id: score.id,
@@ -2095,7 +2109,7 @@ class GincanaState {
           teamTurma: team.turma,
           teamColor: team.color,
           teamIcon: team.icon,
-          activityId: score.activityId,
+          activityId: provaId,
           activityName: activity.name,
           maxPoints: activity.maxPoints,
           points: score.points,
