@@ -600,7 +600,7 @@ class GincanaState {
           anexo: 'Cultural',
           itemEdital: 'Prova 1',
           description: 'Identidade da equipe e apresentação com paródia musical autoral. Avaliação por critérios (rubricas) de 0 a 100 pontos e colocação.',
-          type: 'rubrica_colocacao',
+          type: 'soma_direta',
           maxScore: 100,
           status: 'active',
           timeLimitSeconds: 300,
@@ -620,7 +620,7 @@ class GincanaState {
           anexo: 'Tecnologia',
           itemEdital: 'Prova 2',
           description: 'Criação de objeto ou protótipo funcional utilizando materiais reaproveitados e tecnologia.',
-          type: 'rubrica_colocacao',
+          type: 'soma_direta',
           maxScore: 100,
           status: 'active',
           criteria: [
@@ -653,7 +653,7 @@ class GincanaState {
           anexo: 'Solidariedade',
           itemEdital: 'Prova 4',
           description: 'Mobilização comunitária, arrecadação solidária e impacto social.',
-          type: 'rubrica_colocacao',
+          type: 'soma_direta',
           maxScore: 100,
           status: 'active',
           criteria: [
@@ -671,7 +671,7 @@ class GincanaState {
           anexo: 'E-Lixo',
           itemEdital: 'Prova 5',
           description: 'Campanha oficial de recolhimento e descarte correto de lixo eletrônico.',
-          type: 'rubrica_colocacao',
+          type: 'soma_direta',
           maxScore: 100,
           status: 'active',
           criteria: [

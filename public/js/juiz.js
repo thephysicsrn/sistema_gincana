@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const restored = state.resetProvaCriteria(form.provaId);
             if (restored) {
               tempCriteriaList = JSON.parse(JSON.stringify(restored.criteria || []));
-              editScoringTypeSelect.value = restored.type || 'rubrica_colocacao';
+              editScoringTypeSelect.value = restored.type || 'soma_direta';
               sound.playScoreDing();
               renderCriteriaEditorRows();
             }
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     criteriaEditorTitle.innerText = `Definir Critérios da Prova: ${prova.title}`;
     tempCriteriaList = JSON.parse(JSON.stringify(prova.criteria || []));
-    editScoringTypeSelect.value = prova.type || 'rubrica_colocacao';
+    editScoringTypeSelect.value = prova.type || 'soma_direta';
 
     renderCriteriaEditorRows();
     criteriaEditorModal.classList.add('active');
@@ -899,21 +899,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           `;
         }).join('')}
-
-        ${prova.type === 'rubrica_colocacao' ? `
-          <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-glass);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0;">Colocação Oficial da Turma (Item 36):</label>
-              <span style="font-size: 0.72rem; color: #a5b4fc;">Baseado na Soma da Rubrica</span>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
-              <button type="button" class="btn btn-secondary m-btn-place ${form.directPlace === 1 ? 'btn-primary' : ''}" data-place="1">1º Lugar (100 pts)</button>
-              <button type="button" class="btn btn-secondary m-btn-place ${form.directPlace === 2 ? 'btn-primary' : ''}" data-place="2">2º Lugar (75 pts)</button>
-              <button type="button" class="btn btn-secondary m-btn-place ${form.directPlace === 3 ? 'btn-primary' : ''}" data-place="3">3º Lugar (50 pts)</button>
-              <button type="button" class="btn btn-secondary m-btn-place ${form.directPlace === 4 ? 'btn-primary' : ''}" data-place="4">Demais (25 pts)</button>
-            </div>
-          </div>
-        ` : ''}
       `;
 
       // Eventos dos sliders e inputs numéricos sincronizados
@@ -1095,20 +1080,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const prova = state.getProva(form.provaId);
     if (!prova || form.isExceededTime) return 0;
 
+    // Se a prova possui critérios de rubrica definidos, a nota é sempre a soma das rubricas (cada uma até 25 pts, total 100)
+    if (prova.criteria && prova.criteria.length > 0) {
+      return calculateRubricSum();
+    }
+
     // Se a prova é soma direta dos critérios
-    if (prova.type === 'soma_direta') {
+    if (prova.type === 'soma_direta' || prova.type === 'rubrica_elixo_mob') {
       return calculateRubricSum();
-    }
-
-    if (prova.type === 'rubrica_elixo_mob') {
-      return calculateRubricSum();
-    }
-
-    if (prova.type === 'rubrica_colocacao' || prova.type === 'standard_colocacao') {
-      if (form.directPlace === 1) return 100;
-      if (form.directPlace === 2) return 75;
-      if (form.directPlace === 3) return 50;
-      return 25;
     }
 
     if (prova.type === 'top3_zero') {
@@ -1118,7 +1097,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return 0;
     }
 
-    return 0;
+    // Provas diretas sem critérios (colocação 100, 75, 50, 25)
+    if (form.directPlace === 1) return 100;
+    if (form.directPlace === 2) return 75;
+    if (form.directPlace === 3) return 50;
+    return 25;
   }
 
   function updateTotal() {
@@ -1129,8 +1112,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       totalPreview.innerText = total.toLocaleString('pt-BR');
       const prova = state.getProva(form.provaId);
-      if (prova && prova.type === 'soma_direta') {
-        if (mobilePreviewInfoSub) mobilePreviewInfoSub.innerText = 'soma direta dos critérios da rubrica';
+      if (prova && prova.criteria && prova.criteria.length > 0) {
+        if (mobilePreviewInfoSub) mobilePreviewInfoSub.innerText = 'soma de cada rubrica (máx: 100 pts)';
       } else {
         if (mobilePreviewInfoSub) mobilePreviewInfoSub.innerText = 'pontos oficiais calculados para a gincana';
       }
