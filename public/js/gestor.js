@@ -453,13 +453,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let adminTurnoElixo = 'Matutino';
   let adminTurnoXadrez = 'Matutino';
   let adminTurnoPingPong = 'Matutino';
+  let adminTurnoEmpreendedorismo = 'Matutino';
   let adminSubtabsInitialized = false;
 
   function setupAdminLancamentosSubtabs() {
     if (adminSubtabsInitialized) return;
     adminSubtabsInitialized = true;
 
-    // Subabas: E-Lixo, Xadrez, Ping Pong
+    // Subabas: E-Lixo, Xadrez, Ping Pong, Feira de Empreendedorismo
     const subtabButtons = document.querySelectorAll('.btn-admin-subtab');
     subtabButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -477,9 +478,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const cElixo = document.getElementById('admin-subcontent-elixo');
         const cXadrez = document.getElementById('admin-subcontent-xadrez');
         const cPingpong = document.getElementById('admin-subcontent-pingpong');
+        const cEmpreend = document.getElementById('admin-subcontent-empreendedorismo');
         if (cElixo) cElixo.style.display = sub === 'elixo' ? 'block' : 'none';
         if (cXadrez) cXadrez.style.display = sub === 'xadrez' ? 'block' : 'none';
         if (cPingpong) cPingpong.style.display = sub === 'pingpong' ? 'block' : 'none';
+        if (cEmpreend) cEmpreend.style.display = sub === 'empreendedorismo' ? 'block' : 'none';
 
         if (window.sound && typeof sound.playClick === 'function') sound.playClick();
         renderAdminLancamentos();
@@ -536,6 +539,23 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAdminPingPong();
       });
     });
+
+    // Seletor de Turno para Feira de Empreendedorismo
+    document.querySelectorAll('.btn-admin-turno-empreendedorismo').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adminTurnoEmpreendedorismo = btn.dataset.turno;
+        document.querySelectorAll('.btn-admin-turno-empreendedorismo').forEach((b) => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.color = '#94a3b8';
+        });
+        btn.classList.add('active');
+        btn.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
+        btn.style.color = '#fff';
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        renderAdminEmpreendedorismo();
+      });
+    });
   }
 
   function renderAdminLancamentos() {
@@ -546,6 +566,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderAdminXadrez();
     } else if (adminCurrentSubtab === 'pingpong') {
       renderAdminPingPong();
+    } else if (adminCurrentSubtab === 'empreendedorismo') {
+      renderAdminEmpreendedorismo();
     }
   }
 
@@ -621,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`Pontuação de ${provaName} salva: ${points} pts para ${team ? team.name : teamId}`, 'toast-success');
     if (provaId === 'p_xadrez') renderAdminXadrez();
     if (provaId === 'p_pingpong') renderAdminPingPong();
+    if (provaId === 'p_empreendedorismo') renderAdminEmpreendedorismo();
   }
 
   function renderAdminTournament(provaId, provaName, containerId, currentTurno) {
@@ -709,6 +732,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderAdminPingPong() {
     renderAdminTournament('p_pingpong', 'Ping Pong', 'admin-pingpong-grid', adminTurnoPingPong);
+  }
+
+  function renderAdminEmpreendedorismo() {
+    renderAdminTournament('p_empreendedorismo', 'Feira de Empreendedorismo', 'admin-empreendedorismo-grid', adminTurnoEmpreendedorismo);
   }
 
   // =========================================================================

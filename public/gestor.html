@@ -520,6 +520,9 @@
           <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="pingpong" id="btn-subtab-admin-pingpong" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #94a3b8;">
             🏓 Torneio de Ping Pong (100 pts)
           </button>
+          <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="empreendedorismo" id="btn-subtab-admin-empreendedorismo" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #94a3b8;">
+            💡 Feira de Empreendedorismo (100 pts)
+          </button>
         </div>
 
         <!-- Conteúdo 1: Lançamento de E-Lixo -->
@@ -596,6 +599,32 @@
             </div>
           </div>
           <div id="admin-pingpong-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            <!-- Preenchido via gestor.js -->
+          </div>
+        </div>
+
+        <!-- Conteúdo 4: Lançamento de Feira de Empreendedorismo -->
+        <div id="admin-subcontent-empreendedorismo" class="admin-subcontent" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: #facc15; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <span>💡</span> Pontuação da Feira de Empreendedorismo (Máx: 100 pts)
+              </h3>
+              <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.2rem;">
+                Atribua a pontuação oficial da Feira de Empreendedorismo para cada turma. Lançamento exclusivo da Coordenação / Admin.
+              </p>
+            </div>
+            <!-- Seletor de Turno -->
+            <div style="background: rgba(15, 23, 42, 0.85); padding: 3px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.25rem;">
+              <button type="button" class="btn-admin-turno-empreendedorismo active" data-turno="Matutino" id="btn-admin-turno-empreendedorismo-mat" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+                ☀️ Matutino (8 Turmas)
+              </button>
+              <button type="button" class="btn-admin-turno-empreendedorismo" data-turno="Vespertino" id="btn-admin-turno-empreendedorismo-vesp" style="padding: 0.45rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+                🌙 Vespertino (8 Turmas)
+              </button>
+            </div>
+          </div>
+          <div id="admin-empreendedorismo-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
             <!-- Preenchido via gestor.js -->
           </div>
         </div>

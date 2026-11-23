@@ -749,6 +749,20 @@ class GincanaState {
           maxScore: 100,
           status: 'active',
           criteria: []
+        },
+        {
+          id: 'p_empreendedorismo',
+          title: 'Feira de Empreendedorismo',
+          shortTitle: 'Empreendedorismo',
+          icon: 'P11',
+          category: 'Inovação & Negócios',
+          anexo: 'Empreendedorismo',
+          itemEdital: 'Feira',
+          description: 'Avaliação oficial da Feira de Empreendedorismo das turmas. Lançamento exclusivo da Coordenação / Admin.',
+          type: 'standard_colocacao',
+          maxScore: 100,
+          status: 'active',
+          criteria: []
         }
       ],
       // Lançamentos de notas
@@ -811,6 +825,14 @@ class GincanaState {
       if (hasOldProvas) {
         this.data.provas = this.getDefaultData().provas;
         this.saveToStorage(false);
+      }
+
+      if (Array.isArray(this.data.provas) && !this.data.provas.some((p) => p.id === 'p_empreendedorismo')) {
+        const defaultEmpreendedorismo = this.getDefaultData().provas.find((p) => p.id === 'p_empreendedorismo');
+        if (defaultEmpreendedorismo) {
+          this.data.provas.push(defaultEmpreendedorismo);
+          this.saveToStorage(false);
+        }
       }
 
       if (Array.isArray(this.data.provas)) {

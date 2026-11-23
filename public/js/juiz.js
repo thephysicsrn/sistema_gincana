@@ -265,13 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================================================================
 
   function getAllAvailableProvas() {
-    // Provas de Xadrez e Ping Pong são de responsabilidade e lançamento exclusivo do Admin / Coordenação
-    return state.getProvas().filter((p) => p.id !== 'p_xadrez' && p.id !== 'p_pingpong');
+    // Provas de Xadrez, Ping Pong e Feira de Empreendedorismo são de responsabilidade e lançamento exclusivo do Admin / Coordenação
+    return state.getProvas().filter((p) => p.id !== 'p_xadrez' && p.id !== 'p_pingpong' && p.id !== 'p_empreendedorismo');
   }
 
   function initScoringForm() {
     const allProvas = getAllAvailableProvas();
-    if ((!form.provaId || form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong') && allProvas.length > 0) {
+    if ((!form.provaId || form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong' || form.provaId === 'p_empreendedorismo') && allProvas.length > 0) {
       form.provaId = allProvas[0].id;
     }
 
@@ -1224,6 +1224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const team = state.getTeam(form.teamId);
     if (!team) {
+      
       alert('Selecione uma turma para avaliar.');
       return;
     }
@@ -1282,8 +1283,8 @@ document.addEventListener('DOMContentLoaded', () => {
         sound.playScoreDing();
         alert(`${form.pesoInput} kg registrados com sucesso para ${state.getTeam(form.teamId).name}.`);
       } else {
-        if (form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong') {
-          alert('As provas de Xadrez e Ping Pong são lançadas exclusivamente pela Coordenação / Admin.');
+        if (form.provaId === 'p_xadrez' || form.provaId === 'p_pingpong' || form.provaId === 'p_empreendedorismo') {
+          alert('As provas de Xadrez, Ping Pong e Feira de Empreendedorismo são lançadas exclusivamente pela Coordenação / Admin.');
           return;
         }
 
