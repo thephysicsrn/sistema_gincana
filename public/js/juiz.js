@@ -724,8 +724,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let statusBadge = '';
       if (isMulti) {
-        // Apresentação com Paródia: banca com múltiplos juízes
-        const myScore = judge ? state.getTeamScore(t.id, form.provaId, judge.id || judge.name) : null;
+        // Apresentação com Paródia e Recicla Tech: banca com múltiplos juízes
+        const myScore = judge ? (state.getTeamScore(t.id, form.provaId, judge.id) || state.getTeamScore(t.id, form.provaId, judge.name)) : null;
         const allScoresForTeam = state.getScores().filter((s) => s.teamId === t.id && s.provaId === form.provaId);
         const countJudges = allScoresForTeam.length;
 
@@ -784,19 +784,32 @@ document.addEventListener('DOMContentLoaded', () => {
   function loadExistingScoreForTeam(teamId) {
     const judge = state.getLoggedInJudge();
     const isMulti = state.isMultiJudgeProva(form.provaId);
-    const existing = isMulti && judge 
-      ? state.getTeamScore(teamId, form.provaId, judge.id || judge.name) 
-      : state.getTeamScore(teamId, form.provaId);
+    let existing = null;
+    if (isMulti && judge) {
+      existing = state.getTeamScore(teamId, form.provaId, judge.id) || 
+                 state.getTeamScore(teamId, form.provaId, judge.name);
+      // Fallback: se este juiz ainda não pontuou mas outro já avaliou esta prova com critérios salvos
+      if (!existing) {
+        const allScores = state.getScores() || [];
+        existing = allScores.find(s => s.teamId === teamId && s.provaId === form.provaId && s.criteriaDetails && Object.keys(s.criteriaDetails).length > 0);
+      }
+    } else {
+      existing = state.getTeamScore(teamId, form.provaId);
+    }
 
     if (existing && !existing.isWeight) {
-      if (existing.criteriaDetails) {
+      if (existing.criteriaDetails && typeof existing.criteriaDetails === 'object') {
         form.criteriaValues = { ...existing.criteriaDetails };
+      } else {
+        form.criteriaValues = {};
       }
       if (existing.placeInProva) {
         form.directPlace = existing.placeInProva;
       }
       if (noteInput && existing.note) {
         noteInput.value = existing.note;
+      } else if (noteInput) {
+        noteInput.value = '';
       }
     } else {
       form.criteriaValues = {};

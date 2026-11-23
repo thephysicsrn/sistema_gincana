@@ -29,12 +29,115 @@ const MIME_TYPES = {
 // Arquivo de persistência local para não perder o estado no servidor
 const DATA_DIR = path.join(__dirname, 'data');
 const STATE_FILE = path.join(DATA_DIR, 'gincana_state.json');
+const BACKUP_FILE = path.join(DATA_DIR, 'gincana_state_backup.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
 }
 
 let lastKnownState = null;
+
+function getScoreKey(s) {
+  if (!s) return '';
+  const teamId = String(s.teamId || '');
+  const provaId = String(s.provaId || '');
+  const isMulti = provaId === 'p_parodia' || provaId === 'p_recicla';
+  if (isMulti) {
+    const judge = String(s.judgeId || s.judgeName || 'general').trim().toLowerCase();
+    return `${teamId}_${provaId}_${judge}`;
+  }
+  return `${teamId}_${provaId}`;
+}
+
+function mergeScoreLists(baseList, incomingList) {
+  const map = new Map();
+  const listA = Array.isArray(baseList) ? baseList : [];
+  const listB = Array.isArray(incomingList) ? incomingList : [];
+
+  listA.forEach(s => {
+    if (s && s.teamId && s.provaId) {
+      map.set(getScoreKey(s), s);
+    }
+  });
+
+  listB.forEach(s => {
+    if (s && s.teamId && s.provaId) {
+      const key = getScoreKey(s);
+      const existing = map.get(key);
+      if (!existing) {
+        map.set(key, s);
+      } else {
+        const tExist = existing.createdAt ? new Date(existing.createdAt).getTime() : 0;
+        const tIncom = s.createdAt ? new Date(s.createdAt).getTime() : 0;
+        const hasCritExist = existing.criteriaDetails && Object.keys(existing.criteriaDetails).length > 0;
+        const hasCritIncom = s.criteriaDetails && Object.keys(s.criteriaDetails).length > 0;
+        if (hasCritIncom && !hasCritExist) {
+          map.set(key, { ...existing, ...s });
+        } else if (tIncom >= tExist) {
+          map.set(key, { ...existing, ...s });
+        } else {
+          map.set(key, { ...s, ...existing });
+        }
+      }
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+function mergePenaltyLists(baseList, incomingList) {
+  const map = new Map();
+  const listA = Array.isArray(baseList) ? baseList : [];
+  const listB = Array.isArray(incomingList) ? incomingList : [];
+
+  listA.forEach(p => {
+    if (p) {
+      const key = p.id || `${p.teamId}_${p.infraction}_${p.points}`;
+      map.set(key, p);
+    }
+  });
+
+  listB.forEach(p => {
+    if (p) {
+      const key = p.id || `${p.teamId}_${p.infraction}_${p.points}`;
+      map.set(key, p);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+function mergeState(current, incoming) {
+  if (!current) return incoming;
+  if (!incoming) return current;
+
+  const result = { ...current, ...incoming };
+  result.config = { ...(current.config || {}), ...(incoming.config || {}) };
+  result.scores = mergeScoreLists(current.scores, incoming.scores);
+  result.penalties = mergePenaltyLists(current.penalties, incoming.penalties);
+
+  if (Array.isArray(incoming.teams) && incoming.teams.length > 0) {
+    const currentTeamsMap = new Map((current.teams || []).map(t => [t.id, t]));
+    result.teams = incoming.teams.map(t => {
+      const exist = currentTeamsMap.get(t.id);
+      return exist ? { ...exist, ...t } : t;
+    });
+  } else {
+    result.teams = current.teams || [];
+  }
+
+  if (Array.isArray(incoming.provas) && incoming.provas.length > 0) {
+    const existingProvasMap = new Map((current.provas || []).map(p => [p.id, p]));
+    incoming.provas.forEach(p => {
+      existingProvasMap.set(p.id, p);
+    });
+    result.provas = Array.from(existingProvasMap.values());
+  } else {
+    result.provas = current.provas || [];
+  }
+
+  return result;
+}
 
 // Tenta carregar o estado salvo previamente no disco
 try {
@@ -43,6 +146,19 @@ try {
     lastKnownState = JSON.parse(raw);
     console.log('📦 Estado prévio carregado do disco com sucesso.');
   }
+  if (fs.existsSync(BACKUP_FILE)) {
+    const rawBackup = fs.readFileSync(BACKUP_FILE, 'utf-8');
+    const parsedBackup = JSON.parse(rawBackup);
+    if (parsedBackup && Array.isArray(parsedBackup.scores) && parsedBackup.scores.length > 0) {
+      if (!lastKnownState) {
+        lastKnownState = parsedBackup;
+      } else {
+        lastKnownState.scores = mergeScoreLists(lastKnownState.scores, parsedBackup.scores);
+        lastKnownState.penalties = mergePenaltyLists(lastKnownState.penalties, parsedBackup.penalties);
+      }
+      console.log(`🛡️ Backup de segurança carregado com ${parsedBackup.scores.length} nota(s).`);
+    }
+  }
 } catch (err) {
   console.warn('Aviso: Não foi possível carregar estado salvo em disco:', err.message);
 }
@@ -50,7 +166,11 @@ try {
 function saveStateToDisk() {
   if (!lastKnownState) return;
   try {
-    fs.writeFileSync(STATE_FILE, JSON.stringify(lastKnownState, null, 2), 'utf-8');
+    const jsonStr = JSON.stringify(lastKnownState, null, 2);
+    fs.writeFileSync(STATE_FILE, jsonStr, 'utf-8');
+    if (Array.isArray(lastKnownState.scores) && lastKnownState.scores.length > 0) {
+      fs.writeFileSync(BACKUP_FILE, jsonStr, 'utf-8');
+    }
   } catch (err) {
     console.warn('Erro ao salvar estado em disco:', err.message);
   }
@@ -90,8 +210,27 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       try {
         const parsed = JSON.parse(body);
-        if (parsed.payload) {
-          lastKnownState = parsed.payload;
+        if (parsed.action === 'CLEAR_SCORES') {
+          if (lastKnownState) {
+            lastKnownState.scores = [];
+            lastKnownState.penalties = [];
+            saveStateToDisk();
+            broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
+          }
+        } else if (parsed.action === 'DELETE_SCORE_BY_GESTOR' && parsed.scoreId) {
+          if (lastKnownState && Array.isArray(lastKnownState.scores)) {
+            lastKnownState.scores = lastKnownState.scores.filter(s => s.id !== parsed.scoreId);
+            saveStateToDisk();
+            broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
+          }
+        } else if (parsed.action === 'DELETE_PENALTY' && parsed.penaltyId) {
+          if (lastKnownState && Array.isArray(lastKnownState.penalties)) {
+            lastKnownState.penalties = lastKnownState.penalties.filter(p => p.id !== parsed.penaltyId);
+            saveStateToDisk();
+            broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
+          }
+        } else if (parsed.payload) {
+          lastKnownState = mergeState(lastKnownState, parsed.payload);
           saveStateToDisk();
           broadcastServerMessage({ type: 'SYNC_DATA', payload: lastKnownState });
         }
@@ -242,9 +381,28 @@ if (WebSocket) {
           return;
         }
 
-        if (data.type === 'STATE_UPDATE' && data.payload) {
-          lastKnownState = data.payload;
-          saveStateToDisk();
+        if (data.type === 'STATE_UPDATE') {
+          const action = (data.customPayload && data.customPayload.action) || (data.payload && data.payload.action);
+          if (action === 'CLEAR_SCORES') {
+            if (lastKnownState) {
+              lastKnownState.scores = [];
+              lastKnownState.penalties = [];
+              saveStateToDisk();
+            }
+          } else if (action === 'DELETE_SCORE_BY_GESTOR' && data.customPayload && data.customPayload.scoreId) {
+            if (lastKnownState && Array.isArray(lastKnownState.scores)) {
+              lastKnownState.scores = lastKnownState.scores.filter(s => s.id !== data.customPayload.scoreId);
+              saveStateToDisk();
+            }
+          } else if (action === 'DELETE_PENALTY' && data.customPayload && data.customPayload.penaltyId) {
+            if (lastKnownState && Array.isArray(lastKnownState.penalties)) {
+              lastKnownState.penalties = lastKnownState.penalties.filter(p => p.id !== data.customPayload.penaltyId);
+              saveStateToDisk();
+            }
+          } else if (data.payload) {
+            lastKnownState = mergeState(lastKnownState, data.payload);
+            saveStateToDisk();
+          }
         } else if (data.type === 'TELAO_MODE_CHANGE') {
           if (!lastKnownState) lastKnownState = { config: {} };
           if (!lastKnownState.config) lastKnownState.config = {};

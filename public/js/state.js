@@ -6,6 +6,7 @@
 class GincanaState {
   constructor() {
     this.storageKey = 'gincana_sesi_conecta_2026_v3';
+    this.archiveKey = 'sesi_conecta_scores_archive_v1';
     this.channel = null;
     this.socket = null;
     this.listeners = new Set();
@@ -57,6 +58,173 @@ class GincanaState {
     this.loadFromStorage(true);
   }
 
+  // =========================================================================
+  // MÉTODOS DE BLINDAGEM E PERSISTÊNCIA NÃO-DESTRUTIVA DE NOTAS
+  // =========================================================================
+
+  getScoreUniqueKey(score) {
+    if (!score) return '';
+    const teamId = String(score.teamId || '');
+    const provaId = String(score.provaId || '');
+    const isMulti = (typeof this.isMultiJudgeProva === 'function') 
+      ? this.isMultiJudgeProva(provaId) 
+      : (provaId === 'p_parodia' || provaId === 'p_recicla');
+    if (isMulti) {
+      const judgeKey = String(score.judgeId || score.judgeName || 'general').trim().toLowerCase();
+      return `${teamId}_${provaId}_${judgeKey}`;
+    }
+    return `${teamId}_${provaId}`;
+  }
+
+  mergeScoresLists(currentList, incomingList) {
+    const map = new Map();
+    const listA = Array.isArray(currentList) ? currentList : [];
+    const listB = Array.isArray(incomingList) ? incomingList : [];
+
+    listA.forEach(s => {
+      if (s && s.teamId && s.provaId) {
+        map.set(this.getScoreUniqueKey(s), s);
+      }
+    });
+
+    listB.forEach(s => {
+      if (s && s.teamId && s.provaId) {
+        const key = this.getScoreUniqueKey(s);
+        const existing = map.get(key);
+        if (!existing) {
+          map.set(key, s);
+        } else {
+          const tExist = existing.createdAt ? new Date(existing.createdAt).getTime() : 0;
+          const tIncom = s.createdAt ? new Date(s.createdAt).getTime() : 0;
+          const hasCritExist = existing.criteriaDetails && Object.keys(existing.criteriaDetails).length > 0;
+          const hasCritIncom = s.criteriaDetails && Object.keys(s.criteriaDetails).length > 0;
+          
+          if (hasCritIncom && !hasCritExist) {
+            map.set(key, { ...existing, ...s });
+          } else if (tIncom >= tExist) {
+            map.set(key, { ...existing, ...s });
+          } else {
+            map.set(key, { ...s, ...existing });
+          }
+        }
+      }
+    });
+
+    return Array.from(map.values());
+  }
+
+  mergePenaltiesLists(currentList, incomingList) {
+    const map = new Map();
+    const listA = Array.isArray(currentList) ? currentList : [];
+    const listB = Array.isArray(incomingList) ? incomingList : [];
+
+    listA.forEach(p => {
+      if (p) {
+        const key = p.id || `${p.teamId}_${p.infraction}_${p.points}`;
+        map.set(key, p);
+      }
+    });
+
+    listB.forEach(p => {
+      if (p) {
+        const key = p.id || `${p.teamId}_${p.infraction}_${p.points}`;
+        map.set(key, p);
+      }
+    });
+
+    return Array.from(map.values());
+  }
+
+  updateArchive(scores, penalties = []) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      let archivedScores = [];
+      let archivedPenalties = [];
+      const raw = localStorage.getItem(this.archiveKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.scores)) archivedScores = parsed.scores;
+          if (Array.isArray(parsed.penalties)) archivedPenalties = parsed.penalties;
+        } catch (e) {}
+      }
+      const mergedScores = this.mergeScoresLists(archivedScores, scores);
+      const mergedPenalties = this.mergePenaltiesLists(archivedPenalties, penalties);
+      const dataToSave = JSON.stringify({
+        scores: mergedScores,
+        penalties: mergedPenalties,
+        updatedAt: new Date().toISOString()
+      });
+      localStorage.setItem(this.archiveKey, dataToSave);
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(this.archiveKey, dataToSave);
+      }
+    } catch (e) {}
+  }
+
+  removeFromArchive(scoreId) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const raw = localStorage.getItem(this.archiveKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.scores)) {
+          parsed.scores = parsed.scores.filter(s => s.id !== scoreId);
+          const dataToSave = JSON.stringify(parsed);
+          localStorage.setItem(this.archiveKey, dataToSave);
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(this.archiveKey, dataToSave);
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  removePenaltyFromArchive(penaltyId) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const raw = localStorage.getItem(this.archiveKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed.penalties)) {
+          parsed.penalties = parsed.penalties.filter(p => p.id !== penaltyId);
+          const dataToSave = JSON.stringify(parsed);
+          localStorage.setItem(this.archiveKey, dataToSave);
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem(this.archiveKey, dataToSave);
+          }
+        }
+      }
+    } catch (e) {}
+  }
+
+  clearArchive() {
+    if (typeof localStorage !== 'undefined') {
+      try { localStorage.removeItem(this.archiveKey); } catch (e) {}
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      try { sessionStorage.removeItem(this.archiveKey); } catch (e) {}
+    }
+  }
+
+  getArchivedScoresAndPenalties() {
+    if (typeof localStorage === 'undefined') return { scores: [], penalties: [] };
+    try {
+      let raw = localStorage.getItem(this.archiveKey);
+      if (!raw && typeof sessionStorage !== 'undefined') {
+        raw = sessionStorage.getItem(this.archiveKey);
+      }
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          scores: Array.isArray(parsed.scores) ? parsed.scores : [],
+          penalties: Array.isArray(parsed.penalties) ? parsed.penalties : []
+        };
+      }
+    } catch (e) {}
+    return { scores: [], penalties: [] };
+  }
+
   // Conecta ao WebSocket local se ativo
   initSocket() {
     if (window.location.protocol === 'file:') return;
@@ -76,7 +244,22 @@ class GincanaState {
           const data = JSON.parse(event.data);
           if (data.type === 'SYNC_DATA' || data.type === 'STATE_UPDATE') {
             if (data.payload) {
-              this.data = data.payload;
+              const incoming = data.payload;
+              const mergedScores = this.mergeScoresLists(this.data ? this.data.scores : [], incoming.scores);
+              const mergedPenalties = this.mergePenaltiesLists(this.data ? this.data.penalties : [], incoming.penalties);
+
+              const existingProvasMap = new Map(((this.data && this.data.provas) || []).map(p => [p.id, p]));
+              (incoming.provas || []).forEach(p => existingProvasMap.set(p.id, p));
+              const mergedProvas = Array.from(existingProvasMap.values());
+
+              this.data = {
+                ...(this.data || {}),
+                ...incoming,
+                config: { ...((this.data && this.data.config) || {}), ...(incoming.config || {}) },
+                scores: mergedScores,
+                penalties: mergedPenalties,
+                provas: mergedProvas.length > 0 ? mergedProvas : (this.data && this.data.provas)
+              };
               this.saveToStorage(false);
             }
             this.notifyListeners({ source: 'socket_sync', payload: data });
@@ -143,17 +326,49 @@ class GincanaState {
         const json = await res.json();
         if (json && json.data) {
           const prevMode = this.getTelaoMode();
-          this.data = json.data;
+          const incoming = json.data;
+          const currentScores = (this.data && this.data.scores) || [];
+          const currentPenalties = (this.data && this.data.penalties) || [];
+
+          const mergedScores = this.mergeScoresLists(currentScores, incoming.scores);
+          const mergedPenalties = this.mergePenaltiesLists(currentPenalties, incoming.penalties);
+
+          const shouldPushToServer = mergedScores.length > (Array.isArray(incoming.scores) ? incoming.scores.length : 0);
+
+          const existingProvasMap = new Map(((this.data && this.data.provas) || []).map(p => [p.id, p]));
+          (incoming.provas || []).forEach(p => existingProvasMap.set(p.id, p));
+          const mergedProvas = Array.from(existingProvasMap.values());
+
+          this.data = {
+            ...(this.data || {}),
+            ...incoming,
+            config: { ...((this.data && this.data.config) || {}), ...(incoming.config || {}) },
+            scores: mergedScores,
+            penalties: mergedPenalties,
+            provas: mergedProvas.length > 0 ? mergedProvas : (this.data && this.data.provas)
+          };
+
           this.saveToStorage(false);
+
+          if (shouldPushToServer) {
+            try {
+              fetch('/api/state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ payload: this.data })
+              }).catch(() => {});
+            } catch (e) {}
+          }
+
           const newMode = this.getTelaoMode();
           const modeChanged = prevMode !== newMode;
           this.notifyListeners({
             source: 'server_sync',
-            payload: json.data,
+            payload: this.data,
             telaoMode: newMode,
             modeChanged
           });
-          return json.data;
+          return this.data;
         }
       }
     } catch (e) {
@@ -814,8 +1029,6 @@ class GincanaState {
                                this.data.teams.some(t => t.id === 't1' && t.name === 'Cyber Fênix');
       if (hasOldDummyTeams) {
         this.data.teams = this.getDefaultData().teams;
-        this.data.scores = [];
-        this.data.penalties = [];
         this.saveToStorage(false);
       }
 
@@ -842,6 +1055,18 @@ class GincanaState {
           }
         });
       }
+
+      // Restauração de segurança a partir do arquivo persistente de backup
+      const archive = this.getArchivedScoresAndPenalties();
+      if (archive.scores.length > 0) {
+        this.data.scores = this.mergeScoresLists(this.data.scores || [], archive.scores);
+      }
+      if (archive.penalties.length > 0) {
+        this.data.penalties = this.mergePenaltiesLists(this.data.penalties || [], archive.penalties);
+      }
+      if ((this.data.scores && this.data.scores.length > 0) || (this.data.penalties && this.data.penalties.length > 0)) {
+        this.updateArchive(this.data.scores || [], this.data.penalties || []);
+      }
     }
 
     if (initial) {
@@ -854,6 +1079,9 @@ class GincanaState {
 
   saveToStorage(broadcast = true, customPayload = null) {
     try {
+      if (this.data) {
+        this.updateArchive(this.data.scores || [], this.data.penalties || []);
+      }
       localStorage.setItem(this.storageKey, JSON.stringify(this.data));
 
       if (broadcast) {
@@ -961,8 +1189,18 @@ class GincanaState {
     if (scores.length === 0) return null;
 
     if (specificJudge) {
-      const found = scores.find((s) => (s.judgeId && s.judgeId === specificJudge) || s.judgeName === specificJudge);
+      const judgeStr = (typeof specificJudge === 'object' && specificJudge !== null)
+        ? String(specificJudge.id || specificJudge.name || '').trim().toLowerCase()
+        : String(specificJudge).trim().toLowerCase();
+
+      const found = scores.find((s) => {
+        const sId = (s.judgeId || '').toLowerCase().trim();
+        const sName = (s.judgeName || '').toLowerCase().trim();
+        return (sId && sId === judgeStr) || (sName && sName === judgeStr);
+      });
       if (found) return found;
+      // Retorna null explicitamente se o juiz específico solicitado ainda não avaliou
+      return null;
     }
 
     if (this.isMultiJudgeProva(provaId) || scores.length > 1) {
@@ -1433,7 +1671,8 @@ class GincanaState {
     const idx = (this.data.penalties || []).findIndex((p) => p.id === penaltyId);
     if (idx !== -1) {
       const removed = this.data.penalties.splice(idx, 1)[0];
-      this.saveToStorage(true, { action: 'DELETE_PENALTY', penalty: removed });
+      this.removePenaltyFromArchive(penaltyId);
+      this.saveToStorage(true, { action: 'DELETE_PENALTY', penalty: removed, penaltyId });
       return true;
     }
     return false;
@@ -1443,7 +1682,8 @@ class GincanaState {
     const idx = (this.data.scores || []).findIndex((s) => s.id === scoreId);
     if (idx !== -1) {
       const removed = this.data.scores.splice(idx, 1)[0];
-      this.saveToStorage(true, { action: 'DELETE_SCORE', score: removed });
+      this.removeFromArchive(scoreId);
+      this.saveToStorage(true, { action: 'DELETE_SCORE_BY_GESTOR', score: removed, scoreId });
       return true;
     }
     return false;
@@ -1458,6 +1698,7 @@ class GincanaState {
   clearScoresOnly() {
     this.data.scores = [];
     this.data.penalties = [];
+    this.clearArchive();
     (this.data.teams || []).forEach((t) => (t.pesoELixoKg = 0));
     this.saveToStorage(true, { action: 'CLEAR_SCORES' });
   }
@@ -2144,6 +2385,7 @@ class GincanaState {
     this.data.scores = this.data.scores.filter((s) => s.id !== scoreId);
 
     if (this.data.scores.length !== initialLen) {
+      this.removeFromArchive(scoreId);
       this.saveToStorage(true, { action: 'DELETE_SCORE_BY_GESTOR', scoreId });
       return true;
     }
