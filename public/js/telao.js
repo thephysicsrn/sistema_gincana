@@ -303,17 +303,17 @@ document.addEventListener('DOMContentLoaded', () => {
     podiumTimers.forEach(t => clearTimeout(t));
     podiumTimers = [];
 
-    // Watchdog de segurança para garantir que a tela nunca trave
+    // Watchdog de segurança para garantir que a tela nunca trave (4.5 minutos para cobrir toda a cerimônia lenta)
     podiumTimers.push(setTimeout(() => {
       stopPodiumCeremonyAnimation();
-    }, 55000));
+    }, 270000));
 
     // =========================================================================
-    // FASE 0: Abertura Solene com Rufar de Tambores (0s a 4.5s)
+    // FASE 0: Abertura Solene com Rufar de Tambores (0s a 5.0s)
     // =========================================================================
     if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🏆 CERIMÔNIA OFICIAL DO PÓDIO • TURNO ${currentTurno.toUpperCase()}`;
-    if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `OS GRANDES VENCEDORES DO SESI CONECTA 2026`;
-    if (podiumCeremonySub) podiumCeremonySub.innerText = `A Coordenação Geral convida todos para a consagração dos 3 primeiros colocados!`;
+    if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `OS GRANDES VENCEDORES DA GINCANA SESI ESCOLA 2026`;
+    if (podiumCeremonySub) podiumCeremonySub.innerText = `A Coordenação Geral convida todos para a consagração solene dos 3 primeiros colocados!`;
 
     if (podiumStage) {
       podiumStage.innerHTML = `
@@ -323,16 +323,16 @@ document.addEventListener('DOMContentLoaded', () => {
             A Tensão Toma Conta da Quadra...
           </div>
           <div style="font-size: 1.35rem; color: #fbbf24; font-weight: 700; margin-top: 0.75rem;">
-            Rufem os tambores! Revelando a classificação sagrada do pódio...
+            Rufem os tambores! Revelando a classificação oficial do pódio...
           </div>
         </div>
       `;
     }
 
-    sound.playDrumRoll(4.2);
+    sound.playDrumRoll(4.8);
 
     // =========================================================================
-    // FASE 1: Revelação do 3º Colocado (Bronze) (4.5s a 12.0s)
+    // FASE 1: Revelação do 3º Colocado (Bronze) (5s a 65s - 1 MINUTO COMPLETO)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       if (!isRevealing) return;
@@ -342,6 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       sound.playScoreDing();
       confetti.celebrate();
+      setTimeout(() => confetti.celebrate(), 1500);
 
       if (podiumStage && team3) {
         podiumStage.innerHTML = `
@@ -367,10 +368,16 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-    }, 4500));
+    }, 5000));
+
+    // Rufar preparatório de tambor antes do 2º lugar aos 61.5s
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      sound.playDrumRoll(3.5);
+    }, 61500));
 
     // =========================================================================
-    // FASE 2: Revelação do 2º Colocado (Prata / Vice-Campeã) (12.0s a 19.5s)
+    // FASE 2: Revelação do 2º Colocado (Prata) (65s a 125s - EXATAMENTE 1 MINUTO APÓS O 3º LUGAR)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       if (!isRevealing) return;
@@ -378,11 +385,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = team2 ? team2.name : '2º Colocado';
       if (podiumCeremonySub) podiumCeremonySub.innerText = `Uma jornada brilhante de superação e destaque absoluto em quadra!`;
 
-      sound.playDrumRoll(2.5);
-      setTimeout(() => {
-        sound.playScoreDing();
-        confetti.celebrate();
-      }, 500);
+      sound.playScoreDing();
+      confetti.celebrate();
+      setTimeout(() => confetti.celebrate(), 1500);
 
       if (podiumStage && team2) {
         podiumStage.innerHTML = `
@@ -408,10 +413,10 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-    }, 12000));
+    }, 65000));
 
     // =========================================================================
-    // FASE 3: Suspense Eletrizante para o 1º Lugar (19.5s a 25.0s)
+    // FASE 3: Suspense Eletrizante para o 1º Lugar (125s - EXATAMENTE 1 MINUTO APÓS O 2º LUGAR)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       if (!isRevealing) return;
@@ -434,16 +439,16 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-    }, 19500));
+    }, 125000));
 
     // =========================================================================
-    // FASE 4: Revelação Apoteótica do 1º Lugar (Ouro / Campeã) (25.0s a 34.0s)
+    // FASE 4: Revelação Apoteótica do 1º Lugar (Ouro / Campeã) (130s a 190s - 1 MINUTO COMPLETO)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       if (!isRevealing) return;
-      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🥇 1º LUGAR • GRANDE CAMPEÃ GERAL SESI CONECTA`;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🥇 1º LUGAR • GRANDE CAMPEÃ GERAL SESI ESCOLA`;
       if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = team1 ? team1.name : '1º Colocado';
-      if (podiumCeremonySub) podiumCeremonySub.innerText = `A grande vencedora que levou a honra máxima da Gincana SESI CONECTA 2026!`;
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `A grande vencedora que levou a honra máxima da Gincana SESI ESCOLA 2026!`;
 
       sound.playFanfare();
       confetti.celebrate();
@@ -470,21 +475,23 @@ document.addEventListener('DOMContentLoaded', () => {
               <span style="font-size: 1.4rem; font-weight: 900; color: #fef08a; text-transform: uppercase;">PONTOS CAMPEÃ!</span>
             </div>
             <div style="margin-top: 1.5rem; font-size: 1.35rem; color: #ffffff; font-weight: 900; text-shadow: 0 0 20px rgba(255,255,255,0.6);">
-              🏆 GLÓRIA E HONRA MÁXIMA NA GINCANA SESI CONECTA 2026! 🏆
+              🏆 GLÓRIA E HONRA MÁXIMA NA GINCANA SESI ESCOLA 2026! 🏆
             </div>
           </div>
         `;
       }
-    }, 25000));
+    }, 130000));
 
     // =========================================================================
-    // FASE 5: Pódio Olímpico Completo (Todos os 3 Degraus) (34.0s a 48.0s)
+    // FASE 5: Pódio Olímpico Consagrado (Todos os 3 Degraus) (190s a 250s - 1 MINUTO PARA FOTOS)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       if (!isRevealing) return;
-      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🏆 PÓDIO CONSAGRADO • GINCANA SESI CONECTA 2026`;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🏆 PÓDIO CONSAGRADO • GINCANA SESI ESCOLA 2026`;
       if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `O PÓDIO OFICIAL DA GINCANA (${currentTurno.toUpperCase()})`;
-      if (podiumCeremonySub) podiumCeremonySub.innerText = `As três melhores turmas lado a lado na história do SESI CONECTA!`;
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `As três melhores turmas lado a lado na consagração oficial do SESI Escola!`;
+
+      confetti.celebrate();
 
       confetti.celebrate();
 
@@ -546,14 +553,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         `;
       }
-    }, 34000));
+    }, 190000));
 
     // =========================================================================
-    // FASE FINAL: Transição Suave para o Placar Geral Deslizante (48.0s)
+    // FASE FINAL: Transição Suave para o Placar Geral Deslizante (250s / 4m10s)
     // =========================================================================
     podiumTimers.push(setTimeout(() => {
       stopPodiumCeremonyAnimation();
-    }, 48000));
+    }, 250000));
   }
 
   // =========================================================================
