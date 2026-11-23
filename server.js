@@ -194,6 +194,22 @@ try {
       console.log(`🛡️ Backup de segurança carregado com ${parsedBackup.scores.length} nota(s).`);
     }
   }
+
+  // Atualização garantida dos critérios oficiais do Desafio E-Lixo
+  if (lastKnownState && Array.isArray(lastKnownState.provas)) {
+    const elixoP = lastKnownState.provas.find(p => p.id === 'p_elixo');
+    if (elixoP) {
+      elixoP.criteria = [
+        { name: 'Criatividade', max: 20, description: 'Abordagem envolvente, narrativa dinâmica e recursos audiovisuais criativos.' },
+        { name: 'Clareza da mensagem', max: 20, description: 'Objetividade na resposta à pergunta obrigatória e facilidade de compreensão pelo público escolar.' },
+        { name: 'Relação com o tema', max: 20, description: 'Foco nos impactos do descarte inadequado de eletroeletrônicos e na destinação correta.' },
+        { name: 'Qualidade do conteúdo', max: 20, description: 'Precisão das informações ambientais, educativas e conceituais apresentadas no roteiro.' },
+        { name: 'Participação da equipe', max: 10, description: 'Protagonismo e envolvimento visível dos estudantes na produção, atuação ou narração.' },
+        { name: 'Qualidade técnica', max: 10, description: 'Nitidez de imagem, inteligibilidade do áudio, enquadramento e respeito ao limite de 60s.' }
+      ];
+      elixoP.maxScore = 100;
+    }
+  }
 } catch (err) {
   console.warn('Aviso: Não foi possível carregar estado salvo em disco:', err.message);
 }

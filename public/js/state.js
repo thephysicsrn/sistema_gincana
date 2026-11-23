@@ -915,9 +915,36 @@ class GincanaState {
           maxScore: 100,
           status: 'active',
           criteria: [
-            { name: 'Volume / Peso E-Lixo Arrecadado', max: 50 },
-            { name: 'Mobilização da Comunidade', max: 30 },
-            { name: 'Organização da Triagem', max: 20 }
+            {
+              name: 'Criatividade',
+              max: 20,
+              description: 'Abordagem envolvente, narrativa dinâmica e recursos audiovisuais criativos.'
+            },
+            {
+              name: 'Clareza da mensagem',
+              max: 20,
+              description: 'Objetividade na resposta à pergunta obrigatória e facilidade de compreensão pelo público escolar.'
+            },
+            {
+              name: 'Relação com o tema',
+              max: 20,
+              description: 'Foco nos impactos do descarte inadequado de eletroeletrônicos e na destinação correta.'
+            },
+            {
+              name: 'Qualidade do conteúdo',
+              max: 20,
+              description: 'Precisão das informações ambientais, educativas e conceituais apresentadas no roteiro.'
+            },
+            {
+              name: 'Participação da equipe',
+              max: 10,
+              description: 'Protagonismo e envolvimento visível dos estudantes na produção, atuação ou narração.'
+            },
+            {
+              name: 'Qualidade técnica',
+              max: 10,
+              description: 'Nitidez de imagem, inteligibilidade do áudio, enquadramento e respeito ao limite de 60s.'
+            }
           ]
         },
         {
@@ -1082,6 +1109,47 @@ class GincanaState {
         const defaultEmpreendedorismo = this.getDefaultData().provas.find((p) => p.id === 'p_empreendedorismo');
         if (defaultEmpreendedorismo) {
           this.data.provas.push(defaultEmpreendedorismo);
+          this.saveToStorage(false);
+        }
+      }
+
+      // Atualiza automaticamente critérios do Desafio E-Lixo para os critérios oficiais da rubrica
+      if (Array.isArray(this.data.provas)) {
+        const elixoP = this.data.provas.find(p => p.id === 'p_elixo');
+        if (elixoP && (!elixoP.criteria || elixoP.criteria.length !== 6 || elixoP.criteria.some(c => c.name.includes('Volume')))) {
+          elixoP.criteria = [
+            {
+              name: 'Criatividade',
+              max: 20,
+              description: 'Abordagem envolvente, narrativa dinâmica e recursos audiovisuais criativos.'
+            },
+            {
+              name: 'Clareza da mensagem',
+              max: 20,
+              description: 'Objetividade na resposta à pergunta obrigatória e facilidade de compreensão pelo público escolar.'
+            },
+            {
+              name: 'Relação com o tema',
+              max: 20,
+              description: 'Foco nos impactos do descarte inadequado de eletroeletrônicos e na destinação correta.'
+            },
+            {
+              name: 'Qualidade do conteúdo',
+              max: 20,
+              description: 'Precisão das informações ambientais, educativas e conceituais apresentadas no roteiro.'
+            },
+            {
+              name: 'Participação da equipe',
+              max: 10,
+              description: 'Protagonismo e envolvimento visível dos estudantes na produção, atuação ou narração.'
+            },
+            {
+              name: 'Qualidade técnica',
+              max: 10,
+              description: 'Nitidez de imagem, inteligibilidade do áudio, enquadramento e respeito ao limite de 60s.'
+            }
+          ];
+          elixoP.maxScore = 100;
           this.saveToStorage(false);
         }
       }
