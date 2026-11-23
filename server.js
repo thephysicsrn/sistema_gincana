@@ -264,15 +264,20 @@ const server = http.createServer((req, res) => {
         const mode = parsed.mode || 'results';
         const triggerReveal = Boolean(parsed.triggerReveal);
         const triggerPodiumReveal = Boolean(parsed.triggerPodiumReveal);
+        const forceRefresh = Boolean(parsed.forceRefresh);
 
         if (!lastKnownState) lastKnownState = { config: {} };
         if (!lastKnownState.config) lastKnownState.config = {};
-        lastKnownState.config.telaoMode = mode;
+        if (!forceRefresh) {
+          lastKnownState.config.telaoMode = mode;
+        }
         if (triggerReveal || triggerPodiumReveal) lastKnownState.config.lastRevealAt = Date.now();
         saveStateToDisk();
 
         // Faz broadcast pelo WebSocket para o telão e todos os clientes
-        if (triggerPodiumReveal) {
+        if (forceRefresh) {
+          broadcastServerMessage({ type: 'FORCE_REFRESH_TELAO', timestamp: Date.now() });
+        } else if (triggerPodiumReveal) {
           broadcastServerMessage({ type: 'TELAO_PODIUM_REVEAL', turno: parsed.turno || null, timestamp: Date.now() });
         } else if (triggerReveal) {
           broadcastServerMessage({ type: 'TELAO_TRIGGER_REVEAL', timestamp: Date.now() });
@@ -281,7 +286,7 @@ const server = http.createServer((req, res) => {
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, mode, triggerReveal, triggerPodiumReveal }));
+        res.end(JSON.stringify({ success: true, mode, triggerReveal, triggerPodiumReveal, forceRefresh }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ success: false, error: e.message }));
@@ -438,6 +443,8 @@ if (WebSocket) {
           lastKnownState.config.telaoMode = 'results';
           lastKnownState.config.lastRevealAt = Date.now();
           saveStateToDisk();
+        } else if (data.type === 'FORCE_REFRESH_TELAO') {
+          // Apenas retransmite a ordem de atualização imediata para todos
         }
       } catch (e) {}
 

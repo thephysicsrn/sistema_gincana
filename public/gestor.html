@@ -429,97 +429,131 @@
           </div>
         </div>
 
-        <!-- Seletor do Turno / Gincana a Transmitir no Telão -->
-        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass-bright); border-radius: 12px; padding: 1rem 1.5rem; margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <!-- Seletor do Turno & Ação Rápida de Sincronismo do Telão -->
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-glass-bright); border-radius: 14px; padding: 1.1rem 1.5rem; margin-top: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div>
             <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8;">Gincana Projetada no Telão:</span>
             <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-top: 2px;">
-              Escolha qual competição independente exibir no telão da quadra
+              Escolha qual competição exibir no telão e gerencie a transmissão
             </div>
           </div>
-          <div style="background: rgba(30, 41, 59, 0.8); padding: 4px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.35rem;">
-            <button type="button" class="btn-gestor-telao-turno active" data-turno="Matutino" id="btn-gestor-turno-matutino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
-              ☀️ Gincana Matutino (8 Turmas)
-            </button>
-            <button type="button" class="btn-gestor-telao-turno" data-turno="Vespertino" id="btn-gestor-turno-vespertino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
-              🌙 Gincana Vespertino (8 Turmas)
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="background: rgba(30, 41, 59, 0.8); padding: 4px; border-radius: 999px; border: 1px solid var(--border-glass-bright); display: inline-flex; gap: 0.35rem;">
+              <button type="button" class="btn-gestor-telao-turno active" data-turno="Matutino" id="btn-gestor-turno-matutino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff;">
+                ☀️ Gincana Matutino (8 Turmas)
+              </button>
+              <button type="button" class="btn-gestor-telao-turno" data-turno="Vespertino" id="btn-gestor-turno-vespertino" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; background: transparent; color: #94a3b8;">
+                🌙 Gincana Vespertino (8 Turmas)
+              </button>
+            </div>
+            <button type="button" id="btn-gestor-force-refresh-telao" class="btn" style="padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.85rem; border: 1px solid rgba(59, 130, 246, 0.6); background: rgba(37, 99, 235, 0.25); color: #bfdbfe; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 0 15px rgba(59,130,246,0.25);">
+              🔄 Forçar Atualização do Telão
             </button>
           </div>
         </div>
 
-        <!-- Painel de Ações Rápidas do Telão -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
+        <!-- Painel de Ações Rápidas do Telão (Grid Balanceado 3x2) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
           
-          <!-- Opção VIP: Cerimônia Oficial do Pódio (Revelação Lenta: 3º, 2º e 1º Lugar) -->
-          <div class="glass-card" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(30, 27, 75, 0.6) 100%); border: 2px solid rgba(245, 158, 11, 0.7); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);">
+          <!-- Card 1: Cerimônia Oficial do Pódio (Revelação Lenta: 3º, 2º e 1º Lugar) -->
+          <div class="glass-card" style="padding: 1.4rem; background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(30, 27, 75, 0.6) 100%); border: 2px solid rgba(245, 158, 11, 0.7); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px; box-shadow: 0 0 25px rgba(245, 158, 11, 0.25);">
             <div>
-              <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="font-size: 0.8rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">Grande Momento Solene</div>
-                <span style="background: rgba(245, 158, 11, 0.25); color: #fef08a; border: 1px solid rgba(245, 158, 11, 0.6); font-size: 0.7rem; font-weight: 900; padding: 0.2rem 0.5rem; border-radius: 99px;">PREMIAÇÃO SOLENE</span>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">Grande Momento Solene</span>
+                <span style="background: rgba(245, 158, 11, 0.25); color: #fef08a; border: 1px solid rgba(245, 158, 11, 0.6); font-size: 0.7rem; font-weight: 900; padding: 0.2rem 0.55rem; border-radius: 99px;">PREMIAÇÃO SOLENE</span>
               </div>
-              <h3 style="font-size: 1.25rem; font-weight: 900; margin: 0.4rem 0; color: #fef08a;">🏆 Pódio Oficial (Lento: 3º ➔ 2º ➔ 1º)</h3>
+              <h3 style="font-size: 1.2rem; font-weight: 900; margin: 0.3rem 0 0.5rem; color: #fef08a; line-height: 1.25;">🏆 Pódio Oficial (3º, 2º e 1º)</h3>
               <p style="font-size: 0.85rem; color: #fde68a; line-height: 1.45;">
-                Animação solene e cinematográfica com rufar prolongado de tambores e grande suspense! Revela pausadamente primeiro o <strong>3º Lugar (Bronze)</strong>, depois o <strong>2º Lugar (Prata)</strong> e culmina na apoteose do <strong>1º Lugar (Grande Campeã)</strong> com fanfarra triunfante, chuva dourada de confetes e montagem do pódio completo na tela da quadra.
+                Animação solene com rufar prolongado de tambores e grande suspense! Revela pausadamente primeiro o <strong>3º Lugar (Bronze)</strong>, depois o <strong>2º Lugar (Prata)</strong> e culmina na apoteose do <strong>1º Lugar (Grande Campeã)</strong> com fanfarra triunfante e confetes.
               </p>
             </div>
-            <button id="btn-telao-podium-reveal" class="btn" style="margin-top: 1.25rem; width: 100%; font-weight: 900; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border: none; box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); font-size: 0.95rem; padding: 0.75rem 1rem; cursor: pointer;">
+            <button id="btn-telao-podium-reveal" class="btn" style="margin-top: 1.2rem; width: 100%; font-weight: 900; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border: none; box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); font-size: 0.88rem; padding: 0.7rem 0.9rem; cursor: pointer; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
               🏆 Iniciar Cerimônia do Pódio (3º ➔ 2º ➔ 1º)
             </button>
           </div>
 
-          <!-- Opção 1: Bloquear e mostrar Logo -->
-          <div class="glass-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.6); display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Card 2: Bloquear e mostrar Logo (Standby) -->
+          <div class="glass-card" style="padding: 1.4rem; background: rgba(15, 23, 42, 0.6); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px;">
             <div>
-              <div style="font-size: 0.8rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">Modo de Espera</div>
-              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Exibir Apenas Logo no Telão</h3>
-              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 1px;">Modo de Espera</span>
+                <span style="background: rgba(245, 158, 11, 0.2); color: #fef08a; border: 1px solid rgba(245, 158, 11, 0.4); font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 99px;">STANDBY</span>
+              </div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.3rem 0 0.5rem; color: #f8fafc; line-height: 1.25;">Exibir Apenas Logo no Telão</h3>
+              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.45;">
                 Oculta totalmente o pódio e o quadro geral na quadra. O telão exibe exclusivamente o brasão do SESI com efeitos de luz e a mensagem "Apuração Oficial em Andamento".
               </p>
             </div>
-            <button id="btn-telao-set-standby" class="btn btn-secondary" style="margin-top: 1.25rem; width: 100%; font-weight: 700;">
+            <button id="btn-telao-set-standby" class="btn btn-secondary" style="margin-top: 1.2rem; width: 100%; font-weight: 800; font-size: 0.88rem; padding: 0.7rem 0.9rem; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
               Bloquear e Exibir Logo
             </button>
           </div>
 
-          <!-- Opção 2: Liberar Resultados com Animação -->
-          <div class="glass-card" style="padding: 1.5rem; background: rgba(6, 78, 59, 0.25); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Card 3: Liberar Resultados com Animação (Rápida 3-2-1) -->
+          <div class="glass-card" style="padding: 1.4rem; background: rgba(6, 78, 59, 0.25); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px;">
             <div>
-              <div style="font-size: 0.8rem; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 1px;">Momento da Premiação</div>
-              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Liberar Resultados com Animação</h3>
-              <p style="font-size: 0.85rem; color: #a7f3d0; line-height: 1.4;">
-                Dispara no telão a Cerimônia Oficial de Premiação com contagem regressiva (3, 2, 1), rufar de tambores, revelação gradativa do 3º, 2º e a Apoteose do 1º Lugar com fanfarra e confetes!
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 1px;">Abertura Rápida</span>
+                <span style="background: rgba(16, 185, 129, 0.2); color: #a7f3d0; border: 1px solid rgba(16, 185, 129, 0.4); font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 99px;">CONTAGEM 3-2-1</span>
+              </div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.3rem 0 0.5rem; color: #f8fafc; line-height: 1.25;">Liberar Resultados (3-2-1)</h3>
+              <p style="font-size: 0.85rem; color: #a7f3d0; line-height: 1.45;">
+                Dispara no telão a contagem regressiva rápida (3, 2, 1), rufar de tambores e abertura imediata do placar com fanfarra triunfante e confetes para a turma líder.
               </p>
             </div>
-            <button id="btn-telao-release-results" class="btn btn-success" style="margin-top: 1.25rem; width: 100%; font-weight: 800; background: #059669; border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.35);">
+            <button id="btn-telao-release-results" class="btn btn-success" style="margin-top: 1.2rem; width: 100%; font-weight: 800; background: #059669; border-color: #10b981; box-shadow: 0 0 15px rgba(16,185,129,0.35); font-size: 0.88rem; padding: 0.7rem 0.9rem; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
               Liberar Resultados com Animação
             </button>
           </div>
 
-          <!-- Opção 3: Liberar Ranking Deslizante Contínuo -->
-          <div class="glass-card" style="padding: 1.5rem; background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Card 4: Liberar Ranking Deslizante Contínuo -->
+          <div class="glass-card" style="padding: 1.4rem; background: rgba(30, 58, 138, 0.25); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px;">
             <div>
-              <div style="font-size: 0.8rem; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: 1px;">Transmissão Contínua</div>
-              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Liberar Ranking Deslizante</h3>
-              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.4;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #93c5fd; text-transform: uppercase; letter-spacing: 1px;">Transmissão Contínua</span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #bfdbfe; border: 1px solid rgba(59, 130, 246, 0.4); font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 99px;">AO VIVO</span>
+              </div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.3rem 0 0.5rem; color: #f8fafc; line-height: 1.25;">Liberar Ranking Deslizante</h3>
+              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.45;">
                 Libera a esteira contínua e suave de todas as turmas na tela da quadra. As pontuações deslizam em loop contínuo com destaque para a liderança.
               </p>
             </div>
-            <button id="btn-telao-release-direct" class="btn btn-primary" style="margin-top: 1.25rem; width: 100%; font-weight: 700;">
+            <button id="btn-telao-release-direct" class="btn btn-primary" style="margin-top: 1.2rem; width: 100%; font-weight: 800; font-size: 0.88rem; padding: 0.7rem 0.9rem; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
               Liberar Ranking Deslizante
             </button>
           </div>
 
-          <!-- Opção 4: Repetir Animação da Cerimônia -->
-          <div class="glass-card" style="padding: 1.5rem; background: rgba(88, 28, 135, 0.25); border: 1px solid rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Card 5: Repetir Animação da Cerimônia -->
+          <div class="glass-card" style="padding: 1.4rem; background: rgba(88, 28, 135, 0.25); border: 1px solid rgba(168, 85, 247, 0.4); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px;">
             <div>
-              <div style="font-size: 0.8rem; font-weight: 800; color: #d8b4fe; text-transform: uppercase; letter-spacing: 1px;">Reexecução</div>
-              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.4rem 0;">Repetir Show do Pódio</h3>
-              <p style="font-size: 0.85rem; color: #e9d5ff; line-height: 1.4;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #d8b4fe; text-transform: uppercase; letter-spacing: 1px;">Reexecução</span>
+                <span style="background: rgba(168, 85, 247, 0.2); color: #f3e8ff; border: 1px solid rgba(168, 85, 247, 0.4); font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 99px;">REPLAY</span>
+              </div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.3rem 0 0.5rem; color: #f8fafc; line-height: 1.25;">Repetir Show do Pódio</h3>
+              <p style="font-size: 0.85rem; color: #e9d5ff; line-height: 1.45;">
                 Reexecuta a contagem, os tambores e a revelação do campeão geral a qualquer instante para homenagens adicionais ou gravações do evento.
               </p>
             </div>
-            <button id="btn-telao-trigger-reveal" class="btn btn-secondary" style="margin-top: 1.25rem; width: 100%; font-weight: 700; border-color: #a855f7; color: #f3e8ff;">
+            <button id="btn-telao-trigger-reveal" class="btn btn-secondary" style="margin-top: 1.2rem; width: 100%; font-weight: 800; border-color: #a855f7; color: #f3e8ff; font-size: 0.88rem; padding: 0.7rem 0.9rem; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
               Repetir Animação Completa
+            </button>
+          </div>
+
+          <!-- Card 6: Forçar Atualização Imediata (Anti-Delay) -->
+          <div class="glass-card" style="padding: 1.4rem; background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%); border: 2px solid rgba(59, 130, 246, 0.6); display: flex; flex-direction: column; justify-content: space-between; min-height: 275px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);">
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <span style="font-size: 0.75rem; font-weight: 800; color: #60a5fa; text-transform: uppercase; letter-spacing: 1px;">Sincronismo Tempo Real</span>
+                <span style="background: rgba(59, 130, 246, 0.25); color: #bfdbfe; border: 1px solid rgba(59, 130, 246, 0.5); font-size: 0.7rem; font-weight: 900; padding: 0.2rem 0.55rem; border-radius: 99px;">ANTI-DELAY</span>
+              </div>
+              <h3 style="font-size: 1.2rem; font-weight: 800; margin: 0.3rem 0 0.5rem; color: #93c5fd; line-height: 1.25;">🔄 Forçar Atualização do Telão</h3>
+              <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.45;">
+                Recarrega imediatamente as notas mais recentes dos juízes e reconstrói o placar no telão da quadra em tempo real, eliminando qualquer delay.
+              </p>
+            </div>
+            <button id="btn-telao-force-refresh-card" class="btn btn-primary" style="margin-top: 1.2rem; width: 100%; font-weight: 900; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.35); font-size: 0.88rem; padding: 0.7rem 0.9rem; cursor: pointer; white-space: normal !important; word-break: break-word; text-align: center; line-height: 1.35;">
+              🔄 Atualizar Placar no Telão Agora
             </button>
           </div>
 

@@ -514,6 +514,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Ação de Forçar Atualização Imediata das Notas no Telão (Anti-Delay)
+  function handleForceTelaoRefresh() {
+    state.forceTelaoRefresh();
+    sound.playScoreDing();
+    updateMetrics();
+    renderClassificationTable();
+    showToast('🔄 Atualização forçada transmitida! O Telão e a classificação foram atualizados com as notas mais recentes.', 'toast-success');
+  }
+
+  const btnGestorForceRefreshTelao = document.getElementById('btn-gestor-force-refresh-telao');
+  if (btnGestorForceRefreshTelao) {
+    btnGestorForceRefreshTelao.addEventListener('click', handleForceTelaoRefresh);
+  }
+
+  const btnTelaoForceRefreshCard = document.getElementById('btn-telao-force-refresh-card');
+  if (btnTelaoForceRefreshCard) {
+    btnTelaoForceRefreshCard.addEventListener('click', handleForceTelaoRefresh);
+  }
+
   function updateMetrics() {
     const judgesWithPres = state.getJudgesWithPresence();
     const onlineCount = judgesWithPres.filter((j) => j.isOnline).length;

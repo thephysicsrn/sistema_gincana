@@ -39,6 +39,10 @@ class GincanaState {
               }
               this.loadFromStorage(false);
               this.notifyListeners({ source: 'telao_podium_reveal', turno: event.data.turno || null });
+            } else if (event.data.type === 'FORCE_REFRESH_TELAO') {
+              this.loadFromStorage(false);
+              this.syncWithServer();
+              this.notifyListeners({ source: 'force_refresh_telao' });
             } else if (event.data.type === 'PRESENCE_HEARTBEAT' || event.data.type === 'PRESENCE_SYNC') {
               this.handlePresenceMessage(event.data);
             }
@@ -293,6 +297,10 @@ class GincanaState {
               this.saveToStorage(false);
             }
             this.notifyListeners({ source: 'telao_podium_reveal', turno: data.turno || null });
+          } else if (data.type === 'FORCE_REFRESH_TELAO') {
+            this.loadFromStorage(false);
+            this.syncWithServer();
+            this.notifyListeners({ source: 'force_refresh_telao' });
           } else if (data.type === 'PRESENCE_SYNC' || data.type === 'PRESENCE_UPDATE') {
             this.handlePresenceMessage(data);
           }
@@ -2294,6 +2302,29 @@ class GincanaState {
     }
 
     this.notifyListeners({ source: 'telao_podium_reveal', turno: targetTurno });
+  }
+
+  forceTelaoRefresh() {
+    const msg = { type: 'FORCE_REFRESH_TELAO', timestamp: Date.now() };
+    if (this.channel) {
+      try { this.channel.postMessage(msg); } catch (e) {}
+    }
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      try { this.socket.send(JSON.stringify(msg)); } catch (e) {}
+    }
+
+    if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      fetch('/api/telao-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ forceRefresh: true, timestamp: Date.now() })
+      }).catch(err => {
+        console.warn('[Sync] Falha no POST /api/telao-mode (forceRefresh):', err.message);
+      });
+    }
+
+    this.syncWithServer();
+    this.notifyListeners({ source: 'force_refresh_telao' });
   }
 
   // =========================================================================

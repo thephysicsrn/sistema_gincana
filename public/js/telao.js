@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const slidingTrack = document.getElementById('sliding-track');
   const tickerLeaderContent = document.getElementById('ticker-leader-content');
   const btnToggleScroll = document.getElementById('btn-toggle-scroll');
+  const btnTelaoForceRefresh = document.getElementById('btn-telao-force-refresh');
   const slidingSpeedIndicator = document.getElementById('sliding-speed-indicator');
 
   let bannerTimeout = null;
@@ -712,6 +713,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  if (btnTelaoForceRefresh) {
+    btnTelaoForceRefresh.addEventListener('click', async () => {
+      btnTelaoForceRefresh.innerText = '🔄 Atualizando...';
+      sound.playClick();
+      await autoSyncTelao();
+      sound.playScoreDing();
+      btnTelaoForceRefresh.innerText = '✓ Atualizado!';
+      btnTelaoForceRefresh.style.borderColor = '#10b981';
+      btnTelaoForceRefresh.style.color = '#34d399';
+      setTimeout(() => {
+        btnTelaoForceRefresh.innerText = '🔄 Atualizar Placar';
+        btnTelaoForceRefresh.style.borderColor = '';
+        btnTelaoForceRefresh.style.color = '';
+      }, 2000);
+    });
+  }
+
   if (slidingViewport) {
     slidingViewport.addEventListener('mouseenter', () => {
       isScrollPaused = true;
@@ -794,6 +812,22 @@ document.addEventListener('DOMContentLoaded', () => {
       lastKnownTelaoMode = 'results';
       const targetTurno = eventInfo.turno || (state.getTelaoTurno ? state.getTelaoTurno() : null);
       runPodiumCeremonyAnimation(targetTurno);
+      return;
+    }
+
+    // 1.2 Comando explícito para Forçar Atualização Imediata das Notas
+    if (source === 'force_refresh_telao') {
+      autoSyncTelao();
+      if (btnTelaoForceRefresh) {
+        btnTelaoForceRefresh.innerText = '✓ Atualizado!';
+        btnTelaoForceRefresh.style.borderColor = '#10b981';
+        btnTelaoForceRefresh.style.color = '#34d399';
+        setTimeout(() => {
+          btnTelaoForceRefresh.innerText = '🔄 Atualizar Placar';
+          btnTelaoForceRefresh.style.borderColor = '';
+          btnTelaoForceRefresh.style.color = '';
+        }, 2000);
+      }
       return;
     }
 
@@ -899,8 +933,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Agenda sincronização contínua a cada 10 segundos para resposta ágil e infalível
-  const TELAO_SYNC_INTERVAL_MS = 10000;
+  // Agenda sincronização contínua a cada 3 segundos para resposta ultra-rápida sem delay
+  const TELAO_SYNC_INTERVAL_MS = 3000;
   setInterval(autoSyncTelao, TELAO_SYNC_INTERVAL_MS);
 
   // Inicialização imediata
