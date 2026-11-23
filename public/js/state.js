@@ -1244,13 +1244,18 @@ class GincanaState {
     });
 
     this.updateArchive(this.data.scores || [], this.data.penalties || []);
-    this.saveToStorage(true, { action: 'CLEAR_TURNO_SCORES', turno: targetTurno });
+    const gestorPin = this.getGestorAuthPin();
+    const token = this.getAuthToken();
+    this.saveToStorage(true, { action: 'CLEAR_TURNO_SCORES', turno: targetTurno, pin: gestorPin, token });
 
     if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      const headers = { 'Content-Type': 'application/json' };
+      if (gestorPin) headers['x-gestor-pin'] = gestorPin;
+      if (token) headers['x-auth-token'] = token;
       fetch('/api/state', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'CLEAR_TURNO_SCORES', turno: targetTurno })
+        headers,
+        body: JSON.stringify({ action: 'CLEAR_TURNO_SCORES', turno: targetTurno, pin: gestorPin, token })
       }).catch(() => {});
     }
 
@@ -1272,21 +1277,41 @@ class GincanaState {
           });
         }
 
+        const gestorPin = this.getGestorAuthPin();
+        const authToken = this.getAuthToken();
+
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
           this.socket.send(JSON.stringify({
             type: 'STATE_UPDATE',
             payload: this.data,
-            customPayload
+            customPayload: {
+              ...(customPayload || {}),
+              gestorPin,
+              token: authToken
+            },
+            gestorPin,
+            token: authToken
           }));
         }
 
         // Persistência assíncrona redundante via HTTP
         if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
           try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (gestorPin) headers['x-gestor-pin'] = gestorPin;
+            if (authToken) headers['x-auth-token'] = authToken;
+
             fetch('/api/state', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ payload: this.data })
+              headers,
+              body: JSON.stringify({
+                payload: this.data,
+                customPayload,
+                action: customPayload ? customPayload.action : null,
+                gestorPin,
+                token: authToken,
+                ...customPayload
+              })
             }).catch(() => {});
           } catch (e) {}
         }
@@ -1979,7 +2004,9 @@ class GincanaState {
     this.data.penalties = [];
     this.clearArchive();
     (this.data.teams || []).forEach((t) => (t.pesoELixoKg = 0));
-    this.saveToStorage(true, { action: 'CLEAR_SCORES' });
+    const gestorPin = this.getGestorAuthPin();
+    const token = this.getAuthToken();
+    this.saveToStorage(true, { action: 'CLEAR_SCORES', pin: gestorPin, token });
   }
 
   exportJSON() {
@@ -2156,18 +2183,34 @@ class GincanaState {
   // AUTENTICAÇÃO E CONTROLE DE ACESSO POR PIN (JUIZES / COMISSÃO)
   // =========================================================================
 
+  getGestorAuthPin() {
+    try {
+      return sessionStorage.getItem('sesi_gestor_pin') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  getAuthToken() {
+    try {
+      return sessionStorage.getItem('sesi_auth_token') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   /**
    * Autentica um juiz pelo ID e PIN informado.
-   * Suporta o PIN cadastrado do juiz ou o PIN Mestre '1234' / '9999'.
+   * Suporta o PIN cadastrado do juiz ou o PIN Mestre da Coordenação '9999'.
    */
   authenticateJudge(judgeId, enteredPin) {
     const judge = this.getJudges().find((j) => j.id === judgeId);
     if (!judge) return { success: false, message: 'Avaliador não encontrado.' };
 
     const cleanPin = String(enteredPin || '').trim();
-    const expectedPin = String(judge.pin || '1234').trim();
+    const expectedPin = String(judge.pin || '').trim();
 
-    if (cleanPin === expectedPin || cleanPin === '1234' || cleanPin === '9999') {
+    if (cleanPin === expectedPin || (expectedPin === '' && cleanPin.length === 4) || cleanPin === '9999') {
       const authSession = {
         id: judge.id,
         name: judge.name,
@@ -2175,6 +2218,24 @@ class GincanaState {
         assignedProvaId: judge.assignedProvaId || null,
         authenticatedAt: new Date().toISOString()
       };
+
+      try {
+        sessionStorage.setItem('sesi_judge_pin', cleanPin);
+      } catch (e) {}
+
+      // Registra sessão autenticada no servidor para gerar token
+      if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+        fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'juiz', judgeId: judge.id, pin: cleanPin })
+        }).then(r => r.json()).then(data => {
+          if (data && data.token) {
+            try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
+          }
+        }).catch(() => {});
+      }
+
       this.setLoggedInJudge(authSession);
       return { success: true, judge: authSession };
     }
@@ -2329,20 +2390,35 @@ class GincanaState {
     const cleanPin = String(enteredPin || '').trim();
     const masterPin = String((this.data.config && this.data.config.gestorPin) || '9999').trim();
 
-    if (cleanPin === masterPin || cleanPin === '9999' || cleanPin === 'admin') {
+    if (cleanPin === masterPin || cleanPin === '9999') {
       const gestorSession = {
         role: 'gestor',
-        name: this.data.config.gestorTitle || 'Coordenação Geral da Gincana',
+        name: (this.data.config && this.data.config.gestorTitle) || 'Coordenação Geral da Gincana',
         authenticatedAt: new Date().toISOString()
       };
       try {
+        sessionStorage.setItem('sesi_gestor_pin', cleanPin);
         sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
+
+        // Tenta registrar sessão autenticada no servidor para gerar token
+        if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+          fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: 'gestor', pin: cleanPin })
+          }).then(r => r.json()).then(data => {
+            if (data && data.token) {
+              try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
+            }
+          }).catch(() => {});
+        }
+
         this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
       } catch (e) {}
       return { success: true, gestor: gestorSession };
     }
 
-    return { success: false, message: 'PIN do Gestor inválido. O PIN padrão inicial é 9999.' };
+    return { success: false, message: 'PIN do Gestor inválido. O PIN padrão oficial é 9999.' };
   }
 
   getLoggedInGestor() {
