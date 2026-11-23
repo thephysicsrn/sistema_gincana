@@ -1403,6 +1403,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const rankBadgeColor = team.rank === 1 ? '#facc15' : team.rank === 2 ? '#cbd5e1' : team.rank === 3 ? '#f97316' : '#64748b';
       const rankBadgeBg = team.rank === 1 ? 'rgba(234,179,8,0.15)' : team.rank === 2 ? 'rgba(203,213,225,0.15)' : team.rank === 3 ? 'rgba(249,115,22,0.15)' : 'rgba(100,116,139,0.15)';
 
+      const percent = (leaderPoints > 0 && team.totalPoints > 0)
+        ? Math.min(100, Math.max(5, Math.round((team.totalPoints / leaderPoints) * 100)))
+        : 0;
+
       let diffText = '';
       if (leaderPoints === 0 && team.totalPoints === 0) {
         diffText = 'Aguardando notas';
