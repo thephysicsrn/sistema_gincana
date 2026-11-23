@@ -12,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Elementos de Autenticação do Gestor
   const pinOverlay = document.getElementById('gestor-pin-overlay');
   const pinErrorMsg = document.getElementById('gestor-pin-error');
+  const pinDirectInput = document.getElementById('gestor-pin-input');
+  const formGestorPin = document.getElementById('form-gestor-pin');
+  const btnPinSubmit = document.getElementById('btn-gestor-pin-submit');
   const pinDots = [
     document.getElementById('gdot-0'),
     document.getElementById('gdot-1'),
@@ -19,111 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('gdot-3')
   ];
   let enteredPin = '';
-
-  // Elementos do Cabeçalho e Navegação
-  const headerEventTitle = document.getElementById('header-event-title');
-  const headerUnitSubtitle = document.getElementById('header-unit-subtitle');
-  const btnLogout = document.getElementById('btn-gestor-logout');
-  const tabButtons = document.querySelectorAll('.gestor-tab-btn');
-  const tabContents = document.querySelectorAll('.gestor-tab-content');
-  let currentActiveTab = 'tab-telao-control';
-
-  // Elementos de Controle de Transmissão do Telão
-  const telaoStatusBadge = document.getElementById('telao-status-badge');
-  const btnTelaoSetStandby = document.getElementById('btn-telao-set-standby');
-  const btnTelaoReleaseResults = document.getElementById('btn-telao-release-results');
-  const btnTelaoReleaseDirect = document.getElementById('btn-telao-release-direct');
-  const btnTelaoTriggerReveal = document.getElementById('btn-telao-trigger-reveal');
-
-  // Métricas
-  const metricOnlineCount = document.getElementById('metric-online-count');
-  const metricTotalJudges = document.getElementById('metric-total-judges');
-  const metricProgressPercent = document.getElementById('metric-progress-percent');
-  const metricEvalFraction = document.getElementById('metric-eval-fraction');
-  const metricTotalTeams = document.getElementById('metric-total-teams');
-  const metricWsStatus = document.getElementById('metric-ws-status');
-
-  // Aba 1: Presença
-  const judgesPresenceGrid = document.getElementById('judges-presence-grid');
-  const btnRefreshPresence = document.getElementById('btn-refresh-presence');
-
-  // Aba 2: Matriz
-  const matrixFilterProva = document.getElementById('matrix-filter-prova');
-  const matrixFilterStatus = document.getElementById('matrix-filter-status');
-  const matrixProgressText = document.getElementById('matrix-progress-text');
-  const matrixProgressBar = document.getElementById('matrix-progress-bar');
-  const matrixTableBody = document.getElementById('matrix-table-body');
-  const matrixJudgesHeaderCols = document.getElementById('matrix-judges-header-cols');
-
-  // Aba 3: Auditoria
-  const auditScoresContainer = document.getElementById('audit-scores-container');
-  const auditSearchInput = document.getElementById('audit-search-input');
-  const btnExportAuditCsv = document.getElementById('btn-export-audit-csv');
-
-  // Aba 4: Gestão de Juízes & PINs
-  const judgesListContainer = document.getElementById('judges-list-container');
-  const btnOpenAddJudgeModal = document.getElementById('btn-open-add-judge-modal');
-  const formUpdateGestorPin = document.getElementById('form-update-gestor-pin');
-  const inputNewGestorPin = document.getElementById('input-new-gestor-pin');
-  const inputConfirmGestorPin = document.getElementById('input-confirm-gestor-pin');
-
-  // Aba 5: Gestão de Equipes
-  const teamsCardsGrid = document.getElementById('teams-cards-grid');
-  const btnOpenAddTeamModal = document.getElementById('btn-open-add-team-modal');
-
-  // Aba 6: Configurações do Painel
-  const formPanelConfig = document.getElementById('form-panel-config');
-  const cfgEventName = document.getElementById('cfg-event-name');
-  const cfgInstitution = document.getElementById('cfg-institution');
-  const cfgEditalTitle = document.getElementById('cfg-edital-title');
-  const cfgSelectedUnit = document.getElementById('cfg-selected-unit');
-  const cfgSelectedSegment = document.getElementById('cfg-selected-segment');
-  const cfgSelectedShift = document.getElementById('cfg-selected-shift');
-  const cfgDates = document.getElementById('cfg-dates');
-  const cfgYear = document.getElementById('cfg-year');
-  const btnClearScores = document.getElementById('btn-gestor-clear-scores');
-  const btnResetAll = document.getElementById('btn-gestor-reset-all');
-
-  // Modais
-  const modalJudgeCrud = document.getElementById('modal-judge-crud');
-  const formJudgeCrud = document.getElementById('form-judge-crud');
-  const modalJudgeTitle = document.getElementById('modal-judge-title');
-  const crudJudgeId = document.getElementById('crud-judge-id');
-  const crudJudgeName = document.getElementById('crud-judge-name');
-  const crudJudgeRole = document.getElementById('crud-judge-role');
-  const crudJudgeProva = document.getElementById('crud-judge-prova');
-  const crudJudgePin = document.getElementById('crud-judge-pin');
-  const btnCloseJudgeModal = document.getElementById('btn-close-judge-modal');
-
-  const modalChangeJudgePin = document.getElementById('modal-change-judge-pin');
-  const formChangeJudgePin = document.getElementById('form-change-judge-pin');
-  const changePinJudgeId = document.getElementById('change-pin-judge-id');
-  const modalChangePinJudgeName = document.getElementById('modal-change-pin-judge-name');
-  const inputSingleJudgePin = document.getElementById('input-single-judge-pin');
-  const btnCloseChangePinModal = document.getElementById('btn-close-change-pin-modal');
-
-  const modalTeamCrud = document.getElementById('modal-team-crud');
-  const formTeamCrud = document.getElementById('form-team-crud');
-  const modalTeamTitle = document.getElementById('modal-team-title');
-  const crudTeamId = document.getElementById('crud-team-id');
-  const crudTeamName = document.getElementById('crud-team-name');
-  const crudTeamIcon = document.getElementById('crud-team-icon');
-  const crudTeamTurma = document.getElementById('crud-team-turma');
-  const crudTeamSegmento = document.getElementById('crud-team-segmento');
-  const crudTeamColor = document.getElementById('crud-team-color');
-  const crudTeamColorEnd = document.getElementById('crud-team-color-end');
-  const crudTeamTutor = document.getElementById('crud-team-tutor');
-  const crudTeamPeso = document.getElementById('crud-team-peso');
-  const crudTeamSlogan = document.getElementById('crud-team-slogan');
-  const btnCloseTeamModal = document.getElementById('btn-close-team-modal');
-
-  const modalEditScore = document.getElementById('modal-edit-score');
-  const formEditScore = document.getElementById('form-edit-score');
-  const editScoreId = document.getElementById('edit-score-id');
-  const editScoreSubtitle = document.getElementById('edit-score-subtitle');
-  const editScorePoints = document.getElementById('edit-score-points');
-  const editScoreNote = document.getElementById('edit-score-note');
-  const btnCloseEditScoreModal = document.getElementById('btn-close-edit-score-modal');
 
   // =========================================================================
   // 1. AUTENTICAÇÃO DO GESTOR COM PIN MASTER
@@ -141,9 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showPinScreen() {
     enteredPin = '';
+    if (pinDirectInput) pinDirectInput.value = '';
     updatePinDots();
     pinErrorMsg.innerText = '';
     pinOverlay.classList.remove('hidden');
+    if (pinDirectInput) {
+      setTimeout(() => {
+        try { pinDirectInput.focus(); } catch (e) {}
+      }, 150);
+    }
   }
 
   function applyLoggedInState() {
@@ -158,17 +62,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updatePinDots() {
     pinDots.forEach((dot, idx) => {
-      if (idx < enteredPin.length) {
-        dot.classList.add('filled');
-      } else {
-        dot.classList.remove('filled');
+      if (dot) {
+        if (idx < enteredPin.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
       }
     });
+    if (pinDirectInput && pinDirectInput.value !== enteredPin) {
+      pinDirectInput.value = enteredPin;
+    }
   }
 
   function handlePinInput(key) {
     if (key === 'clear') {
       enteredPin = '';
+      if (pinDirectInput) pinDirectInput.value = '';
       updatePinDots();
       pinErrorMsg.innerText = '';
       return;
@@ -177,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (key === 'backspace') {
       if (enteredPin.length > 0) {
         enteredPin = enteredPin.slice(0, -1);
+        if (pinDirectInput) pinDirectInput.value = enteredPin;
         updatePinDots();
         pinErrorMsg.innerText = '';
       }
@@ -185,17 +96,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (enteredPin.length < 4) {
       enteredPin += key;
+      if (pinDirectInput) pinDirectInput.value = enteredPin;
       updatePinDots();
 
       if (enteredPin.length === 4) {
-        setTimeout(verifyPin, 150);
+        setTimeout(verifyPin, 100);
       }
     }
   }
 
   function verifyPin() {
+    const candidate = (pinDirectInput && pinDirectInput.value.trim().length > 0) 
+      ? pinDirectInput.value.trim() 
+      : enteredPin;
+
     try {
-      const result = state.authenticateGestor(enteredPin);
+      const result = state.authenticateGestor(candidate);
       if (result.success) {
         if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
         pinErrorMsg.innerText = '';
@@ -206,17 +122,19 @@ document.addEventListener('DOMContentLoaded', () => {
         pinErrorMsg.innerText = result.message || 'PIN da Coordenação incorreto.';
         setTimeout(() => {
           enteredPin = '';
+          if (pinDirectInput) pinDirectInput.value = '';
           updatePinDots();
         }, 500);
       }
     } catch (err) {
       console.error('Erro ao autenticar gestor:', err);
-      if (enteredPin === '9999' || enteredPin === 'admin') {
+      if (candidate === '9999' || candidate === 'admin') {
         applyLoggedInState();
       } else {
         pinErrorMsg.innerText = 'PIN incorreto.';
         setTimeout(() => {
           enteredPin = '';
+          if (pinDirectInput) pinDirectInput.value = '';
           updatePinDots();
         }, 500);
       }
@@ -224,21 +142,59 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function setupKeypad() {
+    // Teclado virtual na tela
     document.querySelectorAll('.pin-keypad .key-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         handlePinInput(btn.dataset.key);
       });
     });
 
+    // Campo de texto direto (aceita teclado do celular e físico)
+    if (pinDirectInput) {
+      pinDirectInput.addEventListener('input', () => {
+        enteredPin = pinDirectInput.value.replace(/[^0-9]/g, '').slice(0, 4);
+        pinDirectInput.value = enteredPin;
+        updatePinDots();
+        pinErrorMsg.innerText = '';
+        if (enteredPin.length === 4) {
+          setTimeout(verifyPin, 100);
+        }
+      });
+
+      pinDirectInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          verifyPin();
+        }
+      });
+    }
+
+    if (formGestorPin) {
+      formGestorPin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        verifyPin();
+      });
+    }
+
+    if (btnPinSubmit) {
+      btnPinSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+        verifyPin();
+      });
+    }
+
+    // Teclado físico global
     window.addEventListener('keydown', (e) => {
       if (!pinOverlay.classList.contains('hidden')) {
+        if (document.activeElement === pinDirectInput) return; // já tratado pelo input
         if (/^[0-9]$/.test(e.key)) {
           handlePinInput(e.key);
         } else if (e.key === 'Backspace') {
           handlePinInput('backspace');
         } else if (e.key === 'Escape') {
           handlePinInput('clear');
-        } else if (e.key === 'Enter' && enteredPin.length >= 4) {
+        } else if (e.key === 'Enter' && (enteredPin.length >= 4 || (pinDirectInput && pinDirectInput.value.length >= 4))) {
           verifyPin();
         }
       }
@@ -253,6 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+
+  // Inicializa imediatamente a autenticação para garantir funcionamento instantâneo
+  initAuth();
 
   // =========================================================================
   // 2. NAVEGAÇÃO ENTRE ABAS DO GESTOR
@@ -1452,28 +1411,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderConfigForm() {
     const config = state.getConfig();
-    cfgEventName.value = config.eventName || '';
-    cfgInstitution.value = config.institution || '';
-    cfgEditalTitle.value = config.editalTitle || '';
-    cfgSelectedUnit.value = config.selectedUnit || 'SESI Escola São Gonçalo do Amarante';
-    cfgSelectedSegment.value = config.selectedSegment || 'Ensino Médio';
-    cfgSelectedShift.value = config.selectedShift || 'Matutino';
-    cfgDates.value = config.dates || '';
-    cfgYear.value = config.year || 2026;
+    if (cfgEventName) cfgEventName.value = config.eventName || '';
+    if (cfgInstitution) cfgInstitution.value = config.institution || '';
+    if (cfgEditalTitle) cfgEditalTitle.value = config.editalTitle || '';
+    if (cfgSelectedUnit) cfgSelectedUnit.value = config.selectedUnit || 'SESI Escola São Gonçalo do Amarante';
+    if (cfgSelectedSegment) cfgSelectedSegment.value = config.selectedSegment || 'Ensino Médio';
+    if (cfgSelectedShift) cfgSelectedShift.value = config.selectedShift || 'Matutino';
+    if (cfgDates) cfgDates.value = config.dates || '';
+    if (cfgYear) cfgYear.value = config.year || 2026;
   }
 
   if (formPanelConfig) {
     formPanelConfig.addEventListener('submit', (e) => {
       e.preventDefault();
       const newConfig = {
-        eventName: cfgEventName.value.trim(),
-        institution: cfgInstitution.value.trim(),
-        editalTitle: cfgEditalTitle.value.trim(),
-        selectedUnit: cfgSelectedUnit.value,
-        selectedSegment: cfgSelectedSegment.value,
-        selectedShift: cfgSelectedShift.value,
-        dates: cfgDates.value.trim(),
-        year: parseInt(cfgYear.value, 10) || 2026
+        eventName: cfgEventName ? cfgEventName.value.trim() : 'Gincana SESI 2026',
+        institution: cfgInstitution ? cfgInstitution.value.trim() : 'SESI Escola',
+        editalTitle: cfgEditalTitle ? cfgEditalTitle.value.trim() : '',
+        selectedUnit: cfgSelectedUnit ? cfgSelectedUnit.value : 'SESI Escola',
+        selectedSegment: cfgSelectedSegment ? cfgSelectedSegment.value : 'Ensino Médio',
+        selectedShift: cfgSelectedShift ? cfgSelectedShift.value : 'Matutino',
+        dates: cfgDates ? cfgDates.value.trim() : '',
+        year: parseInt(cfgYear ? cfgYear.value : 2026, 10) || 2026
       };
 
       state.updateConfig(newConfig);
@@ -1717,7 +1676,4 @@ document.addEventListener('DOMContentLoaded', () => {
       renderOnlineJudges();
     }
   }, 10000);
-
-  // Inicializa autenticação do gestor
-  initAuth();
 });
