@@ -944,9 +944,8 @@ class GincanaState {
   }
 
   isMultiJudgeProva(provaId) {
-    // Apresentação com paródia: banca com múltiplos juízes (calcula a média das notas)
-    // Recicla Tech, Xadrez, Prova Social, Desafio E-Lixo, Quiz, Complete a música, Corrida do arco, Estoura o balão, Ping Pong: apenas um juiz lança a nota para cada equipe
-    return provaId === 'p_parodia';
+    // Apresentação com Paródia e Recicla Tech: bancas abertas para todos os juízes habilitados lançarem notas
+    return provaId === 'p_parodia' || provaId === 'p_recicla';
   }
 
   getScores() {
@@ -961,25 +960,24 @@ class GincanaState {
     const scores = (this.data.scores || []).filter((s) => s.teamId === teamId && s.provaId === provaId);
     if (scores.length === 0) return null;
 
-    if (this.isMultiJudgeProva(provaId)) {
-      if (specificJudge) {
-        const found = scores.find((s) => (s.judgeId && s.judgeId === specificJudge) || s.judgeName === specificJudge);
-        if (found) return found;
-      }
-      // Retorna a média da banca julgadora
+    if (specificJudge) {
+      const found = scores.find((s) => (s.judgeId && s.judgeId === specificJudge) || s.judgeName === specificJudge);
+      if (found) return found;
+    }
+
+    if (this.isMultiJudgeProva(provaId) || scores.length > 1) {
+      // Retorna o somatório de todas as notas dos juízes (sem média)
       const totalPoints = scores.reduce((acc, s) => acc + Number(s.points || 0), 0);
       const totalRubric = scores.reduce((acc, s) => acc + Number(s.rubricScore || s.points || 0), 0);
-      const avgPoints = Math.round((totalPoints / scores.length) * 10) / 10;
-      const avgRubric = Math.round((totalRubric / scores.length) * 10) / 10;
 
       return {
         teamId,
         provaId,
-        points: avgPoints,
-        rubricScore: avgRubric,
+        points: totalPoints,
+        rubricScore: totalRubric,
         judgesCount: scores.length,
         judgesNames: scores.map((s) => s.judgeName).join(', '),
-        isMultiJudgeAverage: true,
+        isMultiJudgeSum: true,
         scoresList: scores
       };
     }
@@ -1358,7 +1356,7 @@ class GincanaState {
     const isMultiJudge = this.isMultiJudgeProva(provaId);
 
     if (isMultiJudge) {
-      // Paródia: banca com múltiplos juízes. Cada juiz tem sua própria nota para a equipe.
+      // Bancas com múltiplos juízes (Paródia, Recicla Tech): cada juiz tem seu próprio lançamento independente para a equipe.
       const existingIdx = this.data.scores.findIndex((s) => 
         s.teamId === teamId && 
         s.provaId === provaId && 

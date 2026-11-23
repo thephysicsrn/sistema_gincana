@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isMulti = state.isMultiJudgeProva(form.provaId);
     const judgeRuleText = isMulti 
-      ? ' • <span style="color:#c084fc; font-weight:700;">⚖️ Avaliação em Banca (Múltiplos Jurados com Média)</span>'
+      ? ' • <span style="color:#c084fc; font-weight:700;">⚖️ Avaliação em Banca (Somatório de Todos os Juízes)</span>'
       : ' • <span style="color:#38bdf8; font-weight:700;">👤 Juiz Único (1 Nota Oficial por Equipe)</span>';
 
     if (heroProvaMode) heroProvaMode.innerHTML = `Modo: ${modeText}${judgeRuleText}`;
