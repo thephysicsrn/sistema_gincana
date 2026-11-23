@@ -659,11 +659,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const activePill = document.getElementById('telao-active-turno-pill');
     if (activePill) {
+      const teamsCount = state && typeof state.getTeams === 'function' ? state.getTeams(currentTurno).length : 6;
       if (currentTurno === 'Matutino') {
-        activePill.innerHTML = '☀️ GINCANA MATUTINO (8 TURMAS)';
+        activePill.innerHTML = `☀️ GINCANA MATUTINO (${teamsCount} TURMAS)`;
         activePill.style.background = 'linear-gradient(135deg, #2563eb, #7c3aed)';
       } else {
-        activePill.innerHTML = '🌙 GINCANA VESPERTINO (8 TURMAS)';
+        activePill.innerHTML = `🌙 GINCANA VESPERTINO (${teamsCount} TURMAS)`;
         activePill.style.background = 'linear-gradient(135deg, #7c3aed, #db2777)';
       }
     }

@@ -173,20 +173,32 @@ const morningNames = ['artuane', 'micarla', 'aparecida', 'palhares', 'rebeca'];
 const afternoonJudges = new Set(['j_diego', 'j_helena', 'j_joaovictor', 'j_joserodrigues', 'j_micael']);
 const afternoonNames = ['diego', 'helena', 'joão victor', 'joao victor', 'josé rodrigues', 'jose rodrigues', 'micael'];
 
-const vespertinoTeamIds = new Set(['t_6av', 't_6bv', 't_7av', 't_7bv', 't_8av', 't_8bv', 't_9av', 't_9bv']);
-const matutinoTeamIds = new Set(['t_6am', 't_6bm', 't_7am', 't_7bm', 't_8am', 't_8bm', 't_9am', 't_9bm']);
+const vespertinoTeamIds = new Set([
+  't_1av', 't_1bv', 't_2av', 't_2bv', 't_3av', 't_3bv',
+  't_6av', 't_6bv', 't_7av', 't_7bv', 't_8av', 't_8bv', 't_9av', 't_9bv'
+]);
+const matutinoTeamIds = new Set([
+  't_1am', 't_1bm', 't_2am', 't_2bm', 't_3am', 't_3bm',
+  't_6am', 't_6bm', 't_7am', 't_7bm', 't_8am', 't_8bm', 't_9am', 't_9bm'
+]);
 
 function isTurnoMismatch(s) {
   if (!s || !s.teamId) return false;
   const teamId = String(s.teamId || '');
+  const team = lastKnownState && Array.isArray(lastKnownState.teams)
+    ? lastKnownState.teams.find(t => t.id === teamId)
+    : null;
+  const isVesp = team ? (team.turno === 'Vespertino') : (teamId.endsWith('v') || vespertinoTeamIds.has(teamId));
+  const isMat = team ? (team.turno === 'Matutino') : (teamId.endsWith('m') || matutinoTeamIds.has(teamId));
+
   const jId = String(s.judgeId || '').trim();
   const jName = String(s.judgeName || '').toLowerCase().trim();
 
-  if (vespertinoTeamIds.has(teamId)) {
+  if (isVesp) {
     if (morningJudges.has(jId)) return true;
     if (morningNames.some(n => jName.includes(n))) return true;
   }
-  if (matutinoTeamIds.has(teamId)) {
+  if (isMat) {
     if (afternoonJudges.has(jId)) return true;
     if (afternoonNames.some(n => jName.includes(n))) return true;
   }
