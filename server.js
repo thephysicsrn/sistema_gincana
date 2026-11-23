@@ -504,6 +504,23 @@ const server = http.createServer((req, res) => {
 
   // API HTTP: GET /api/state
   if (req.method === 'GET' && parsedUrl === '/api/state') {
+    // Sincroniza do disco se disponível
+    if (fs.existsSync(STATE_FILE)) {
+      try {
+        const diskState = JSON.parse(fs.readFileSync(STATE_FILE, 'utf-8'));
+        if (diskState) {
+          if (!lastKnownState) lastKnownState = diskState;
+          else {
+            lastKnownState.judges = diskState.judges || lastKnownState.judges;
+            lastKnownState.teams = diskState.teams || lastKnownState.teams;
+            if (diskState.config) {
+              lastKnownState.config = { ...(lastKnownState.config || {}), ...diskState.config };
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
     const isGestor = isGestorAuthenticated(req);
     // Para visualizadores públicos e Telão, oculta PINs e chaves mestras
     const dataToSend = isGestor ? lastKnownState : sanitizePublicState(lastKnownState);

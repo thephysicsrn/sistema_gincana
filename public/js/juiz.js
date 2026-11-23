@@ -1546,6 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Escuta atualizações do state (WebSocket / BroadcastChannel / Storage)
   state.subscribe(() => {
+    renderJudgeLoginSelect();
     renderProvaTabs();
     renderTeams();
     renderProvaEvalSummary();

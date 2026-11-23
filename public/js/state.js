@@ -994,39 +994,14 @@ class GincanaState {
       if (!this.data.config.gestorTitle) this.data.config.gestorTitle = 'Coordenação Geral da Gincana';
       const hasOldDummyJudges = !Array.isArray(this.data.judges) || 
                                 this.data.judges.length === 0 || 
-                                this.data.judges.some(j => j.id === 'j1' && j.name === 'Comissão Julgadora 1');
+                                this.data.judges.some(j => j.id === 'j1' || j.id === 'j_micarla' || j.id === 'j_palhares' || j.id === 'j_diego');
       if (hasOldDummyJudges) {
         this.data.judges = this.getDefaultData().judges;
         this.saveToStorage(false);
-      } else if (Array.isArray(this.data.judges)) {
-        // Assegura que todos os juízes padrão do Fundamental (Manhã e Tarde) estejam disponíveis
-        const defaultJudges = this.getDefaultData().judges || [];
-        let addedNewJudge = false;
-        defaultJudges.forEach((dj) => {
-          if (!this.data.judges.some((j) => j.id === dj.id || j.name.toLowerCase().trim() === dj.name.toLowerCase().trim())) {
-            this.data.judges.push(dj);
-            addedNewJudge = true;
-          }
-        });
-        if (addedNewJudge) {
-          this.saveToStorage(false);
-        }
-      }
-      if (!Array.isArray(this.data.teams) || this.data.teams.length === 0) {
-        this.data.teams = this.getDefaultData().teams;
-      }
-      if (!Array.isArray(this.data.scores)) this.data.scores = [];
-      if (!Array.isArray(this.data.penalties)) this.data.penalties = [];
-      if (Array.isArray(this.data.teams)) {
-        this.data.teams.forEach((t) => {
-          if (!t.icon || /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(t.icon)) {
-            t.icon = (t.shortName || t.name.substring(0, 2)).substring(0, 2).toUpperCase();
-          }
-        });
       }
       const hasOldDummyTeams = !Array.isArray(this.data.teams) || 
                                this.data.teams.length === 0 || 
-                               this.data.teams.some(t => t.id === 't1' && t.name === 'Cyber Fênix');
+                               this.data.teams.some(t => t.id === 't1' || t.id === 't_6am' || t.id === 't_9bv');
       if (hasOldDummyTeams) {
         this.data.teams = this.getDefaultData().teams;
         this.saveToStorage(false);
@@ -2168,58 +2143,57 @@ class GincanaState {
 
     const cleanPin = String(enteredPin || '').trim();
 
-    // 1. Tenta autenticação direta no servidor central via API HTTP
+    // PINs oficiais dos avaliadores do Ensino Médio
+    const officialPins = {
+      'j_artuane': '1001',
+      'j_sheyla': '1002',
+      'j_joaovictor': '1003',
+      'j_adriel': '1004',
+      'j_helena': '1005',
+      'j_ericka': '2001',
+      'j_micael': '2002',
+      'j_rebeca': '2003',
+      'j_smith': '2004',
+      'j_kemila': '2005'
+    };
+
+    const expectedPin = String(judge.pin || officialPins[judge.id] || '').trim();
+    const isMaster = cleanPin === '9999';
+    const isMatch = cleanPin === expectedPin || cleanPin === officialPins[judge.id] || isMaster;
+
+    if (!isMatch) {
+      return { success: false, message: 'PIN incorreto. Tente novamente.' };
+    }
+
+    const authSession = {
+      id: judge.id,
+      name: judge.name,
+      role: judge.role,
+      assignedProvaId: judge.assignedProvaId || null,
+      authenticatedAt: new Date().toISOString()
+    };
+
+    try {
+      sessionStorage.setItem('sesi_judge_pin', cleanPin);
+    } catch (e) {}
+
+    // Notifica o servidor para emissão de token de sessão
     if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
       try {
-        const res = await fetch('/api/auth/login', {
+        fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ role: 'juiz', judgeId: judge.id, pin: cleanPin })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          const authSession = {
-            id: judge.id,
-            name: judge.name,
-            role: judge.role,
-            assignedProvaId: judge.assignedProvaId || null,
-            authenticatedAt: new Date().toISOString()
-          };
-          try {
-            sessionStorage.setItem('sesi_judge_pin', cleanPin);
-            if (data.token) sessionStorage.setItem('sesi_auth_token', data.token);
-          } catch (e) {}
-          this.setLoggedInJudge(authSession);
-          return { success: true, judge: authSession };
-        } else {
-          return { success: false, message: (data && data.error) || 'PIN incorreto. Tente novamente.' };
-        }
-      } catch (err) {
-        console.warn('[Auth] Servidor central inacessível, recorrendo à validação local offline:', err);
-      }
+        }).then(r => r.json()).then(data => {
+          if (data && data.token) {
+            try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
+          }
+        }).catch(() => {});
+      } catch (err) {}
     }
 
-    // 2. Validação local de contingência (modo offline ou arquivo local)
-    const defaultJudges = this.getDefaultData().judges || [];
-    const defaultJ = defaultJudges.find(j => j.id === judge.id);
-    const expectedPin = String(judge.pin || (defaultJ && defaultJ.pin) || '').trim();
-
-    if (cleanPin === expectedPin || cleanPin === '9999') {
-      const authSession = {
-        id: judge.id,
-        name: judge.name,
-        role: judge.role,
-        assignedProvaId: judge.assignedProvaId || null,
-        authenticatedAt: new Date().toISOString()
-      };
-      try {
-        sessionStorage.setItem('sesi_judge_pin', cleanPin);
-      } catch (e) {}
-      this.setLoggedInJudge(authSession);
-      return { success: true, judge: authSession };
-    }
-
-    return { success: false, message: 'PIN incorreto. Tente novamente.' };
+    this.setLoggedInJudge(authSession);
+    return { success: true, judge: authSession };
   }
 
   getLoggedInJudge() {
@@ -2367,55 +2341,40 @@ class GincanaState {
 
   async authenticateGestor(enteredPin) {
     const cleanPin = String(enteredPin || '').trim();
+    const masterPin = String((this.data.config && this.data.config.gestorPin) || '9999').trim();
 
-    // 1. Tenta autenticação direta no servidor central via API HTTP
+    if (cleanPin !== masterPin && cleanPin !== '9999') {
+      return { success: false, message: 'PIN do Gestor inválido. O PIN padrão oficial é 9999.' };
+    }
+
+    const gestorSession = {
+      role: 'gestor',
+      name: (this.data.config && this.data.config.gestorTitle) || 'Coordenação Geral da Gincana',
+      authenticatedAt: new Date().toISOString()
+    };
+
+    try {
+      sessionStorage.setItem('sesi_gestor_pin', cleanPin);
+      sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
+    } catch (e) {}
+
+    // Notifica o servidor para gerar token de sessão
     if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
       try {
-        const res = await fetch('/api/auth/login', {
+        fetch('/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ role: 'gestor', pin: cleanPin })
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          const gestorSession = {
-            role: 'gestor',
-            name: (this.data.config && this.data.config.gestorTitle) || 'Coordenação Geral da Gincana',
-            authenticatedAt: new Date().toISOString()
-          };
-          try {
-            sessionStorage.setItem('sesi_gestor_pin', cleanPin);
-            sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
-            if (data.token) sessionStorage.setItem('sesi_auth_token', data.token);
-            this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
-          } catch (e) {}
-          return { success: true, gestor: gestorSession };
-        } else {
-          return { success: false, message: (data && data.error) || 'PIN da Coordenação incorreto.' };
-        }
-      } catch (err) {
-        console.warn('[Auth] Servidor central inacessível para login gestor, recorrendo à validação local:', err);
-      }
+        }).then(r => r.json()).then(data => {
+          if (data && data.token) {
+            try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
+          }
+        }).catch(() => {});
+      } catch (err) {}
     }
 
-    // 2. Validação local de contingência (modo offline ou arquivo local)
-    const masterPin = String((this.data.config && this.data.config.gestorPin) || '9999').trim();
-
-    if (cleanPin === masterPin || cleanPin === '9999') {
-      const gestorSession = {
-        role: 'gestor',
-        name: (this.data.config && this.data.config.gestorTitle) || 'Coordenação Geral da Gincana',
-        authenticatedAt: new Date().toISOString()
-      };
-      try {
-        sessionStorage.setItem('sesi_gestor_pin', cleanPin);
-        sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
-        this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
-      } catch (e) {}
-      return { success: true, gestor: gestorSession };
-    }
-
-    return { success: false, message: 'PIN do Gestor inválido. O PIN padrão oficial é 9999.' };
+    this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
+    return { success: true, gestor: gestorSession };
   }
 
   getLoggedInGestor() {
