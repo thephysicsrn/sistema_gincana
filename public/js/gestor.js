@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnTelaoReleaseResults = document.getElementById('btn-telao-release-results');
   const btnTelaoReleaseDirect = document.getElementById('btn-telao-release-direct');
   const btnTelaoTriggerReveal = document.getElementById('btn-telao-trigger-reveal');
+  const btnTelaoPodiumReveal = document.getElementById('btn-telao-podium-reveal');
 
   // Métricas
   const metricOnlineCount = document.getElementById('metric-online-count');
@@ -467,6 +468,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Controles de Transmissão do Telão
+  if (btnTelaoPodiumReveal) {
+    btnTelaoPodiumReveal.addEventListener('click', () => {
+      const currentTurno = state.getTelaoTurno ? state.getTelaoTurno() : 'Matutino';
+      state.triggerTelaoPodiumAnimation(currentTurno);
+      updateTelaoStatusBadge();
+      sound.playDrumRoll(3.5);
+      showToast(`🏆 Cerimônia Solene do Pódio iniciada no Telão (${currentTurno})!`, 'toast-success');
+    });
+  }
+
   if (btnTelaoSetStandby) {
     btnTelaoSetStandby.addEventListener('click', () => {
       state.setTelaoMode('standby');

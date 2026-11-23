@@ -33,6 +33,12 @@ class GincanaState {
               }
               this.loadFromStorage(false);
               this.notifyListeners({ source: 'telao_trigger_reveal' });
+            } else if (event.data.type === 'TELAO_PODIUM_REVEAL') {
+              if (this.data && this.data.config) {
+                this.data.config.telaoMode = 'results';
+              }
+              this.loadFromStorage(false);
+              this.notifyListeners({ source: 'telao_podium_reveal', turno: event.data.turno || null });
             } else if (event.data.type === 'PRESENCE_HEARTBEAT' || event.data.type === 'PRESENCE_SYNC') {
               this.handlePresenceMessage(event.data);
             }
@@ -281,6 +287,12 @@ class GincanaState {
               this.saveToStorage(false);
             }
             this.notifyListeners({ source: 'telao_trigger_reveal' });
+          } else if (data.type === 'TELAO_PODIUM_REVEAL') {
+            if (this.data && this.data.config) {
+              this.data.config.telaoMode = 'results';
+              this.saveToStorage(false);
+            }
+            this.notifyListeners({ source: 'telao_podium_reveal', turno: data.turno || null });
           } else if (data.type === 'PRESENCE_SYNC' || data.type === 'PRESENCE_UPDATE') {
             this.handlePresenceMessage(data);
           }
@@ -2253,6 +2265,35 @@ class GincanaState {
     this.sendTelaoModeToServer('results', true);
 
     this.notifyListeners({ source: 'telao_trigger_reveal' });
+  }
+
+  triggerTelaoPodiumAnimation(turno = null) {
+    if (!this.data) this.data = this.getDefaultData();
+    if (!this.data.config) this.data.config = {};
+    this.data.config.telaoMode = 'results';
+    this.data.config.lastRevealAt = Date.now();
+    this.saveToStorage(true, { action: 'TELAO_PODIUM_REVEAL', turno });
+
+    const targetTurno = turno || this.getTelaoTurno();
+    const msg = { type: 'TELAO_PODIUM_REVEAL', turno: targetTurno, timestamp: Date.now() };
+    if (this.channel) {
+      try { this.channel.postMessage(msg); } catch (e) {}
+    }
+    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      try { this.socket.send(JSON.stringify(msg)); } catch (e) {}
+    }
+
+    if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      fetch('/api/telao-mode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'results', triggerPodiumReveal: true, turno: targetTurno, timestamp: Date.now() })
+      }).catch(err => {
+        console.warn('[Sync] Falha no POST /api/telao-mode (podium):', err.message);
+      });
+    }
+
+    this.notifyListeners({ source: 'telao_podium_reveal', turno: targetTurno });
   }
 
   // =========================================================================

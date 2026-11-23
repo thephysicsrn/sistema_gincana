@@ -263,22 +263,25 @@ const server = http.createServer((req, res) => {
         const parsed = JSON.parse(body);
         const mode = parsed.mode || 'results';
         const triggerReveal = Boolean(parsed.triggerReveal);
+        const triggerPodiumReveal = Boolean(parsed.triggerPodiumReveal);
 
         if (!lastKnownState) lastKnownState = { config: {} };
         if (!lastKnownState.config) lastKnownState.config = {};
         lastKnownState.config.telaoMode = mode;
-        if (triggerReveal) lastKnownState.config.lastRevealAt = Date.now();
+        if (triggerReveal || triggerPodiumReveal) lastKnownState.config.lastRevealAt = Date.now();
         saveStateToDisk();
 
         // Faz broadcast pelo WebSocket para o telão e todos os clientes
-        if (triggerReveal) {
+        if (triggerPodiumReveal) {
+          broadcastServerMessage({ type: 'TELAO_PODIUM_REVEAL', turno: parsed.turno || null, timestamp: Date.now() });
+        } else if (triggerReveal) {
           broadcastServerMessage({ type: 'TELAO_TRIGGER_REVEAL', timestamp: Date.now() });
         } else {
           broadcastServerMessage({ type: 'TELAO_MODE_CHANGE', mode, timestamp: Date.now() });
         }
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-        res.end(JSON.stringify({ success: true, mode, triggerReveal }));
+        res.end(JSON.stringify({ success: true, mode, triggerReveal, triggerPodiumReveal }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify({ success: false, error: e.message }));
@@ -424,6 +427,12 @@ if (WebSocket) {
           lastKnownState.config.telaoTurno = data.turno;
           saveStateToDisk();
         } else if (data.type === 'TELAO_TRIGGER_REVEAL') {
+          if (!lastKnownState) lastKnownState = { config: {} };
+          if (!lastKnownState.config) lastKnownState.config = {};
+          lastKnownState.config.telaoMode = 'results';
+          lastKnownState.config.lastRevealAt = Date.now();
+          saveStateToDisk();
+        } else if (data.type === 'TELAO_PODIUM_REVEAL') {
           if (!lastKnownState) lastKnownState = { config: {} };
           if (!lastKnownState.config) lastKnownState.config = {};
           lastKnownState.config.telaoMode = 'results';

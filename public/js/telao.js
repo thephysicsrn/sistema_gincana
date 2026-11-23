@@ -26,6 +26,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const revealMainTitle = document.getElementById('reveal-main-title');
   const revealSubtitle = document.getElementById('reveal-subtitle');
 
+  // Elementos do Overlay da Cerimônia Solene do Pódio (Lenta: 3º -> 2º -> 1º)
+  const podiumOverlay = document.getElementById('telao-podium-overlay');
+  const podiumStage = document.getElementById('podium-stage-container');
+  const btnPodiumClose = document.getElementById('btn-podium-overlay-close');
+  const podiumCeremonyTag = document.getElementById('podium-ceremony-tag');
+  const podiumCeremonyTitle = document.getElementById('podium-ceremony-title');
+  const podiumCeremonySub = document.getElementById('podium-ceremony-subtitle');
+  let podiumTimers = [];
+
+  if (btnPodiumClose) {
+    btnPodiumClose.addEventListener('click', () => {
+      stopPodiumCeremonyAnimation();
+    });
+  }
+
+  function stopPodiumCeremonyAnimation() {
+    podiumTimers.forEach(t => clearTimeout(t));
+    podiumTimers = [];
+    if (podiumOverlay) podiumOverlay.classList.add('hidden');
+    if (resultsScreen) resultsScreen.style.display = 'block';
+    isRevealing = false;
+    renderTelao();
+  }
+
   // Elementos da Tela de Resultados
   const podiumEl = document.getElementById('telao-podium');
   const listEl = document.getElementById('telao-leaderboard-list');
@@ -233,6 +257,299 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     bannerEl.classList.add('show');
     setTimeout(() => bannerEl.classList.remove('show'), 12000);
+  }
+
+  // =========================================================================
+  // 2.1 CERIMÔNIA SOLENE DO PÓDIO (REVELAÇÃO LENTA: 3º ➔ 2º ➔ 1º LUGAR)
+  // =========================================================================
+
+  function runPodiumCeremonyAnimation(customTurno = null) {
+    if (isRevealing) {
+      stopPodiumCeremonyAnimation();
+    }
+    isRevealing = true;
+
+    // Garante que o áudio está inicializado
+    sound.init();
+
+    // Determina o turno da cerimônia
+    const currentTurno = customTurno || ((state && typeof state.getTelaoTurno === 'function') ? state.getTelaoTurno() : 'Matutino');
+    updateTelaoTurnoButtons(currentTurno);
+
+    // Esconde standby e overlay rápido caso estejam abertos
+    if (standbyScreen) standbyScreen.classList.add('hidden');
+    if (revealOverlay) revealOverlay.classList.add('hidden');
+    if (resultsScreen) resultsScreen.style.display = 'none';
+
+    // Exibe overlay solene do pódio
+    if (podiumOverlay) podiumOverlay.classList.remove('hidden');
+
+    // Recupera ranking ordenado das turmas
+    const rankings = state.getTeamRankings(currentTurno);
+    if (!rankings || rankings.length === 0) {
+      setTimeout(() => stopPodiumCeremonyAnimation(), 3000);
+      return;
+    }
+
+    const team1 = rankings[0] || null;
+    const team2 = rankings.length >= 2 ? rankings[1] : null;
+    const team3 = rankings.length >= 3 ? rankings[2] : (rankings.length >= 2 ? rankings[1] : rankings[0]);
+
+    // Reseta timers anteriores
+    podiumTimers.forEach(t => clearTimeout(t));
+    podiumTimers = [];
+
+    // Watchdog de segurança para garantir que a tela nunca trave
+    podiumTimers.push(setTimeout(() => {
+      stopPodiumCeremonyAnimation();
+    }, 55000));
+
+    // =========================================================================
+    // FASE 0: Abertura Solene com Rufar de Tambores (0s a 4.5s)
+    // =========================================================================
+    if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🏆 CERIMÔNIA OFICIAL DO PÓDIO • TURNO ${currentTurno.toUpperCase()}`;
+    if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `OS GRANDES VENCEDORES DO SESI CONECTA 2026`;
+    if (podiumCeremonySub) podiumCeremonySub.innerText = `A Coordenação Geral convida todos para a consagração dos 3 primeiros colocados!`;
+
+    if (podiumStage) {
+      podiumStage.innerHTML = `
+        <div style="animation: suspensePulseGlow 1.8s infinite ease-in-out; text-align: center; max-width: 800px;">
+          <div style="font-size: 5rem; margin-bottom: 0.5rem; filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.6));">👑</div>
+          <div style="font-size: 2.3rem; font-weight: 900; color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 2px;">
+            A Tensão Toma Conta da Quadra...
+          </div>
+          <div style="font-size: 1.35rem; color: #fbbf24; font-weight: 700; margin-top: 0.75rem;">
+            Rufem os tambores! Revelando a classificação sagrada do pódio...
+          </div>
+        </div>
+      `;
+    }
+
+    sound.playDrumRoll(4.2);
+
+    // =========================================================================
+    // FASE 1: Revelação do 3º Colocado (Bronze) (4.5s a 12.0s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🥉 3º LUGAR • MEDALHA DE BRONZE`;
+      if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = team3 ? team3.name : '3º Colocado';
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `Parabéns pela garra, união e dedicação extraordinária durante toda a gincana!`;
+
+      sound.playScoreDing();
+      confetti.celebrate();
+
+      if (podiumStage && team3) {
+        podiumStage.innerHTML = `
+          <div class="podium-spotlight-card podium-card-bronze">
+            <div class="podium-rank-pill pill-bronze">
+              <span>🥉</span> 3º LUGAR • MEDALHA DE BRONZE
+            </div>
+            <div style="font-size: 3.4rem; font-weight: 900; color: #ffffff; line-height: 1.15; margin-bottom: 0.4rem; text-shadow: 0 0 30px rgba(205, 127, 50, 0.75);">
+              ${team3.name}
+            </div>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #fdba74; margin-bottom: 1.4rem;">
+              Turma: ${team3.turma} • ${team3.className || team3.segmento || ''}
+            </div>
+            <div style="display: inline-flex; align-items: baseline; gap: 0.6rem; background: rgba(0,0,0,0.5); border: 2px solid rgba(205, 127, 50, 0.65); padding: 0.85rem 2.25rem; border-radius: 22px;">
+              <span style="font-size: 3.2rem; font-weight: 900; color: #fbbf24; font-family: 'Outfit', sans-serif;">
+                ${(team3.totalPoints || 0).toLocaleString('pt-BR')}
+              </span>
+              <span style="font-size: 1.25rem; font-weight: 900; color: #fed7aa; text-transform: uppercase;">Pontos Oficiais</span>
+            </div>
+            <div style="margin-top: 1.4rem; font-size: 1.2rem; color: #e2e8f0; font-weight: 700;">
+              👏 Uma gigantesca salva de palmas para o 3º Lugar!
+            </div>
+          </div>
+        `;
+      }
+    }, 4500));
+
+    // =========================================================================
+    // FASE 2: Revelação do 2º Colocado (Prata / Vice-Campeã) (12.0s a 19.5s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🥈 2º LUGAR • VICE-CAMPEÃ GERAL`;
+      if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = team2 ? team2.name : '2º Colocado';
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `Uma jornada brilhante de superação e destaque absoluto em quadra!`;
+
+      sound.playDrumRoll(2.5);
+      setTimeout(() => {
+        sound.playScoreDing();
+        confetti.celebrate();
+      }, 500);
+
+      if (podiumStage && team2) {
+        podiumStage.innerHTML = `
+          <div class="podium-spotlight-card podium-card-silver">
+            <div class="podium-rank-pill pill-silver">
+              <span>🥈</span> 2º LUGAR • MEDALHA DE PRATA / VICE-CAMPEÃ
+            </div>
+            <div style="font-size: 3.4rem; font-weight: 900; color: #ffffff; line-height: 1.15; margin-bottom: 0.4rem; text-shadow: 0 0 30px rgba(226, 232, 240, 0.7);">
+              ${team2.name}
+            </div>
+            <div style="font-size: 1.65rem; font-weight: 800; color: #cbd5e1; margin-bottom: 1.4rem;">
+              Turma: ${team2.turma} • ${team2.className || team2.segmento || ''}
+            </div>
+            <div style="display: inline-flex; align-items: baseline; gap: 0.6rem; background: rgba(0,0,0,0.5); border: 2px solid rgba(226, 232, 240, 0.65); padding: 0.85rem 2.25rem; border-radius: 22px;">
+              <span style="font-size: 3.2rem; font-weight: 900; color: #f1f5f9; font-family: 'Outfit', sans-serif;">
+                ${(team2.totalPoints || 0).toLocaleString('pt-BR')}
+              </span>
+              <span style="font-size: 1.25rem; font-weight: 900; color: #e2e8f0; text-transform: uppercase;">Pontos Oficiais</span>
+            </div>
+            <div style="margin-top: 1.4rem; font-size: 1.2rem; color: #f8fafc; font-weight: 700;">
+              🥈 Parabéns à Vice-Campeã pela brilhante conquista!
+            </div>
+          </div>
+        `;
+      }
+    }, 12000));
+
+    // =========================================================================
+    // FASE 3: Suspense Eletrizante para o 1º Lugar (19.5s a 25.0s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `👑 QUEM É A GRANDE CAMPEÃ?`;
+      if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `O LUGAR MAIS ALTO DO PÓDIO!`;
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `Atenção absoluta na quadra para o anúncio da equipe Campeã Geral!`;
+
+      sound.playDrumRoll(5.0);
+
+      if (podiumStage) {
+        podiumStage.innerHTML = `
+          <div style="animation: suspensePulseGlow 1.2s infinite ease-in-out; text-align: center; max-width: 850px;">
+            <div style="font-size: 6.5rem; margin-bottom: 0.5rem; filter: drop-shadow(0 0 35px #f59e0b);">👑</div>
+            <div style="font-size: 3.2rem; font-weight: 900; color: #fef08a; text-shadow: 0 0 45px rgba(245, 158, 11, 0.9); text-transform: uppercase; letter-spacing: 3px;">
+              E A GRANDE CAMPEÃ É...
+            </div>
+            <div style="font-size: 1.6rem; color: #fde68a; font-weight: 800; margin-top: 1.2rem; letter-spacing: 2px;">
+              RUFEM TODOS OS TAMBORES!
+            </div>
+          </div>
+        `;
+      }
+    }, 19500));
+
+    // =========================================================================
+    // FASE 4: Revelação Apoteótica do 1º Lugar (Ouro / Campeã) (25.0s a 34.0s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🥇 1º LUGAR • GRANDE CAMPEÃ GERAL SESI CONECTA`;
+      if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = team1 ? team1.name : '1º Colocado';
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `A grande vencedora que levou a honra máxima da Gincana SESI CONECTA 2026!`;
+
+      sound.playFanfare();
+      confetti.celebrate();
+      setTimeout(() => confetti.celebrate(), 1500);
+      setTimeout(() => confetti.celebrate(), 3000);
+      setTimeout(() => confetti.celebrate(), 4500);
+
+      if (podiumStage && team1) {
+        podiumStage.innerHTML = `
+          <div class="podium-spotlight-card podium-card-gold" style="padding: 2.75rem 3.5rem;">
+            <div class="podium-rank-pill pill-gold">
+              <span>👑</span> 1º LUGAR • GRANDE CAMPEÃ GERAL SESI 2026
+            </div>
+            <div style="font-size: 3.8rem; font-weight: 900; color: #ffffff; line-height: 1.1; margin-bottom: 0.5rem; text-shadow: 0 0 40px rgba(245, 158, 11, 0.95);">
+              ${team1.name}
+            </div>
+            <div style="font-size: 1.9rem; font-weight: 900; color: #fde047; margin-bottom: 1.5rem;">
+              Turma: ${team1.turma} • ${team1.className || team1.segmento || ''}
+            </div>
+            <div style="display: inline-flex; align-items: baseline; gap: 0.6rem; background: rgba(0,0,0,0.55); border: 2px solid rgba(245, 158, 11, 0.85); padding: 0.9rem 2.6rem; border-radius: 24px; box-shadow: 0 0 35px rgba(245, 158, 11, 0.45);">
+              <span style="font-size: 3.6rem; font-weight: 900; color: #facc15; font-family: 'Outfit', sans-serif;">
+                ${(team1.totalPoints || 0).toLocaleString('pt-BR')}
+              </span>
+              <span style="font-size: 1.4rem; font-weight: 900; color: #fef08a; text-transform: uppercase;">PONTOS CAMPEÃ!</span>
+            </div>
+            <div style="margin-top: 1.5rem; font-size: 1.35rem; color: #ffffff; font-weight: 900; text-shadow: 0 0 20px rgba(255,255,255,0.6);">
+              🏆 GLÓRIA E HONRA MÁXIMA NA GINCANA SESI CONECTA 2026! 🏆
+            </div>
+          </div>
+        `;
+      }
+    }, 25000));
+
+    // =========================================================================
+    // FASE 5: Pódio Olímpico Completo (Todos os 3 Degraus) (34.0s a 48.0s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      if (!isRevealing) return;
+      if (podiumCeremonyTag) podiumCeremonyTag.innerText = `🏆 PÓDIO CONSAGRADO • GINCANA SESI CONECTA 2026`;
+      if (podiumCeremonyTitle) podiumCeremonyTitle.innerText = `O PÓDIO OFICIAL DA GINCANA (${currentTurno.toUpperCase()})`;
+      if (podiumCeremonySub) podiumCeremonySub.innerText = `As três melhores turmas lado a lado na história do SESI CONECTA!`;
+
+      confetti.celebrate();
+
+      if (podiumStage && team1 && team2 && team3) {
+        podiumStage.innerHTML = `
+          <div class="olympic-podium-grid">
+            
+            <!-- 2º LUGAR (ESQUERDA) -->
+            <div class="olympic-column">
+              <div style="margin-bottom: 0.75rem;">
+                <span style="font-size: 2.2rem;">🥈</span>
+                <div style="font-size: 1.35rem; font-weight: 900; color: #f1f5f9; text-shadow: 0 0 15px rgba(226,232,240,0.5);">${team2.name}</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1;">${team2.turma}</div>
+              </div>
+              <div class="olympic-pedestal pedestal-2">
+                <div style="font-size: 1.4rem; font-weight: 900; color: #f1f5f9;">2º LUGAR</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Vice-Campeã</div>
+                <div style="font-size: 1.9rem; font-weight: 900; color: #f8fafc; margin-top: 0.75rem; font-family: 'Outfit', sans-serif;">
+                  ${(team2.totalPoints || 0).toLocaleString('pt-BR')} <span style="font-size: 0.9rem;">pts</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 1º LUGAR (CENTRO - MAIS ALTO) -->
+            <div class="olympic-column" style="transform: scale(1.05);">
+              <div style="margin-bottom: 0.75rem;">
+                <span style="font-size: 3.2rem; filter: drop-shadow(0 0 20px #f59e0b);">👑</span>
+                <div style="font-size: 1.6rem; font-weight: 900; color: #fef08a; text-shadow: 0 0 20px rgba(245,158,11,0.8);">${team1.name}</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: #fde68a;">${team1.turma}</div>
+              </div>
+              <div class="olympic-pedestal pedestal-1">
+                <div style="font-size: 1.8rem; font-weight: 900; color: #facc15;">🥇 1º LUGAR</div>
+                <div style="font-size: 0.95rem; font-weight: 900; color: #fef08a; text-transform: uppercase; letter-spacing: 1px;">GRANDE CAMPEÃ</div>
+                <div style="font-size: 2.3rem; font-weight: 900; color: #ffffff; margin-top: 0.75rem; font-family: 'Outfit', sans-serif;">
+                  ${(team1.totalPoints || 0).toLocaleString('pt-BR')} <span style="font-size: 1.1rem;">pts</span>
+                </div>
+                <div style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 800; color: #fde047; background: rgba(0,0,0,0.35); padding: 0.25rem 0.75rem; border-radius: 99px;">
+                  CAMPEÃ GERAL
+                </div>
+              </div>
+            </div>
+
+            <!-- 3º LUGAR (DIREITA) -->
+            <div class="olympic-column">
+              <div style="margin-bottom: 0.75rem;">
+                <span style="font-size: 2.2rem;">🥉</span>
+                <div style="font-size: 1.35rem; font-weight: 900; color: #fdba74; text-shadow: 0 0 15px rgba(205,127,50,0.5);">${team3.name}</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #fdba74;">${team3.turma}</div>
+              </div>
+              <div class="olympic-pedestal pedestal-3">
+                <div style="font-size: 1.4rem; font-weight: 900; color: #fdba74;">3º LUGAR</div>
+                <div style="font-size: 0.85rem; font-weight: 800; color: #fdba74; text-transform: uppercase;">Bronze</div>
+                <div style="font-size: 1.9rem; font-weight: 900; color: #f8fafc; margin-top: 0.75rem; font-family: 'Outfit', sans-serif;">
+                  ${(team3.totalPoints || 0).toLocaleString('pt-BR')} <span style="font-size: 0.9rem;">pts</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        `;
+      }
+    }, 34000));
+
+    // =========================================================================
+    // FASE FINAL: Transição Suave para o Placar Geral Deslizante (48.0s)
+    // =========================================================================
+    podiumTimers.push(setTimeout(() => {
+      stopPodiumCeremonyAnimation();
+    }, 48000));
   }
 
   // =========================================================================
@@ -465,10 +782,18 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 1. Comando explícito para disparar a cerimônia animada de revelação
+    // 1. Comando explícito para disparar a cerimônia animada de revelação rápida
     if (source === 'telao_trigger_reveal') {
       lastKnownTelaoMode = 'results';
       runRevealAnimation();
+      return;
+    }
+
+    // 1.1 Comando explícito para disparar a Cerimônia Solene Lenta do Pódio (3º -> 2º -> 1º)
+    if (source === 'telao_podium_reveal') {
+      lastKnownTelaoMode = 'results';
+      const targetTurno = eventInfo.turno || (state.getTelaoTurno ? state.getTelaoTurno() : null);
+      runPodiumCeremonyAnimation(targetTurno);
       return;
     }
 
