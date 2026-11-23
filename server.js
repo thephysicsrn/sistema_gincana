@@ -136,6 +136,16 @@ function mergeState(current, incoming) {
     result.provas = current.provas || [];
   }
 
+  if (Array.isArray(incoming.judges) && incoming.judges.length > 0) {
+    const existingJudgesMap = new Map((current.judges || []).map(j => [j.id, j]));
+    incoming.judges.forEach(j => {
+      existingJudgesMap.set(j.id, j);
+    });
+    result.judges = Array.from(existingJudgesMap.values());
+  } else {
+    result.judges = current.judges || [];
+  }
+
   return result;
 }
 

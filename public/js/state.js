@@ -431,7 +431,12 @@ class GincanaState {
         { id: 'j_micarla', name: 'Micarla', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1002' },
         { id: 'j_aparecida', name: 'Aparecida', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1003' },
         { id: 'j_palhares', name: 'Palhares', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1004' },
-        { id: 'j_rebeca', name: 'Rebeca', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1005' }
+        { id: 'j_rebeca', name: 'Rebeca', role: 'Avaliador(a) Oficial • Fundamental Manhã', assignedProvaId: null, pin: '1005' },
+        { id: 'j_diego', name: 'Diego', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2001' },
+        { id: 'j_helena', name: 'Helena', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2002' },
+        { id: 'j_joaovictor', name: 'João Victor', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2003' },
+        { id: 'j_joserodrigues', name: 'José Rodrigues', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2004' },
+        { id: 'j_micael', name: 'Micael', role: 'Avaliador(a) Oficial • Fundamental Tarde', assignedProvaId: null, pin: '2005' }
       ],
       // Turmas participantes configuradas como equipes (Item 10 do Edital)
       teams: [
@@ -1011,6 +1016,19 @@ class GincanaState {
       if (hasOldDummyJudges) {
         this.data.judges = this.getDefaultData().judges;
         this.saveToStorage(false);
+      } else if (Array.isArray(this.data.judges)) {
+        // Assegura que todos os juízes padrão do Fundamental (Manhã e Tarde) estejam disponíveis
+        const defaultJudges = this.getDefaultData().judges || [];
+        let addedNewJudge = false;
+        defaultJudges.forEach((dj) => {
+          if (!this.data.judges.some((j) => j.id === dj.id || j.name.toLowerCase().trim() === dj.name.toLowerCase().trim())) {
+            this.data.judges.push(dj);
+            addedNewJudge = true;
+          }
+        });
+        if (addedNewJudge) {
+          this.saveToStorage(false);
+        }
       }
       if (!Array.isArray(this.data.teams) || this.data.teams.length === 0) {
         this.data.teams = this.getDefaultData().teams;

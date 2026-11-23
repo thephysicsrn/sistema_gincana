@@ -155,6 +155,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     headerJudgeRole.innerText = `${judge.role}${respText} • Autenticado`;
+
+    // Filtra automaticamente o turno do juiz logado para agilizar o lançamento
+    if (judge.role && (judge.role.includes('Tarde') || judge.role.includes('Vespertino'))) {
+      teamFilterState.turno = 'Vespertino';
+      document.querySelectorAll('.btn-filter-turno').forEach((b) => {
+        b.classList.toggle('active', b.dataset.turno === 'Vespertino');
+      });
+    } else if (judge.role && (judge.role.includes('Manhã') || judge.role.includes('Matutino'))) {
+      teamFilterState.turno = 'Matutino';
+      document.querySelectorAll('.btn-filter-turno').forEach((b) => {
+        b.classList.toggle('active', b.dataset.turno === 'Matutino');
+      });
+    }
+
     initScoringForm();
 
     // Registra presença imediata
