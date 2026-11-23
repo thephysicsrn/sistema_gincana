@@ -2083,24 +2083,27 @@ class GincanaState {
   /**
    * Exporta a planilha oficial completa em formato Excel (.xlsx) com múltiplas abas
    * (Classificação Oficial, Quadro de Provas, Desafio E-Lixo e Auditoria de Notas).
+   * Suporta 'Matutino', 'Vespertino' ou 'Consolidado' (ambos os turnos em abas separadas).
    */
-  exportExcel(turno = 'Matutino') {
+  exportExcel(turno = 'Consolidado') {
     const hasXLSX = typeof window !== 'undefined' && typeof window.XLSX !== 'undefined';
-    const shiftLabel = turno ? (turno === 'Matutino' ? 'Manha' : turno) : 'Geral';
-    const filename = `Resultados_Gincana_SESI_${shiftLabel}_2026.xlsx`;
+    const isConsolidado = turno === 'Consolidado' || turno === 'Ambos' || !turno;
+    const shiftLabel = isConsolidado ? 'Consolidado' : (turno === 'Matutino' ? 'Manha' : turno);
+    const filename = isConsolidado
+      ? 'Resultados_Consolidados_Gincana_SESI_Fundamental_2026.xlsx'
+      : `Resultados_Gincana_SESI_${shiftLabel}_2026.xlsx`;
 
-    const rankings = this.getTeamRankings(turno);
     const provas = this.getProvas();
     const scores = this.data.scores || [];
 
     if (!hasXLSX) {
-      // Fallback para CSV compatível com Excel se XLSX ainda não carregou
-      const csv = this.exportCSV(turno);
+      // Fallback para CSV se SheetJS não estiver disponível
+      const csv = this.exportCSV(isConsolidado ? null : turno);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Resultados_Gincana_SESI_${shiftLabel}_2026.csv`);
+      link.setAttribute('download', `${filename.replace('.xlsx', '.csv')}`);
       document.body.appendChild(link);
       link.click();
       setTimeout(() => {
@@ -2110,80 +2113,104 @@ class GincanaState {
       return;
     }
 
-    // 1. Aba: Classificação Oficial
-    const sheet1Data = rankings.map((r) => {
-      const s = r.stats;
-      return {
-        'Classificação': `${r.rank}º Lugar`,
-        'Turma': r.turma,
-        'Equipe': r.name,
-        'Mascote': r.mascote || '-',
-        'Turno': r.turno || shiftLabel,
-        'Pontos Provas': s.pontosDemaisProvas,
-        'E-Lixo Arrecadado (kg)': s.pesoKg || 0,
-        'Pontos Peso (1 kg = 1 pt)': s.pontosPeso || 0,
-        'Bônus E-Lixo': s.bonusPeso || 0,
-        'Total E-Lixo': s.elixoComTeto || 0,
-        'Penalidades': s.totalPenalidades || 0,
-        'PONTUAÇÃO FINAL': r.totalPoints,
-        'Nota Escolar (Item 39)': r.notaEscolar
-      };
-    });
-    const ws1 = window.XLSX.utils.json_to_sheet(sheet1Data);
-    ws1['!cols'] = [
-      { wch: 16 }, { wch: 18 }, { wch: 24 }, { wch: 16 }, { wch: 12 },
-      { wch: 15 }, { wch: 22 }, { wch: 24 }, { wch: 16 }, { wch: 15 },
-      { wch: 14 }, { wch: 18 }, { wch: 22 }
-    ];
+    const wb = window.XLSX.utils.book_new();
 
-    // 2. Aba: Notas por Prova
-    const sheet2Data = rankings.map((r) => {
-      const s = r.stats;
-      const row = {
-        'Classificação': `${r.rank}º`,
-        'Turma': r.turma,
-        'Equipe': r.name
-      };
-      provas.forEach((p) => {
-        row[p.title] = s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0;
+    const generateRankingSheet = (turnKey, label) => {
+      const rankings = this.getTeamRankings(turnKey);
+      const data = rankings.map((r) => {
+        const s = r.stats;
+        return {
+          'Classificação': `${r.rank}º Lugar`,
+          'Turma': r.turma,
+          'Equipe': r.name,
+          'Mascote': r.mascote || '-',
+          'Turno': r.turno || label,
+          'Pontos Provas': s.pontosDemaisProvas,
+          'E-Lixo Arrecadado (kg)': s.pesoKg || 0,
+          'Pontos Peso (1 kg = 1 pt)': s.pontosPeso || 0,
+          'Bônus E-Lixo': s.bonusPeso || 0,
+          'Total E-Lixo': s.elixoComTeto || 0,
+          'Penalidades': s.totalPenalidades || 0,
+          'PONTUAÇÃO FINAL': r.totalPoints,
+          'Nota Escolar (Item 39)': r.notaEscolar
+        };
       });
-      row['E-Lixo (Total)'] = s.elixoComTeto || 0;
-      row['Penalidades'] = s.totalPenalidades || 0;
-      row['TOTAL FINAL'] = r.totalPoints;
-      return row;
-    });
-    const ws2 = window.XLSX.utils.json_to_sheet(sheet2Data);
+      const ws = window.XLSX.utils.json_to_sheet(data);
+      ws['!cols'] = [
+        { wch: 16 }, { wch: 18 }, { wch: 24 }, { wch: 16 }, { wch: 12 },
+        { wch: 15 }, { wch: 22 }, { wch: 24 }, { wch: 16 }, { wch: 15 },
+        { wch: 14 }, { wch: 18 }, { wch: 22 }
+      ];
+      return ws;
+    };
 
-    // 3. Aba: Detalhamento do E-Lixo
-    const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(turno);
-    const sheet3Data = this.getTeams(turno).map((t) => {
-      const peso = Number(t.pesoELixoKg || 0);
-      const b = peso > 0 ? (bonusMap[t.id] || 0) : 0;
-      const rk = peso > 0 ? (rankMap[t.id] ? `${rankMap[t.id]}º` : '-') : 'Sem peso';
-      return {
-        'Turma': t.turma,
-        'Equipe': t.name,
-        'Peso Validado (kg)': peso,
-        'Pontos pelo Peso': peso,
-        'Colocação no Peso': rk,
-        'Bônus Concedido': b,
-        'Total E-Lixo (pts)': peso + b
-      };
-    });
-    const ws3 = window.XLSX.utils.json_to_sheet(sheet3Data);
-    ws3['!cols'] = [
-      { wch: 18 }, { wch: 24 }, { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
-    ];
+    const generateQuadroSheet = (turnKey) => {
+      const rankings = this.getTeamRankings(turnKey);
+      const data = rankings.map((r) => {
+        const s = r.stats;
+        const row = {
+          'Classificação': `${r.rank}º`,
+          'Turma': r.turma,
+          'Equipe': r.name
+        };
+        provas.forEach((p) => {
+          row[p.title] = s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0;
+        });
+        row['E-Lixo (Total)'] = s.elixoComTeto || 0;
+        row['Penalidades'] = s.totalPenalidades || 0;
+        row['TOTAL FINAL'] = r.totalPoints;
+        return row;
+      });
+      return window.XLSX.utils.json_to_sheet(data);
+    };
 
-    // 4. Aba: Auditoria e Pareceres dos Jurados
-    const teamsInTurnoIds = new Set(this.getTeams(turno).map(t => t.id));
-    const sheet4Data = scores
-      .filter((sc) => teamsInTurnoIds.has(sc.teamId))
+    const generateELixoSheet = (turnKey) => {
+      const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(turnKey);
+      const teams = this.getTeams(turnKey);
+      const data = teams.map((t) => {
+        const peso = Number(t.pesoELixoKg || 0);
+        const b = peso > 0 ? (bonusMap[t.id] || 0) : 0;
+        const rk = peso > 0 ? (rankMap[t.id] ? `${rankMap[t.id]}º` : '-') : 'Sem peso';
+        return {
+          'Turma': t.turma,
+          'Equipe': t.name,
+          'Turno': t.turno || '-',
+          'Peso Validado (kg)': peso,
+          'Pontos pelo Peso': peso,
+          'Colocação no Peso': rk,
+          'Bônus Concedido': b,
+          'Total E-Lixo (pts)': peso + b
+        };
+      });
+      const ws = window.XLSX.utils.json_to_sheet(data);
+      ws['!cols'] = [
+        { wch: 18 }, { wch: 24 }, { wch: 14 }, { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
+      ];
+      return ws;
+    };
+
+    if (isConsolidado) {
+      window.XLSX.utils.book_append_sheet(wb, generateRankingSheet('Matutino', 'Manhã'), 'Classificação Manhã');
+      window.XLSX.utils.book_append_sheet(wb, generateRankingSheet('Vespertino', 'Tarde'), 'Classificação Tarde');
+      window.XLSX.utils.book_append_sheet(wb, generateQuadroSheet('Matutino'), 'Quadro Provas Manhã');
+      window.XLSX.utils.book_append_sheet(wb, generateQuadroSheet('Vespertino'), 'Quadro Provas Tarde');
+      window.XLSX.utils.book_append_sheet(wb, generateELixoSheet(null), 'Desafio E-Lixo');
+    } else {
+      window.XLSX.utils.book_append_sheet(wb, generateRankingSheet(turno, shiftLabel), `Classificação ${shiftLabel}`);
+      window.XLSX.utils.book_append_sheet(wb, generateQuadroSheet(turno), 'Quadro por Prova');
+      window.XLSX.utils.book_append_sheet(wb, generateELixoSheet(turno), 'Desafio E-Lixo');
+    }
+
+    // Aba de Auditoria de Jurados
+    const teamsFilterIds = isConsolidado ? null : new Set(this.getTeams(turno).map(t => t.id));
+    const auditData = scores
+      .filter((sc) => !teamsFilterIds || teamsFilterIds.has(sc.teamId))
       .map((sc) => {
         const team = this.getTeam(sc.teamId);
         const prova = this.getProva(sc.provaId);
         return {
           'Data / Hora': sc.createdAt ? new Date(sc.createdAt).toLocaleString('pt-BR') : '-',
+          'Turno': team ? team.turno : '-',
           'Prova': prova ? prova.title : sc.provaId,
           'Turma': team ? team.turma : sc.teamId,
           'Equipe': team ? team.name : sc.teamId,
@@ -2194,13 +2221,9 @@ class GincanaState {
           'Parecer / Observação': sc.note || ''
         };
       });
-    const ws4 = window.XLSX.utils.json_to_sheet(sheet4Data.length > 0 ? sheet4Data : [{ 'Aviso': 'Nenhum lançamento individual registrado para este turno.' }]);
 
-    const wb = window.XLSX.utils.book_new();
-    window.XLSX.utils.book_append_sheet(wb, ws1, `Classificação ${shiftLabel}`);
-    window.XLSX.utils.book_append_sheet(wb, ws2, 'Quadro por Prova');
-    window.XLSX.utils.book_append_sheet(wb, ws3, 'Desafio E-Lixo');
-    window.XLSX.utils.book_append_sheet(wb, ws4, 'Auditoria de Jurados');
+    const wsAudit = window.XLSX.utils.json_to_sheet(auditData.length > 0 ? auditData : [{ 'Aviso': 'Nenhum lançamento registrado.' }]);
+    window.XLSX.utils.book_append_sheet(wb, wsAudit, 'Auditoria de Jurados');
 
     window.XLSX.writeFile(wb, filename);
   }

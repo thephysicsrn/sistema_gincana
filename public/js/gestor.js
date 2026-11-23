@@ -1330,11 +1330,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   auditSearchInput.addEventListener('input', renderAudit);
 
+  const btnQuickExcelConsolidado = document.getElementById('btn-quick-export-excel-consolidado');
+  if (btnQuickExcelConsolidado) {
+    btnQuickExcelConsolidado.addEventListener('click', () => {
+      state.exportExcel('Consolidado');
+      if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+      showToast('Planilha Consolidada baixada com sucesso!', 'toast-success');
+    });
+  }
+
   const btnQuickExcelManha = document.getElementById('btn-quick-export-excel-manha');
   if (btnQuickExcelManha) {
     btnQuickExcelManha.addEventListener('click', () => {
       state.exportExcel('Matutino');
       if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+      showToast('Planilha da Manhã baixada com sucesso!', 'toast-success');
+    });
+  }
+
+  const btnQuickExcelTarde = document.getElementById('btn-quick-export-excel-tarde');
+  if (btnQuickExcelTarde) {
+    btnQuickExcelTarde.addEventListener('click', () => {
+      state.exportExcel('Vespertino');
+      if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+      showToast('Planilha da Tarde baixada com sucesso!', 'toast-success');
+    });
+  }
+
+  const btnQuickBackupJson = document.getElementById('btn-quick-export-backup-json');
+  if (btnQuickBackupJson) {
+    btnQuickBackupJson.addEventListener('click', () => {
+      state.exportJSON();
+      if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+      showToast('Backup JSON completo baixado com sucesso!', 'toast-success');
     });
   }
 

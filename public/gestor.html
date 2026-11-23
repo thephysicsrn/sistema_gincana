@@ -352,20 +352,29 @@
     </div>
 
     <!-- Ações e Links Rápidos do Gestor -->
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-      <button id="btn-quick-export-excel-manha" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;" title="Baixar Resultados Oficiais da Manhã em Excel (.xlsx)">
-        <span>📊</span> Excel Manhã (.XLSX)
+    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+      <button id="btn-quick-export-excel-consolidado" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; color: white; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;" title="Baixar Resultados Consolidados (Manhã + Tarde) em Excel (.xlsx)">
+        <span>📑</span> Excel Consolidado
       </button>
-      <a href="telao.html" target="_blank" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; font-weight: 800;" title="Abrir Telão da Quadra em Nova Aba">
-        Abrir Telão da Quadra
+      <button id="btn-quick-export-excel-manha" class="btn btn-primary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;" title="Baixar Resultados Oficiais da Manhã em Excel (.xlsx)">
+        <span>☀️</span> Excel Manhã
+      </button>
+      <button id="btn-quick-export-excel-tarde" class="btn btn-primary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: white; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;" title="Baixar Resultados Oficiais da Tarde em Excel (.xlsx)">
+        <span>🌙</span> Excel Tarde
+      </button>
+      <button id="btn-quick-export-backup-json" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer;" title="Baixar Arquivo Completo de Backup JSON">
+        <span>💾</span> Backup JSON
+      </button>
+      <a href="telao.html" target="_blank" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; text-decoration: none; font-weight: 800;" title="Abrir Telão da Quadra em Nova Aba">
+        Telão Quadra
       </a>
-      <a href="index.html" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Placar Geral">
-        Placar Oficial
+      <a href="index.html" class="btn btn-secondary" style="padding: 0.45rem 0.65rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Placar Geral">
+        Placar
       </a>
-      <a href="juiz.html" target="_blank" class="btn btn-secondary" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Portal do Avaliador">
-        Portal do Juiz
+      <a href="juiz.html" target="_blank" class="btn btn-secondary" style="padding: 0.45rem 0.65rem; font-size: 0.8rem; text-decoration: none;" title="Abrir Portal do Avaliador">
+        Portal Juiz
       </a>
-      <button id="btn-gestor-logout" class="btn btn-outline" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; border-color: #ef4444; color: #f87171;" title="Encerrar Sessão">
+      <button id="btn-gestor-logout" class="btn btn-outline" style="padding: 0.45rem 0.65rem; font-size: 0.8rem; border-color: #ef4444; color: #f87171;" title="Encerrar Sessão">
         Sair
       </button>
     </div>
@@ -1216,9 +1225,9 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/sound.js?v=20261123v8"></script>
-  <script src="js/state.js?v=20261123v8"></script>
-  <script src="js/planilha-turmas.js?v=20261123v8"></script>
-  <script src="js/gestor.js?v=20261123v8"></script>
+  <script src="js/sound.js?v=20261123v9"></script>
+  <script src="js/state.js?v=20261123v9"></script>
+  <script src="js/planilha-turmas.js?v=20261123v9"></script>
+  <script src="js/gestor.js?v=20261123v9"></script>
 </body>
 </html>
