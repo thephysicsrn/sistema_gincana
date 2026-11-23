@@ -814,6 +814,14 @@ if (WebSocket) {
             lastKnownState = mergeState(lastKnownState, data.payload);
             saveStateToDisk();
           }
+
+          // Transmite o estado oficial sanitizado para todos os clientes
+          broadcastServerMessage({
+            type: 'SYNC_DATA',
+            payload: sanitizePublicState(lastKnownState),
+            timestamp: new Date().toISOString()
+          });
+          return;
         } else if (data.type === 'TELAO_MODE_CHANGE') {
           if (!lastKnownState) lastKnownState = { config: {} };
           if (!lastKnownState.config) lastKnownState.config = {};
@@ -839,14 +847,25 @@ if (WebSocket) {
         } else if (data.type === 'FORCE_REFRESH_TELAO') {
           // Apenas retransmite a ordem de atualização imediata para todos
         }
-      } catch (e) {}
 
-      // Reenvia para todos os outros clientes conectados (celulares dos juízes e telão)
-      for (const [client] of wsClients) {
-        if (client !== ws && client.readyState === 1 /* OPEN */) {
-          try { client.send(message.toString()); } catch (e) {}
+        // Para mensagens de controle que não sejam STATE_UPDATE, retransmite sem credenciais
+        const safeForward = { ...data };
+        delete safeForward.pin;
+        delete safeForward.gestorPin;
+        delete safeForward.token;
+        if (safeForward.customPayload) {
+          delete safeForward.customPayload.pin;
+          delete safeForward.customPayload.gestorPin;
+          delete safeForward.customPayload.token;
         }
-      }
+        const safeForwardStr = JSON.stringify(safeForward);
+
+        for (const [client] of wsClients) {
+          if (client !== ws && client.readyState === 1 /* OPEN */) {
+            try { client.send(safeForwardStr); } catch (e) {}
+          }
+        }
+      } catch (e) {}
     });
 
     ws.on('close', () => {
@@ -869,7 +888,7 @@ server.listen(PORT, () => {
   console.log(`\n💻 No computador local:`);
   console.log(`   Placar & Geral:    http://localhost:${PORT}`);
   console.log(`   Painel do Gestor:  http://localhost:${PORT}/gestor.html (PIN: 9999)`);
-  console.log(`   Portal do Juiz:    http://localhost:${PORT}/juiz.html (PIN: 1234)`);
+  console.log(`   Portal do Juiz:    http://localhost:${PORT}/juiz.html (PINs: Manhã 1001-1005 / Tarde 2001-2005)`);
   console.log(`   Modo Telão (TV):   http://localhost:${PORT}/telao.html`);
 
   // Detecta IPs locais para facilitar o acesso pelo celular via Wi-Fi

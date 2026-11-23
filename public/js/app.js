@@ -791,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnFinalConfirm = document.getElementById('btn-modal-confirm-score');
   if (btnFinalConfirm) {
-    btnFinalConfirm.addEventListener('click', () => {
+    btnFinalConfirm.addEventListener('click', async () => {
       try {
         const pinInput = document.getElementById('input-confirm-pin');
         const pinError = document.getElementById('pin-modal-error');
@@ -799,9 +799,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const judge = state.getJudges().find((j) => j.name === judgeFormState.selectedJudge);
         if (judge) {
-          const auth = state.authenticateJudge(judge.id, enteredPin);
+          const auth = await state.authenticateJudge(judge.id, enteredPin);
           if (!auth.success) {
-            if (pinError) pinError.innerText = 'PIN incorreto. Tente novamente (padrão: 1234).';
+            if (pinError) pinError.innerText = auth.message || 'PIN incorreto. Tente novamente.';
             sound.playBuzzer();
             if (pinInput) {
               pinInput.value = '';

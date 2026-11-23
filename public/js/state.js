@@ -262,12 +262,22 @@ class GincanaState {
               (incoming.provas || []).forEach(p => existingProvasMap.set(p.id, p));
               const mergedProvas = Array.from(existingProvasMap.values());
 
+              // Preserva PINs existentes dos juízes em memória caso o payload venha higienizado
+              let finalJudges = incoming.judges || (this.data && this.data.judges);
+              if (Array.isArray(finalJudges) && this.data && Array.isArray(this.data.judges)) {
+                finalJudges = finalJudges.map(ij => {
+                  const localJ = this.data.judges.find(lj => lj.id === ij.id);
+                  return { ...ij, pin: ij.pin || (localJ && localJ.pin) };
+                });
+              }
+
               this.data = {
                 ...(this.data || {}),
                 ...incoming,
                 config: { ...((this.data && this.data.config) || {}), ...(incoming.config || {}) },
                 scores: mergedScores,
                 penalties: mergedPenalties,
+                judges: finalJudges || (this.data && this.data.judges),
                 provas: mergedProvas.length > 0 ? mergedProvas : (this.data && this.data.provas)
               };
               this.saveToStorage(false);
@@ -341,7 +351,13 @@ class GincanaState {
   async syncWithServer() {
     if (typeof window === 'undefined' || window.location.protocol === 'file:') return null;
     try {
-      const res = await fetch('/api/state', { cache: 'no-store' });
+      const headers = { 'Cache-Control': 'no-store' };
+      const gestorPin = this.getGestorAuthPin();
+      const token = this.getAuthToken();
+      if (gestorPin) headers['x-gestor-pin'] = gestorPin;
+      if (token) headers['x-auth-token'] = token;
+
+      const res = await fetch('/api/state', { headers, cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
         if (json && json.data) {
@@ -359,12 +375,22 @@ class GincanaState {
           (incoming.provas || []).forEach(p => existingProvasMap.set(p.id, p));
           const mergedProvas = Array.from(existingProvasMap.values());
 
+          // Preserva PINs existentes dos juízes em memória caso o payload venha higienizado
+          let finalJudges = incoming.judges || (this.data && this.data.judges);
+          if (Array.isArray(finalJudges) && this.data && Array.isArray(this.data.judges)) {
+            finalJudges = finalJudges.map(ij => {
+              const localJ = this.data.judges.find(lj => lj.id === ij.id);
+              return { ...ij, pin: ij.pin || (localJ && localJ.pin) };
+            });
+          }
+
           this.data = {
             ...(this.data || {}),
             ...incoming,
             config: { ...((this.data && this.data.config) || {}), ...(incoming.config || {}) },
             scores: mergedScores,
             penalties: mergedPenalties,
+            judges: finalJudges || (this.data && this.data.judges),
             provas: mergedProvas.length > 0 ? mergedProvas : (this.data && this.data.provas)
           };
 
@@ -2202,15 +2228,51 @@ class GincanaState {
   /**
    * Autentica um juiz pelo ID e PIN informado.
    * Suporta o PIN cadastrado do juiz ou o PIN Mestre da Coordenação '9999'.
+   * Valida preferencialmente no servidor central via API HTTP segura.
    */
-  authenticateJudge(judgeId, enteredPin) {
+  async authenticateJudge(judgeId, enteredPin) {
     const judge = this.getJudges().find((j) => j.id === judgeId);
     if (!judge) return { success: false, message: 'Avaliador não encontrado.' };
 
     const cleanPin = String(enteredPin || '').trim();
-    const expectedPin = String(judge.pin || '').trim();
 
-    if (cleanPin === expectedPin || (expectedPin === '' && cleanPin.length === 4) || cleanPin === '9999') {
+    // 1. Tenta autenticação direta no servidor central via API HTTP
+    if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'juiz', judgeId: judge.id, pin: cleanPin })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const authSession = {
+            id: judge.id,
+            name: judge.name,
+            role: judge.role,
+            assignedProvaId: judge.assignedProvaId || null,
+            authenticatedAt: new Date().toISOString()
+          };
+          try {
+            sessionStorage.setItem('sesi_judge_pin', cleanPin);
+            if (data.token) sessionStorage.setItem('sesi_auth_token', data.token);
+          } catch (e) {}
+          this.setLoggedInJudge(authSession);
+          return { success: true, judge: authSession };
+        } else {
+          return { success: false, message: (data && data.error) || 'PIN incorreto. Tente novamente.' };
+        }
+      } catch (err) {
+        console.warn('[Auth] Servidor central inacessível, recorrendo à validação local offline:', err);
+      }
+    }
+
+    // 2. Validação local de contingência (modo offline ou arquivo local)
+    const defaultJudges = this.getDefaultData().judges || [];
+    const defaultJ = defaultJudges.find(j => j.id === judge.id);
+    const expectedPin = String(judge.pin || (defaultJ && defaultJ.pin) || '').trim();
+
+    if (cleanPin === expectedPin || cleanPin === '9999') {
       const authSession = {
         id: judge.id,
         name: judge.name,
@@ -2218,24 +2280,9 @@ class GincanaState {
         assignedProvaId: judge.assignedProvaId || null,
         authenticatedAt: new Date().toISOString()
       };
-
       try {
         sessionStorage.setItem('sesi_judge_pin', cleanPin);
       } catch (e) {}
-
-      // Registra sessão autenticada no servidor para gerar token
-      if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
-        fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: 'juiz', judgeId: judge.id, pin: cleanPin })
-        }).then(r => r.json()).then(data => {
-          if (data && data.token) {
-            try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
-          }
-        }).catch(() => {});
-      }
-
       this.setLoggedInJudge(authSession);
       return { success: true, judge: authSession };
     }
@@ -2386,8 +2433,40 @@ class GincanaState {
   // PERFIL E AUTENTICAÇÃO DO GESTOR DA GINCANA
   // =========================================================================
 
-  authenticateGestor(enteredPin) {
+  async authenticateGestor(enteredPin) {
     const cleanPin = String(enteredPin || '').trim();
+
+    // 1. Tenta autenticação direta no servidor central via API HTTP
+    if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'gestor', pin: cleanPin })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const gestorSession = {
+            role: 'gestor',
+            name: (this.data.config && this.data.config.gestorTitle) || 'Coordenação Geral da Gincana',
+            authenticatedAt: new Date().toISOString()
+          };
+          try {
+            sessionStorage.setItem('sesi_gestor_pin', cleanPin);
+            sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
+            if (data.token) sessionStorage.setItem('sesi_auth_token', data.token);
+            this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
+          } catch (e) {}
+          return { success: true, gestor: gestorSession };
+        } else {
+          return { success: false, message: (data && data.error) || 'PIN da Coordenação incorreto.' };
+        }
+      } catch (err) {
+        console.warn('[Auth] Servidor central inacessível para login gestor, recorrendo à validação local:', err);
+      }
+    }
+
+    // 2. Validação local de contingência (modo offline ou arquivo local)
     const masterPin = String((this.data.config && this.data.config.gestorPin) || '9999').trim();
 
     if (cleanPin === masterPin || cleanPin === '9999') {
@@ -2399,20 +2478,6 @@ class GincanaState {
       try {
         sessionStorage.setItem('sesi_gestor_pin', cleanPin);
         sessionStorage.setItem('sesi_conecta_gestor_session', JSON.stringify(gestorSession));
-
-        // Tenta registrar sessão autenticada no servidor para gerar token
-        if (typeof window !== 'undefined' && window.location.protocol !== 'file:') {
-          fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role: 'gestor', pin: cleanPin })
-          }).then(r => r.json()).then(data => {
-            if (data && data.token) {
-              try { sessionStorage.setItem('sesi_auth_token', data.token); } catch (e) {}
-            }
-          }).catch(() => {});
-        }
-
         this.notifyListeners({ source: 'gestor_auth_change', gestor: gestorSession });
       } catch (e) {}
       return { success: true, gestor: gestorSession };

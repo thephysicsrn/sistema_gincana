@@ -236,9 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function verifyPin() {
+  async function verifyPin() {
     const judgeId = loginJudgeSelect.value;
-    const result = state.authenticateJudge(judgeId, enteredPin);
+    const result = await state.authenticateJudge(judgeId, enteredPin);
 
     if (result.success) {
       sound.playScoreDing();
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
       sound.playBuzzer();
       if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
       pinCard.classList.add('shake-animation');
-      pinErrorMsg.innerText = 'PIN incorreto. Tente novamente.';
+      pinErrorMsg.innerText = result.message || 'PIN incorreto. Tente novamente.';
       setTimeout(() => {
         pinCard.classList.remove('shake-animation');
         enteredPin = '';

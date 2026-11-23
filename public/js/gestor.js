@@ -211,13 +211,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function verifyPin() {
+  async function verifyPin() {
     const candidate = (pinDirectInput && pinDirectInput.value.trim().length > 0) 
       ? pinDirectInput.value.trim() 
       : enteredPin;
 
     try {
-      const result = state.authenticateGestor(candidate);
+      const result = await state.authenticateGestor(candidate);
       if (result.success) {
         if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
         pinErrorMsg.innerText = '';
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (err) {
       console.error('Erro ao autenticar gestor:', err);
-      if (candidate === '9999' || candidate === 'admin') {
+      if (candidate === '9999') {
         applyLoggedInState();
       } else {
         pinErrorMsg.innerText = 'PIN incorreto.';
