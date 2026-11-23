@@ -688,9 +688,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('admin-elixo-grid');
     if (!container) return;
     const teams = state.getTeams().filter((t) => !adminTurnoElixo || t.turno === adminTurnoElixo);
+    const { bonusMap, rankMap } = state.getELixoRankingsAndBonus(adminTurnoElixo || null);
 
     container.innerHTML = teams.map((team) => {
-      const pesoAtual = team.pesoELixoKg || 0;
+      const pesoAtual = Number(team.pesoELixoKg || 0);
+      const rank = pesoAtual > 0 ? rankMap[team.id] : null;
+      const bonus = pesoAtual > 0 ? (bonusMap[team.id] || 0) : 0;
+      const totalELixo = pesoAtual > 0 ? Math.round((pesoAtual + bonus) * 10) / 10 : 0;
       return `
         <div class="glass-card" style="padding: 1.25rem; border-top: 3px solid #10b981; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -705,7 +709,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div style="text-align: right;">
               <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Peso Atual</div>
-              <div style="font-weight: 900; font-size: 1.15rem; color: #10b981;">${pesoAtual} <span style="font-size: 0.75rem; color: #94a3b8;">kg</span></div>
+              <div style="font-weight: 900; font-size: 1.15rem; color: #10b981;">
+                ${pesoAtual} <span style="font-size: 0.75rem; color: #94a3b8;">kg</span>
+              </div>
+              ${pesoAtual > 0 ? `
+                <div style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">
+                  +${totalELixo} pts (${pesoAtual}kg + ${bonus} bônus #${rank}º)
+                </div>
+              ` : `
+                <div style="font-size: 0.72rem; color: #94a3b8;">Sem arrecadação</div>
+              `}
             </div>
           </div>
 

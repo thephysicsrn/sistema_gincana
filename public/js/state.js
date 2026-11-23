@@ -1185,6 +1185,26 @@ class GincanaState {
   }
 
   getTeamScore(teamId, provaId, specificJudge = null) {
+    if (provaId === 'prova_elixo_pesagem') {
+      const team = this.getTeam(teamId);
+      if (team && team.pesoELixoKg > 0) {
+        const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(team.turno || null);
+        const peso = Number(team.pesoELixoKg || 0);
+        const bonus = bonusMap[team.id] || 0;
+        return {
+          teamId,
+          provaId: 'prova_elixo_pesagem',
+          pesoKg: peso,
+          points: Math.round((peso + bonus) * 10) / 10,
+          bonus,
+          rank: rankMap[team.id] || null,
+          isWeight: true,
+          evaluated: true
+        };
+      }
+      return null;
+    }
+
     const scores = (this.data.scores || []).filter((s) => s.teamId === teamId && s.provaId === provaId);
     if (scores.length === 0) return null;
 
@@ -1225,6 +1245,25 @@ class GincanaState {
   }
 
   getProvaScores(provaId) {
+    if (provaId === 'prova_elixo_pesagem') {
+      return this.getTeams().map((t) => {
+        if (!t.pesoELixoKg || t.pesoELixoKg <= 0) return null;
+        const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(t.turno || null);
+        const peso = Number(t.pesoELixoKg || 0);
+        const bonus = bonusMap[t.id] || 0;
+        return {
+          id: 'elixo_' + t.id,
+          teamId: t.id,
+          provaId: 'prova_elixo_pesagem',
+          pesoKg: peso,
+          points: Math.round((peso + bonus) * 10) / 10,
+          bonus,
+          rank: rankMap[t.id] || null,
+          isWeight: true,
+          evaluated: true
+        };
+      }).filter(Boolean);
+    }
     if (this.isMultiJudgeProva(provaId)) {
       return this.getTeams().map((t) => this.getTeamScore(t.id, provaId)).filter(Boolean);
     }
@@ -1399,20 +1438,20 @@ class GincanaState {
 
   /**
    * Calcula a classificação e os bônus da arrecadação de E-Lixo (Item 20 & Anexo IV):
-   * 1 kg = 1 ponto.
-   * Colocação por peso:
+   * 1 kg = 1 ponto somado diretamente à equipe.
+   * Colocação por peso arrecadado:
    * 1º lugar: 300 pontos
    * 2º lugar: 250 pontos
    * 3º lugar: 200 pontos
-   * Demais participantes com arrecadação: 100 pontos
+   * Demais participantes com arrecadação (peso > 0): 100 pontos
    * Sem arrecadação: 0 pontos
    * Empates compartilham bônus e pulam posições.
    */
-  getELixoRankingsAndBonus() {
-    const teams = [...this.getTeams()];
+  getELixoRankingsAndBonus(turno = null) {
+    const teams = [...this.getTeams(turno)];
     
     // Ordena pelo peso validado decrescente
-    teams.sort((a, b) => (b.pesoELixoKg || 0) - (a.pesoELixoKg || 0));
+    teams.sort((a, b) => Number(b.pesoELixoKg || 0) - Number(a.pesoELixoKg || 0));
 
     const bonusMap = {};
     const rankMap = {};
@@ -1457,14 +1496,11 @@ class GincanaState {
 
   /**
    * Apuração Completa da Equipe conforme a Planilha Geral (Anexo X):
-   * - A = Soma das demais provas
-   * - E-Lixo Bruto = Peso em kg (1 kg = 1 pt) + Bônus Colocação Peso + Mobilização (Anexo V)
-   * - B = Total E-Lixo limitado ao Teto
-   * - Subtotal = A + B
+   * - Pontuação das demais provas mantida intacta
+   * - E-Lixo: 1 kg = 1 ponto + Bônus de colocação (300, 250, 200, 100)
    * - TOTAL FINAL = max(0, Subtotal - Penalidades)
-   * - Nota Escolar da Turma (Item 39): 1º=100, 2º=90, 3º=80, demais=70
    */
-  getTeamFullStats(teamId) {
+  getTeamFullStats(teamId, turno = null) {
     const team = this.getTeam(teamId);
     if (!team) return null;
 
@@ -1481,23 +1517,43 @@ class GincanaState {
       }
     });
 
+    // Desafio E-Lixo:
+    // 1 kg = 1 ponto.
+    // Bônus para os que mais arrecadaram:
+    // 1º lugar: 300 pontos
+    // 2º lugar: 250 pontos
+    // 3º lugar: 200 pontos
+    // Demais equipes participantes (peso > 0): 100 pontos
+    // Sem arrecadação (peso <= 0): 0 pontos
+    const pesoKg = Number(team.pesoELixoKg || 0);
+    const pontosPeso = pesoKg > 0 ? Math.round(pesoKg * 10) / 10 : 0;
+
+    const targetTurno = turno || team.turno || null;
+    const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(targetTurno);
+    const bonusPeso = pesoKg > 0 ? (bonusMap[team.id] || 0) : 0;
+    const rankPeso = pesoKg > 0 ? (rankMap[team.id] || null) : null;
+    const pontosELixoTotal = Math.round((pontosPeso + bonusPeso) * 10) / 10;
+
     const totalPenalidades = this.getTeamPenalties(teamId);
-    const totalFinal = Math.max(0, Math.round((pontosDemaisProvas - totalPenalidades) * 10) / 10);
+
+    // Sem mexer na pontuação original das outras provas que já está passando, apenas soma o E-Lixo:
+    const subtotal = Math.round((pontosDemaisProvas + pontosELixoTotal) * 10) / 10;
+    const totalFinal = Math.max(0, Math.round((subtotal - totalPenalidades) * 10) / 10);
 
     return {
       team,
       pontosDemaisProvas,
-      pesoKg: Number(team.pesoELixoKg || 0),
-      pontosPeso: 0,
-      bonusPeso: 0,
-      rankPeso: null,
+      pesoKg,
+      pontosPeso,
+      bonusPeso,
+      rankPeso,
       pontosMobilizacao: byProva['p_elixo'] || 0,
-      elixoBruto: byProva['p_elixo'] || 0,
-      elixoComTeto: byProva['p_elixo'] || 0,
+      elixoBruto: pontosELixoTotal,
+      elixoComTeto: pontosELixoTotal,
       elixoExcedente: 0,
       tetoELixo: 1000,
       totalPenalidades,
-      subtotal: pontosDemaisProvas,
+      subtotal,
       totalFinal,
       byProva
     };
@@ -1512,7 +1568,7 @@ class GincanaState {
    */
   getTeamRankings(turno = null) {
     const teams = this.getTeams(turno);
-    const list = teams.map((t) => this.getTeamFullStats(t.id)).filter(Boolean);
+    const list = teams.map((t) => this.getTeamFullStats(t.id, turno)).filter(Boolean);
 
     list.sort((a, b) => {
       // 1. Total Final
@@ -1710,7 +1766,17 @@ class GincanaState {
   exportCSV() {
     const rankings = this.getTeamRankings();
     const provas = this.getProvas();
-    const header = ['Ranking', 'Turma / Equipe', 'Segmento', ...provas.map((p) => `"${p.title}"`), 'Penalidades', 'TOTAL FINAL'];
+    const header = [
+      'Ranking',
+      'Turma / Equipe',
+      'Segmento',
+      ...provas.map((p) => `"${p.title}"`),
+      'E-Lixo (kg)',
+      'E-Lixo Bônus',
+      'E-Lixo Total (pts)',
+      'Penalidades',
+      'TOTAL FINAL'
+    ];
     const rows = [header];
 
     rankings.forEach((r) => {
@@ -1723,6 +1789,9 @@ class GincanaState {
       provas.forEach((p) => {
         row.push(s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0);
       });
+      row.push(s.pesoKg || 0);
+      row.push(s.bonusPeso || 0);
+      row.push(s.elixoComTeto || 0);
       row.push(s.totalPenalidades);
       row.push(s.totalFinal);
       rows.push(row);

@@ -738,7 +738,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } else {
         // As outras 9 provas: Juiz Único (1 nota oficial por equipe)
-        if (isEvaluated) {
+        if (isPesagem) {
+          if (t.pesoELixoKg && t.pesoELixoKg > 0) {
+            const { bonusMap } = state.getELixoRankingsAndBonus(t.turno || null);
+            const b = bonusMap[t.id] || 0;
+            const totalPts = Math.round((Number(t.pesoELixoKg) + b) * 10) / 10;
+            statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">${t.pesoELixoKg} kg (${totalPts} pts)</span>`;
+          } else {
+            statusBadge = `<span style="font-size: 0.68rem; color: #fbbf24;">Pendente</span>`;
+          }
+        } else if (isEvaluated) {
           const rubricPart = score.rubricScore !== undefined && score.rubricScore !== score.points ? ` (Rubrica: ${score.rubricScore})` : '';
           const judgeNameTag = score.judgeName ? ` [${score.judgeName}]` : '';
           statusBadge = `<span style="font-size: 0.68rem; color: #34d399; font-weight: 700;">${score.points} pts${rubricPart}${judgeNameTag}</span>`;
@@ -1120,8 +1129,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateTotal() {
     const total = calculateScore();
     if (form.provaId === 'prova_elixo_pesagem') {
+      const team = state.getTeam(form.teamId);
+      const targetTurno = team ? team.turno : null;
+      const { bonusMap } = state.getELixoRankingsAndBonus(targetTurno);
+      const bonus = (form.pesoInput > 0 && team) ? (bonusMap[team.id] || 100) : 0;
       totalPreview.innerHTML = `${total} <small style="font-size:1.4rem; color:#94a3b8;">kg</small>`;
-      if (mobilePreviewInfoSub) mobilePreviewInfoSub.innerText = 'peso oficial a registrar para a turma';
+      if (mobilePreviewInfoSub) {
+        mobilePreviewInfoSub.innerHTML = `1 kg = 1 pt. <strong>+${total} pts</strong> pelo peso ${bonus > 0 ? `+ <strong>${bonus} pts</strong> bônus de colocação` : ''}`;
+      }
     } else {
       totalPreview.innerText = total.toLocaleString('pt-BR');
       const prova = state.getProva(form.provaId);
@@ -1167,8 +1182,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (isPesagem) {
               if (team.pesoELixoKg > 0) {
+                const { bonusMap, rankMap } = state.getELixoRankingsAndBonus(team.turno || null);
+                const b = bonusMap[team.id] || 0;
+                const rk = rankMap[team.id] ? `#${rankMap[team.id]}º` : '';
                 rubricCol = `${team.pesoELixoKg} kg`;
-                pointsCol = `${team.pesoELixoKg} pts`;
+                pointsCol = `<span style="color:#34d399; font-weight:800;">${team.pesoELixoKg + b} pts</span> <small style="color:#94a3b8;">(${team.pesoELixoKg}kg + ${b} bônus ${rk})</small>`;
               }
             } else if (isEvaluated) {
               rubricCol = score.rubricScore !== undefined ? `<strong>${score.rubricScore} pts</strong>` : '—';
