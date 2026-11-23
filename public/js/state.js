@@ -1781,19 +1781,21 @@ class GincanaState {
     return JSON.stringify(this.data, null, 2);
   }
 
-  exportCSV() {
-    const rankings = this.getTeamRankings();
+  exportCSV(turno = null) {
+    const rankings = this.getTeamRankings(turno);
     const provas = this.getProvas();
     const header = [
       'Ranking',
       'Turma / Equipe',
       'Segmento',
+      'Turno',
       ...provas.map((p) => `"${p.title}"`),
       'E-Lixo (kg)',
       'E-Lixo Bônus',
       'E-Lixo Total (pts)',
       'Penalidades',
-      'TOTAL FINAL'
+      'TOTAL FINAL',
+      'Nota Escolar (Item 39)'
     ];
     const rows = [header];
 
@@ -1802,7 +1804,8 @@ class GincanaState {
       const row = [
         `"${r.rank}º"`,
         `"${r.name} (${r.turma})"`,
-        `"${r.className || r.segmento || '-'}"`
+        `"${r.className || r.segmento || '-'}"`,
+        `"${r.turno || '-'}"`
       ];
       provas.forEach((p) => {
         row.push(s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0);
@@ -1812,10 +1815,136 @@ class GincanaState {
       row.push(s.elixoComTeto || 0);
       row.push(s.totalPenalidades);
       row.push(s.totalFinal);
+      row.push(r.notaEscolar);
       rows.push(row);
     });
 
     return '\uFEFF' + rows.map((row) => row.join(';')).join('\r\n');
+  }
+
+  /**
+   * Exporta a planilha oficial completa em formato Excel (.xlsx) com múltiplas abas
+   * (Classificação Oficial, Quadro de Provas, Desafio E-Lixo e Auditoria de Notas).
+   */
+  exportExcel(turno = 'Matutino') {
+    const hasXLSX = typeof window !== 'undefined' && typeof window.XLSX !== 'undefined';
+    const shiftLabel = turno ? (turno === 'Matutino' ? 'Manha' : turno) : 'Geral';
+    const filename = `Resultados_Gincana_SESI_${shiftLabel}_2026.xlsx`;
+
+    const rankings = this.getTeamRankings(turno);
+    const provas = this.getProvas();
+    const scores = this.data.scores || [];
+
+    if (!hasXLSX) {
+      // Fallback para CSV compatível com Excel se XLSX ainda não carregou
+      const csv = this.exportCSV(turno);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Resultados_Gincana_SESI_${shiftLabel}_2026.csv`);
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, 200);
+      return;
+    }
+
+    // 1. Aba: Classificação Oficial
+    const sheet1Data = rankings.map((r) => {
+      const s = r.stats;
+      return {
+        'Classificação': `${r.rank}º Lugar`,
+        'Turma': r.turma,
+        'Equipe': r.name,
+        'Mascote': r.mascote || '-',
+        'Turno': r.turno || shiftLabel,
+        'Pontos Provas': s.pontosDemaisProvas,
+        'E-Lixo Arrecadado (kg)': s.pesoKg || 0,
+        'Pontos Peso (1 kg = 1 pt)': s.pontosPeso || 0,
+        'Bônus E-Lixo': s.bonusPeso || 0,
+        'Total E-Lixo': s.elixoComTeto || 0,
+        'Penalidades': s.totalPenalidades || 0,
+        'PONTUAÇÃO FINAL': r.totalPoints,
+        'Nota Escolar (Item 39)': r.notaEscolar
+      };
+    });
+    const ws1 = window.XLSX.utils.json_to_sheet(sheet1Data);
+    ws1['!cols'] = [
+      { wch: 16 }, { wch: 18 }, { wch: 24 }, { wch: 16 }, { wch: 12 },
+      { wch: 15 }, { wch: 22 }, { wch: 24 }, { wch: 16 }, { wch: 15 },
+      { wch: 14 }, { wch: 18 }, { wch: 22 }
+    ];
+
+    // 2. Aba: Notas por Prova
+    const sheet2Data = rankings.map((r) => {
+      const s = r.stats;
+      const row = {
+        'Classificação': `${r.rank}º`,
+        'Turma': r.turma,
+        'Equipe': r.name
+      };
+      provas.forEach((p) => {
+        row[p.title] = s.byProva && s.byProva[p.id] !== undefined ? s.byProva[p.id] : 0;
+      });
+      row['E-Lixo (Total)'] = s.elixoComTeto || 0;
+      row['Penalidades'] = s.totalPenalidades || 0;
+      row['TOTAL FINAL'] = r.totalPoints;
+      return row;
+    });
+    const ws2 = window.XLSX.utils.json_to_sheet(sheet2Data);
+
+    // 3. Aba: Detalhamento do E-Lixo
+    const { bonusMap, rankMap } = this.getELixoRankingsAndBonus(turno);
+    const sheet3Data = this.getTeams(turno).map((t) => {
+      const peso = Number(t.pesoELixoKg || 0);
+      const b = peso > 0 ? (bonusMap[t.id] || 0) : 0;
+      const rk = peso > 0 ? (rankMap[t.id] ? `${rankMap[t.id]}º` : '-') : 'Sem peso';
+      return {
+        'Turma': t.turma,
+        'Equipe': t.name,
+        'Peso Validado (kg)': peso,
+        'Pontos pelo Peso': peso,
+        'Colocação no Peso': rk,
+        'Bônus Concedido': b,
+        'Total E-Lixo (pts)': peso + b
+      };
+    });
+    const ws3 = window.XLSX.utils.json_to_sheet(sheet3Data);
+    ws3['!cols'] = [
+      { wch: 18 }, { wch: 24 }, { wch: 20 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }
+    ];
+
+    // 4. Aba: Auditoria e Pareceres dos Jurados
+    const teamsInTurnoIds = new Set(this.getTeams(turno).map(t => t.id));
+    const sheet4Data = scores
+      .filter((sc) => teamsInTurnoIds.has(sc.teamId))
+      .map((sc) => {
+        const team = this.getTeam(sc.teamId);
+        const prova = this.getProva(sc.provaId);
+        return {
+          'Data / Hora': sc.createdAt ? new Date(sc.createdAt).toLocaleString('pt-BR') : '-',
+          'Prova': prova ? prova.title : sc.provaId,
+          'Turma': team ? team.turma : sc.teamId,
+          'Equipe': team ? team.name : sc.teamId,
+          'Avaliador(a)': sc.judgeName || 'Comissão',
+          'Soma Rubrica': sc.rubricScore !== undefined ? sc.rubricScore : sc.points,
+          'Pontuação': sc.points,
+          'Critérios Detalhados': sc.criteriaDetails ? JSON.stringify(sc.criteriaDetails) : '-',
+          'Parecer / Observação': sc.note || ''
+        };
+      });
+    const ws4 = window.XLSX.utils.json_to_sheet(sheet4Data.length > 0 ? sheet4Data : [{ 'Aviso': 'Nenhum lançamento individual registrado para este turno.' }]);
+
+    const wb = window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(wb, ws1, `Classificação ${shiftLabel}`);
+    window.XLSX.utils.book_append_sheet(wb, ws2, 'Quadro por Prova');
+    window.XLSX.utils.book_append_sheet(wb, ws3, 'Desafio E-Lixo');
+    window.XLSX.utils.book_append_sheet(wb, ws4, 'Auditoria de Jurados');
+
+    window.XLSX.writeFile(wb, filename);
   }
 
   // =========================================================================

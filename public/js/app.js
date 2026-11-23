@@ -991,9 +991,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExpTop = document.getElementById('btn-export-planilha-csv');
     if (btnExpTop) {
       btnExpTop.onclick = () => {
-        const csv = state.exportCSV();
+        const csv = state.exportCSV(activePlanilhaTurno);
         downloadFile(csv, `planilha_geral_gincana_${activePlanilhaTurno.toLowerCase()}.csv`, 'text/csv;charset=utf-8;');
         showToast(`Planilha da Gincana ${activePlanilhaTurno} exportada!`, 'toast-success');
+      };
+    }
+
+    const btnExpExcelManha = document.getElementById('btn-export-excel-manha');
+    if (btnExpExcelManha) {
+      btnExpExcelManha.onclick = () => {
+        state.exportExcel('Matutino');
+        showToast('Planilha Excel da Manhã (.XLSX) gerada com sucesso!', 'toast-success');
       };
     }
   }

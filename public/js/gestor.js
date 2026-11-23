@@ -1300,14 +1300,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   auditSearchInput.addEventListener('input', renderAudit);
 
+  const btnQuickExcelManha = document.getElementById('btn-quick-export-excel-manha');
+  if (btnQuickExcelManha) {
+    btnQuickExcelManha.addEventListener('click', () => {
+      state.exportExcel('Matutino');
+      if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+    });
+  }
+
+  const btnAuditExcelManha = document.getElementById('btn-export-excel-manha-gestor');
+  if (btnAuditExcelManha) {
+    btnAuditExcelManha.addEventListener('click', () => {
+      state.exportExcel('Matutino');
+      if (window.sound && typeof sound.playScoreDing === 'function') sound.playScoreDing();
+    });
+  }
+
   if (btnExportAuditCsv) {
     btnExportAuditCsv.addEventListener('click', () => {
-      const csv = state.exportCSV();
+      const csv = state.exportCSV('Matutino');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `relatorio_gincana_sesi_${Date.now()}.csv`);
+      link.setAttribute('download', `relatorio_gincana_sesi_manha_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

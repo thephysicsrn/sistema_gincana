@@ -353,6 +353,9 @@
 
     <!-- Ações e Links Rápidos do Gestor -->
     <div style="display: flex; align-items: center; gap: 0.6rem;">
+      <button id="btn-quick-export-excel-manha" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;" title="Baixar Resultados Oficiais da Manhã em Excel (.xlsx)">
+        <span>📊</span> Excel Manhã (.XLSX)
+      </button>
       <a href="telao.html" target="_blank" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.8rem; text-decoration: none; font-weight: 800;" title="Abrir Telão da Quadra em Nova Aba">
         Abrir Telão da Quadra
       </a>
@@ -809,10 +812,13 @@
               Histórico detalhado de cada lançamento com possibilidade de retificação pela Coordenação Central.
             </p>
           </div>
-          <div style="display: flex; gap: 0.6rem;">
-            <input type="text" id="audit-search-input" placeholder="Buscar por equipe, prova ou juiz..." class="form-input" style="font-size: 0.85rem; width: 260px;">
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="audit-search-input" placeholder="Buscar por equipe, prova ou juiz..." class="form-input" style="font-size: 0.85rem; width: 240px;">
+            <button id="btn-export-excel-manha-gestor" class="btn btn-primary" style="font-size: 0.8rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); border: none; color: white; display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <span>📊</span> Baixar Excel da Manhã (.XLSX)
+            </button>
             <button id="btn-export-audit-csv" class="btn btn-secondary" style="font-size: 0.8rem;">
-              Exportar Relatório CSV
+              Exportar CSV
             </button>
           </div>
         </div>
