@@ -23,6 +23,111 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
   let enteredPin = '';
 
+  // Elementos do Cabeçalho e Navegação
+  const headerEventTitle = document.getElementById('header-event-title');
+  const headerUnitSubtitle = document.getElementById('header-unit-subtitle');
+  const btnLogout = document.getElementById('btn-gestor-logout');
+  const tabButtons = document.querySelectorAll('.gestor-tab-btn');
+  const tabContents = document.querySelectorAll('.gestor-tab-content');
+  let currentActiveTab = 'tab-telao-control';
+
+  // Elementos de Controle de Transmissão do Telão
+  const telaoStatusBadge = document.getElementById('telao-status-badge');
+  const btnTelaoSetStandby = document.getElementById('btn-telao-set-standby');
+  const btnTelaoReleaseResults = document.getElementById('btn-telao-release-results');
+  const btnTelaoReleaseDirect = document.getElementById('btn-telao-release-direct');
+  const btnTelaoTriggerReveal = document.getElementById('btn-telao-trigger-reveal');
+
+  // Métricas
+  const metricOnlineCount = document.getElementById('metric-online-count');
+  const metricTotalJudges = document.getElementById('metric-total-judges');
+  const metricProgressPercent = document.getElementById('metric-progress-percent');
+  const metricEvalFraction = document.getElementById('metric-eval-fraction');
+  const metricTotalTeams = document.getElementById('metric-total-teams');
+  const metricWsStatus = document.getElementById('metric-ws-status');
+
+  // Aba 1: Presença
+  const judgesPresenceGrid = document.getElementById('judges-presence-grid');
+  const btnRefreshPresence = document.getElementById('btn-refresh-presence');
+
+  // Aba 2: Matriz
+  const matrixFilterProva = document.getElementById('matrix-filter-prova');
+  const matrixFilterStatus = document.getElementById('matrix-filter-status');
+  const matrixProgressText = document.getElementById('matrix-progress-text');
+  const matrixProgressBar = document.getElementById('matrix-progress-bar');
+  const matrixTableBody = document.getElementById('matrix-table-body');
+  const matrixJudgesHeaderCols = document.getElementById('matrix-judges-header-cols');
+
+  // Aba 3: Auditoria
+  const auditScoresContainer = document.getElementById('audit-scores-container');
+  const auditSearchInput = document.getElementById('audit-search-input');
+  const btnExportAuditCsv = document.getElementById('btn-export-audit-csv');
+
+  // Aba 4: Gestão de Juízes & PINs
+  const judgesListContainer = document.getElementById('judges-list-container');
+  const btnOpenAddJudgeModal = document.getElementById('btn-open-add-judge-modal');
+  const formUpdateGestorPin = document.getElementById('form-update-gestor-pin');
+  const inputNewGestorPin = document.getElementById('input-new-gestor-pin');
+  const inputConfirmGestorPin = document.getElementById('input-confirm-gestor-pin');
+
+  // Aba 5: Gestão de Equipes
+  const teamsCardsGrid = document.getElementById('teams-cards-grid');
+  const btnOpenAddTeamModal = document.getElementById('btn-open-add-team-modal');
+
+  // Aba 6: Configurações do Painel
+  const formPanelConfig = document.getElementById('form-panel-config');
+  const cfgEventName = document.getElementById('cfg-event-name');
+  const cfgInstitution = document.getElementById('cfg-institution');
+  const cfgEditalTitle = document.getElementById('cfg-edital-title');
+  const cfgSelectedUnit = document.getElementById('cfg-selected-unit');
+  const cfgSelectedSegment = document.getElementById('cfg-selected-segment');
+  const cfgSelectedShift = document.getElementById('cfg-selected-shift');
+  const cfgDates = document.getElementById('cfg-dates');
+  const cfgYear = document.getElementById('cfg-year');
+  const btnClearScores = document.getElementById('btn-gestor-clear-scores');
+  const btnResetAll = document.getElementById('btn-gestor-reset-all');
+
+  // Modais
+  const modalJudgeCrud = document.getElementById('modal-judge-crud');
+  const formJudgeCrud = document.getElementById('form-judge-crud');
+  const modalJudgeTitle = document.getElementById('modal-judge-title');
+  const crudJudgeId = document.getElementById('crud-judge-id');
+  const crudJudgeName = document.getElementById('crud-judge-name');
+  const crudJudgeRole = document.getElementById('crud-judge-role');
+  const crudJudgeProva = document.getElementById('crud-judge-prova');
+  const crudJudgePin = document.getElementById('crud-judge-pin');
+  const btnCloseJudgeModal = document.getElementById('btn-close-judge-modal');
+
+  const modalChangeJudgePin = document.getElementById('modal-change-judge-pin');
+  const formChangeJudgePin = document.getElementById('form-change-judge-pin');
+  const changePinJudgeId = document.getElementById('change-pin-judge-id');
+  const modalChangePinJudgeName = document.getElementById('modal-change-pin-judge-name');
+  const inputSingleJudgePin = document.getElementById('input-single-judge-pin');
+  const btnCloseChangePinModal = document.getElementById('btn-close-change-pin-modal');
+
+  const modalTeamCrud = document.getElementById('modal-team-crud');
+  const formTeamCrud = document.getElementById('form-team-crud');
+  const modalTeamTitle = document.getElementById('modal-team-title');
+  const crudTeamId = document.getElementById('crud-team-id');
+  const crudTeamName = document.getElementById('crud-team-name');
+  const crudTeamIcon = document.getElementById('crud-team-icon');
+  const crudTeamTurma = document.getElementById('crud-team-turma');
+  const crudTeamSegmento = document.getElementById('crud-team-segmento');
+  const crudTeamColor = document.getElementById('crud-team-color');
+  const crudTeamColorEnd = document.getElementById('crud-team-color-end');
+  const crudTeamTutor = document.getElementById('crud-team-tutor');
+  const crudTeamPeso = document.getElementById('crud-team-peso');
+  const crudTeamSlogan = document.getElementById('crud-team-slogan');
+  const btnCloseTeamModal = document.getElementById('btn-close-team-modal');
+
+  const modalEditScore = document.getElementById('modal-edit-score');
+  const formEditScore = document.getElementById('form-edit-score');
+  const editScoreId = document.getElementById('edit-score-id');
+  const editScoreSubtitle = document.getElementById('edit-score-subtitle');
+  const editScorePoints = document.getElementById('edit-score-points');
+  const editScoreNote = document.getElementById('edit-score-note');
+  const btnCloseEditScoreModal = document.getElementById('btn-close-edit-score-modal');
+
   // =========================================================================
   // 1. AUTENTICAÇÃO DO GESTOR COM PIN MASTER
   // =========================================================================
@@ -856,7 +961,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Renderiza o grid de equipes para a prova selecionada
     renderAdminTournament(activeProva.id, activeProva.title, 'admin-custom-prova-grid', adminTurnoCustom, activeProva.maxScore);
-  }
   }
 
   // =========================================================================

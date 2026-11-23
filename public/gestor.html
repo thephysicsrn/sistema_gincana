@@ -283,8 +283,16 @@
         Acesso restrito à Coordenação Geral e Comissão Central
       </p>
 
-      <!-- Campo de Digitação Real do PIN (Aceita teclado físico, teclado do celular e toque) -->
-      <form id="form-gestor-pin" style="margin-bottom: 1.25rem; display: flex; justify-content: center; align-items: center; gap: 0.65rem;" onsubmit="return false;">
+      <!-- Círculos de feedback visual do PIN -->
+      <div class="pin-dots-container" style="display: flex; justify-content: center; gap: 0.85rem; margin: 0.75rem 0 1.25rem 0;">
+        <span class="pin-dot" id="gdot-0"></span>
+        <span class="pin-dot" id="gdot-1"></span>
+        <span class="pin-dot" id="gdot-2"></span>
+        <span class="pin-dot" id="gdot-3"></span>
+      </div>
+
+      <!-- Campo de Digitação Real do PIN (Aceita teclado físico, celular e botão Entrar) -->
+      <form id="form-gestor-pin" style="margin-bottom: 1rem; display: flex; justify-content: center; align-items: center; gap: 0.65rem;" onsubmit="return false;">
         <input 
           type="password" 
           id="gestor-pin-input" 
@@ -294,19 +302,12 @@
           placeholder="••••" 
           autocomplete="off" 
           autofocus
-          style="width: 160px; height: 50px; font-size: 2rem; font-family: 'Outfit', sans-serif; letter-spacing: 10px; text-align: center; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #3b82f6; color: #fff; font-weight: 900; outline: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.35);"
+          style="width: 140px; height: 46px; font-size: 1.8rem; font-family: 'Outfit', sans-serif; letter-spacing: 8px; text-align: center; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #3b82f6; color: #fff; font-weight: 900; outline: none; box-shadow: 0 0 15px rgba(59, 130, 246, 0.35);"
         >
-        <button type="submit" id="btn-gestor-pin-submit" class="btn btn-primary" style="height: 50px; padding: 0 1.25rem; font-weight: 800; border-radius: 12px; font-size: 0.95rem; cursor: pointer;">
+        <button type="submit" id="btn-gestor-pin-submit" class="btn btn-primary" style="height: 46px; padding: 0 1.25rem; font-weight: 800; border-radius: 12px; font-size: 0.95rem; cursor: pointer;">
           Entrar
         </button>
       </form>
-
-      <div class="pin-dots-container" style="display: none;">
-        <span class="pin-dot" id="gdot-0"></span>
-        <span class="pin-dot" id="gdot-1"></span>
-        <span class="pin-dot" id="gdot-2"></span>
-        <span class="pin-dot" id="gdot-3"></span>
-      </div>
 
       <div id="gestor-pin-error" class="pin-error-msg" style="min-height: 20px; font-weight: 700; color: #ef4444; margin-bottom: 1rem; font-size: 0.85rem;"></div>
 
