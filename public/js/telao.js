@@ -614,6 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="sliding-metric-pill">
               <strong style="color: #f59e0b;">E-Lixo:</strong> ${team.stats ? team.stats.pesoKg : 0} kg
             </span>
+            ${(team.stats && team.stats.totalPenalidades > 0) ? `
+            <span class="sliding-metric-pill" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171; background: rgba(239, 68, 68, 0.12);">
+              <strong style="color: #f87171;">Penalidades:</strong> -${team.stats.totalPenalidades} pts
+            </span>` : ''}
           </div>
         </div>
         <div class="sliding-progress-column">

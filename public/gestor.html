@@ -391,6 +391,9 @@
       <button class="gestor-tab-btn" data-tab="tab-admin-lancamentos" style="border-color: rgba(245, 158, 11, 0.4);">
         <span class="tab-index-badge" style="background:#f59e0b; color:#0f172a; font-weight: 900;">⚡</span> Lançamentos do Admin
       </button>
+      <button class="gestor-tab-btn" data-tab="tab-penalidades" style="border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.08);">
+        <span class="tab-index-badge" style="background:#ef4444; color:#fff; font-weight: 900;">⚠️</span> Penalidades
+      </button>
       <button class="gestor-tab-btn" data-tab="tab-online-judges">
         <span class="tab-index-badge">2</span> Status dos Avaliadores
       </button>
@@ -604,6 +607,9 @@
           <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="customprovas" id="btn-subtab-admin-customprovas" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #c084fc;">
             ✨ Provas Personalizadas (+ Criar Prova)
           </button>
+          <button type="button" class="btn btn-sm btn-admin-subtab" data-subtab="penalidades" id="btn-subtab-admin-penalidades" style="padding: 0.6rem 1.25rem; font-weight: 800; font-size: 0.88rem; border-radius: 8px; background: transparent; color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35);">
+            ⚠️ Penalidades & Descontos
+          </button>
         </div>
 
         <!-- Conteúdo 1: Lançamento de E-Lixo -->
@@ -748,7 +754,220 @@
 
       </div>
     </section>
-    <section id="tab-online-judges" class="gestor-tab-content hidden">
+
+    <!-- ======================================================================= -->
+    <!-- ABA: GESTÃO E LANÇAMENTO DE PENALIDADES (ITEM 37 DO EDITAL)             -->
+    <!-- ======================================================================= -->
+    <section id="tab-penalidades" class="gestor-tab-content hidden">
+      <div class="glass-card" style="padding: 1.75rem; margin-bottom: 1.5rem; border-left: 4px solid #ef4444;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); padding: 0.3rem 0.85rem; border-radius: 99px; margin-bottom: 0.5rem;">
+              <span style="color: #ef4444; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">Módulo Disciplinar • Item 37 do Edital</span>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 900; margin: 0; color: #f8fafc;">Lançamento e Desconto Imediato de Penalidades</h2>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.35rem; max-width: 820px;">
+              Aplique deduções de pontos e advertências regimentais da coordenação. O desconto é subtraído <strong>imediatamente</strong> da pontuação total da equipe e sincronizado ao vivo no Telão da quadra e no Placar Geral.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" id="btn-refresh-penalties" class="btn btn-secondary btn-sm" style="display: flex; align-items: center; gap: 0.4rem;">
+              <span>🔄</span> Atualizar Lista
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards de Métricas de Penalidades -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.75rem;">
+          <div class="glass-card" style="padding: 1.15rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(239, 68, 68, 0.25);">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Total de Infrações</div>
+            <div id="pen-metric-count" style="font-size: 2.2rem; font-weight: 900; color: #f87171; margin-top: 0.25rem;">0</div>
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Lançamentos registrados</div>
+          </div>
+          <div class="glass-card" style="padding: 1.15rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(239, 68, 68, 0.25);">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Total Descontado</div>
+            <div id="pen-metric-points" style="font-size: 2.2rem; font-weight: 900; color: #ef4444; margin-top: 0.25rem;">-0 pts</div>
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Pontos deduzidos no placar</div>
+          </div>
+          <div class="glass-card" style="padding: 1.15rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(239, 68, 68, 0.25);">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Turmas Penalizadas</div>
+            <div id="pen-metric-teams" style="font-size: 2.2rem; font-weight: 900; color: #fbbf24; margin-top: 0.25rem;">0</div>
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.2rem;">Com pelo menos 1 penalidade</div>
+          </div>
+        </div>
+
+        <!-- Grid de Duas Colunas: Formulário à Esquerda / Resumo e Histórico à Direita -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+          
+          <!-- Formulário de Aplicação de Penalidade -->
+          <div class="glass-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 14px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+              <span style="font-size: 1.4rem;">🚨</span>
+              <h3 style="margin: 0; font-size: 1.2rem; font-weight: 900; color: #f87171;">Lançar Nova Penalidade</h3>
+            </div>
+
+            <form id="form-apply-penalty">
+              <!-- Filtro de Turno para facilitar busca da turma -->
+              <div style="margin-bottom: 1rem;">
+                <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem;">1. Filtrar Turno da Turma:</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button type="button" class="btn btn-sm btn-pen-filter-turno active" data-turno="todos" id="btn-pen-filter-todos" style="flex: 1; padding: 0.45rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #fff;">
+                    Todas (12)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-pen-filter-turno" data-turno="Matutino" id="btn-pen-filter-mat" style="flex: 1; padding: 0.45rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; background: transparent; border: 1px solid var(--border-glass-bright); color: #94a3b8;">
+                    ☀️ Manhã (6)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-pen-filter-turno" data-turno="Vespertino" id="btn-pen-filter-vesp" style="flex: 1; padding: 0.45rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; background: transparent; border: 1px solid var(--border-glass-bright); color: #94a3b8;">
+                    🌙 Tarde (6)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Seleção da Equipe -->
+              <div style="margin-bottom: 1.15rem;">
+                <label for="penalty-team-select" style="display: block; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem;">2. Selecionar Turma / Equipe:</label>
+                <select id="penalty-team-select" class="form-input" required style="width: 100%; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.65rem 0.85rem; color: #fff; font-size: 0.92rem; font-weight: 700;">
+                  <!-- Preenchido dinamicamente via gestor.js -->
+                </select>
+              </div>
+
+              <!-- Seleção da Gravidade / Valor do Desconto -->
+              <div style="margin-bottom: 1.15rem;">
+                <label for="penalty-category-select" style="display: block; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem;">3. Gravidade e Desconto Padrão (Edital):</label>
+                <select id="penalty-category-select" class="form-input" style="width: 100%; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.65rem 0.85rem; color: #facc15; font-size: 0.92rem; font-weight: 800;">
+                  <option value="Moderada - 1ª (-50 pts)" data-pts="50" selected>⚠️ Moderada - 1ª Ocorrência (-50 pts)</option>
+                  <option value="Moderada - Reincidência (-100 pts)" data-pts="100">🚫 Moderada - Reincidência (-100 pts)</option>
+                  <option value="Leve - Reincidência (-25 pts)" data-pts="25">🟡 Leve - Reincidência (-25 pts)</option>
+                  <option value="Leve - 1ª (Advertência)" data-pts="0">📋 Leve - 1ª Advertência (0 pts)</option>
+                  <option value="Grave (-100 pts)" data-pts="100">❌ Grave (-100 pts)</option>
+                  <option value="Gravíssima (-200 pts)" data-pts="200">⛔ Gravíssima (-200 pts)</option>
+                  <option value="Personalizada" data-pts="custom">✏️ Outro Valor Personalizado...</option>
+                </select>
+              </div>
+
+              <!-- Campo Numérico de Pontos a Descontar -->
+              <div id="penalty-custom-points-wrapper" style="margin-bottom: 1.15rem;">
+                <label for="penalty-points-input" style="display: block; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem;">Pontos a Descontar da Equipe:</label>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.5rem; font-weight: 900; color: #f87171;">-</span>
+                  <input type="number" id="penalty-points-input" class="form-input" value="50" min="0" max="1000" step="5" required style="width: 140px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 8px; padding: 0.65rem 0.85rem; color: #f87171; font-size: 1.25rem; font-weight: 900; text-align: center;">
+                  <span style="font-size: 0.9rem; font-weight: 800; color: #94a3b8;">pontos na hora</span>
+                </div>
+              </div>
+
+              <!-- Descrição da Infração com Atalhos Rápidos -->
+              <div style="margin-bottom: 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <label for="penalty-desc-input" style="font-size: 0.8rem; font-weight: 700; color: #94a3b8;">4. Motivo / Infração:</label>
+                  <span style="font-size: 0.72rem; color: #64748b;">Atalhos rápidos:</span>
+                </div>
+
+                <!-- Chips Rápidos -->
+                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem;">
+                  <button type="button" class="btn-pen-chip" data-text="USO DO CELULAR" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; font-size: 0.74rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 99px; cursor: pointer;">
+                    📱 USO DO CELULAR
+                  </button>
+                  <button type="button" class="btn-pen-chip" data-text="ATRASO NA ENTRADA / APRESENTAÇÃO" style="background: rgba(251, 191, 36, 0.15); border: 1px solid rgba(251, 191, 36, 0.3); color: #fde68a; font-size: 0.74rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 99px; cursor: pointer;">
+                    ⏱️ ATRASO
+                  </button>
+                  <button type="button" class="btn-pen-chip" data-text="DESCUMPRIMENTO DE UNIFORME / ADEREÇO" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #e9d5ff; font-size: 0.74rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 99px; cursor: pointer;">
+                    👕 UNIFORME
+                  </button>
+                  <button type="button" class="btn-pen-chip" data-text="CONDUTA ANTIDESPORTIVA / PROVOCAÇÃO" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; font-size: 0.74rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 99px; cursor: pointer;">
+                    🚫 CONDUTA
+                  </button>
+                  <button type="button" class="btn-pen-chip" data-text="INVASÃO DA QUADRA / ÁREA TÉCNICA" style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); color: #bfdbfe; font-size: 0.74rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 99px; cursor: pointer;">
+                    ⚠️ INVASÃO
+                  </button>
+                </div>
+
+                <input type="text" id="penalty-desc-input" class="form-input" placeholder="Digite ou selecione o motivo da penalidade..." required style="width: 100%; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.65rem 0.85rem; color: #fff; font-size: 0.9rem;">
+              </div>
+
+              <!-- Responsável pelo lançamento -->
+              <div style="margin-bottom: 1.25rem;">
+                <label for="penalty-judge-input" style="display: block; font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-bottom: 0.35rem;">5. Autoridade Responsável:</label>
+                <input type="text" id="penalty-judge-input" class="form-input" value="Comissão" style="width: 100%; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border-glass-bright); border-radius: 8px; padding: 0.55rem 0.85rem; color: #cbd5e1; font-size: 0.85rem;">
+              </div>
+
+              <!-- Pré-visualização do Impacto Imediato na Nota -->
+              <div id="penalty-live-preview-box" style="background: rgba(0, 0, 0, 0.4); border: 1px dashed rgba(239, 68, 68, 0.5); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px; margin-bottom: 0.35rem;">⚡ Impacto Imediato no Placar:</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                  <div>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">Pontuação Atual:</span>
+                    <strong id="prev-score-current" style="color: #fff; font-size: 1.05rem; margin-left: 0.25rem;">0 pts</strong>
+                  </div>
+                  <div>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">Desconto:</span>
+                    <strong id="prev-score-deduct" style="color: #f87171; font-size: 1.05rem; margin-left: 0.25rem;">-50 pts</strong>
+                  </div>
+                  <div>
+                    <span style="font-size: 0.8rem; color: #94a3b8;">Nova Nota Final:</span>
+                    <strong id="prev-score-final" style="color: #34d399; font-size: 1.15rem; margin-left: 0.25rem;">0 pts</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botão de Ação -->
+              <button type="submit" id="btn-submit-penalty" class="btn btn-primary" style="width: 100%; padding: 0.95rem 1rem; font-weight: 900; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, #ef4444, #b91c1c); border: none; border-radius: 10px; color: #fff; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <span>🚨</span> Aplicar Penalidade e Descontar Nota Agora
+              </button>
+            </form>
+          </div>
+
+          <!-- Histórico de Penalidades Ativas e Ações -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Card de Histórico -->
+            <div class="glass-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass-bright); border-radius: 14px; flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.25rem;">📋</span>
+                  <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #f8fafc;">Histórico de Penalidades Aplicadas</h3>
+                </div>
+                <span id="penalties-list-count" style="font-size: 0.8rem; color: #94a3b8; font-weight: 700;">0 registros</span>
+              </div>
+
+              <!-- Lista de Penalidades -->
+              <div id="penalties-history-list" style="max-height: 440px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 0.25rem;">
+                <!-- Preenchido dinamicamente via gestor.js -->
+              </div>
+            </div>
+
+            <!-- Card de Resumo de Penalidades por Turma -->
+            <div class="glass-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--border-glass-bright); border-radius: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.25rem;">📊</span>
+                  <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #f8fafc;">Quadro Resumo de Deduções</h3>
+                </div>
+              </div>
+
+              <div style="overflow-x: auto;">
+                <table class="data-table" style="font-size: 0.82rem; width: 100%;">
+                  <thead>
+                    <tr>
+                      <th>Turma / Equipe</th>
+                      <th style="text-align: center;">Turno</th>
+                      <th style="text-align: center;">Subtotal</th>
+                      <th style="text-align: center; color: #f87171;">Penalidades</th>
+                      <th style="text-align: center; color: #34d399;">Total Final</th>
+                    </tr>
+                  </thead>
+                  <tbody id="penalties-summary-tbody">
+                    <!-- Preenchido dinamicamente via gestor.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
       <!-- Métricas Rápidas -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
         <div class="glass-card" style="padding: 1.25rem;">
@@ -1225,9 +1444,9 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="js/sound.js?v=20261123v12"></script>
-  <script src="js/state.js?v=20261123v12"></script>
-  <script src="js/planilha-turmas.js?v=20261123v12"></script>
-  <script src="js/gestor.js?v=20261123v12"></script>
+  <script src="js/sound.js?v=20261124v13"></script>
+  <script src="js/state.js?v=20261124v13"></script>
+  <script src="js/planilha-turmas.js?v=20261124v13"></script>
+  <script src="js/gestor.js?v=20261124v13"></script>
 </body>
 </html>

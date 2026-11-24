@@ -348,6 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'tab-admin-lancamentos':
         renderAdminLancamentos();
         break;
+      case 'tab-penalidades':
+        renderPenalidades();
+        break;
       case 'tab-online-judges':
         renderOnlineJudges();
         break;
@@ -375,6 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOnlineJudges();
     populateMatrixProvaFilter();
     renderAdminLancamentos();
+    renderPenalidades();
     renderMatrix();
     renderAudit();
     renderJudgesCrud();
@@ -578,6 +582,11 @@ document.addEventListener('DOMContentLoaded', () => {
     subtabButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
         const sub = btn.dataset.subtab;
+        if (sub === 'penalidades') {
+          const tabBtn = document.querySelector('.gestor-tab-btn[data-tab="tab-penalidades"]');
+          if (tabBtn) tabBtn.click();
+          return;
+        }
         adminCurrentSubtab = sub;
         subtabButtons.forEach((b) => {
           b.classList.remove('active');
@@ -1859,6 +1868,343 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================================================================
+  // 10. GESTÃO E LANÇAMENTO OFICIAL DE PENALIDADES (ITEM 37 DO EDITAL)
+  // =========================================================================
+
+  let penFilterTurno = 'todos';
+  let penModuleInitialized = false;
+
+  function setupPenalidadesModule() {
+    if (penModuleInitialized) return;
+    penModuleInitialized = true;
+
+    // Filtros de Turno: Todos, Matutino, Vespertino
+    const btnTodos = document.getElementById('btn-pen-filter-todos');
+    const btnMat = document.getElementById('btn-pen-filter-mat');
+    const btnVesp = document.getElementById('btn-pen-filter-vesp');
+    const filterBtns = [btnTodos, btnMat, btnVesp];
+
+    function setPenFilter(turno, activeBtn) {
+      penFilterTurno = turno;
+      filterBtns.forEach(b => {
+        if (!b) return;
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.borderColor = 'var(--border-glass-bright)';
+        b.style.color = '#94a3b8';
+      });
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.background = 'rgba(59, 130, 246, 0.25)';
+        activeBtn.style.borderColor = '#3b82f6';
+        activeBtn.style.color = '#fff';
+      }
+      populatePenaltyTeamsSelect();
+      updatePenaltyLivePreview();
+      if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+    }
+
+    if (btnTodos) btnTodos.addEventListener('click', () => setPenFilter('todos', btnTodos));
+    if (btnMat) btnMat.addEventListener('click', () => setPenFilter('Matutino', btnMat));
+    if (btnVesp) btnVesp.addEventListener('click', () => setPenFilter('Vespertino', btnVesp));
+
+    // Botão de Atualizar Lista Manualmente
+    const btnRefresh = document.getElementById('btn-refresh-penalties');
+    if (btnRefresh) {
+      btnRefresh.addEventListener('click', () => {
+        renderPenalidades();
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+        showToast('Lista de penalidades atualizada.', 'toast-info');
+      });
+    }
+
+    // Seletor de Categoria / Gravidade
+    const catSelect = document.getElementById('penalty-category-select');
+    const ptsInput = document.getElementById('penalty-points-input');
+    const teamSelect = document.getElementById('penalty-team-select');
+    const descInput = document.getElementById('penalty-desc-input');
+    const judgeInput = document.getElementById('penalty-judge-input');
+
+    if (catSelect && ptsInput) {
+      catSelect.addEventListener('change', () => {
+        const selectedOpt = catSelect.options[catSelect.selectedIndex];
+        const dataPts = selectedOpt ? selectedOpt.dataset.pts : null;
+        if (dataPts === 'custom') {
+          ptsInput.removeAttribute('readonly');
+          ptsInput.focus();
+        } else if (dataPts !== null && dataPts !== undefined) {
+          ptsInput.value = dataPts;
+        }
+        updatePenaltyLivePreview();
+      });
+    }
+
+    if (ptsInput) {
+      ptsInput.addEventListener('input', updatePenaltyLivePreview);
+      ptsInput.addEventListener('change', updatePenaltyLivePreview);
+    }
+
+    if (teamSelect) {
+      teamSelect.addEventListener('change', updatePenaltyLivePreview);
+    }
+
+    // Chips de Infração Rápida
+    const chips = document.querySelectorAll('.btn-pen-chip');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        if (descInput) {
+          descInput.value = chip.dataset.text || '';
+          descInput.focus();
+        }
+        if (window.sound && typeof sound.playClick === 'function') sound.playClick();
+      });
+    });
+
+    // Submissão do Formulário de Penalidade
+    const formApply = document.getElementById('form-apply-penalty');
+    if (formApply) {
+      formApply.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const teamId = teamSelect ? teamSelect.value : '';
+        if (!teamId) {
+          alert('Por favor, selecione uma turma/equipe.');
+          return;
+        }
+
+        const team = state.getTeam(teamId);
+        if (!team) {
+          alert('Turma não encontrada.');
+          return;
+        }
+
+        const points = Math.max(0, parseFloat(ptsInput ? ptsInput.value : 0) || 0);
+        const category = catSelect ? catSelect.value : 'Penalidade';
+        const infraction = (descInput && descInput.value.trim()) || 'Infração de conduta regimental';
+        const judgeName = (judgeInput && judgeInput.value.trim()) || 'Comissão Organizadora';
+
+        // Confirmação
+        const confirmMsg = points > 0
+          ? `Confirmar desconto de -${points} pts para ${team.turma} (${team.name})?\n\nMotivo: ${infraction}`
+          : `Confirmar registro de advertência (0 pts) para ${team.turma} (${team.name})?\n\nMotivo: ${infraction}`;
+
+        if (!confirm(confirmMsg)) return;
+
+        // Adiciona a penalidade via State (descontando na hora e sincronizando)
+        state.addPenalty({
+          teamId,
+          category,
+          infraction,
+          points,
+          judgeName
+        });
+
+        // Som de alerta / buzzer
+        if (window.sound && typeof sound.playBuzzer === 'function') {
+          sound.playBuzzer();
+        } else if (window.sound && typeof sound.playWarning === 'function') {
+          sound.playWarning();
+        }
+
+        showToast(
+          points > 0
+            ? `🚨 Penalidade de -${points} pts aplicada para ${team.turma} (${team.name})! Descontado na hora no Telão e no Placar.`
+            : `📋 Advertência registrada para ${team.turma} (${team.name}).`,
+          points > 0 ? 'toast-warning' : 'toast-info'
+        );
+
+        // Força sincronização imediata no Telão
+        state.forceTelaoRefresh();
+
+        // Limpa campo de motivo e atualiza tela
+        if (descInput) descInput.value = '';
+        renderPenalidades();
+        updateMetrics();
+      });
+    }
+  }
+
+  function populatePenaltyTeamsSelect() {
+    const teamSelect = document.getElementById('penalty-team-select');
+    if (!teamSelect) return;
+
+    const previousSelected = teamSelect.value;
+    const allTeams = state.getTeams() || [];
+    const filteredTeams = penFilterTurno === 'todos'
+      ? allTeams
+      : allTeams.filter(t => (t.turno || '').toLowerCase().trim() === penFilterTurno.toLowerCase().trim());
+
+    if (filteredTeams.length === 0) {
+      teamSelect.innerHTML = '<option value="">Nenhuma turma disponível neste turno</option>';
+      return;
+    }
+
+    teamSelect.innerHTML = filteredTeams.map(t => {
+      const stats = state.getTeamFullStats(t.id);
+      const pts = stats ? stats.totalFinal : 0;
+      const pen = stats ? stats.totalPenalidades : 0;
+      const penText = pen > 0 ? ` | Penalidades: -${pen} pts` : '';
+      return `<option value="${t.id}">[${t.turno}] ${t.turma} • ${t.name} (Atual: ${pts} pts${penText})</option>`;
+    }).join('');
+
+    if (previousSelected && filteredTeams.some(t => t.id === previousSelected)) {
+      teamSelect.value = previousSelected;
+    }
+  }
+
+  function updatePenaltyLivePreview() {
+    const teamSelect = document.getElementById('penalty-team-select');
+    const ptsInput = document.getElementById('penalty-points-input');
+    const prevScoreCurrent = document.getElementById('prev-score-current');
+    const prevScoreDeduct = document.getElementById('prev-score-deduct');
+    const prevScoreFinal = document.getElementById('prev-score-final');
+
+    if (!teamSelect || !prevScoreCurrent || !prevScoreDeduct || !prevScoreFinal) return;
+
+    const teamId = teamSelect.value;
+    const deduct = Math.max(0, parseFloat(ptsInput ? ptsInput.value : 0) || 0);
+
+    if (!teamId) {
+      prevScoreCurrent.innerText = '0 pts';
+      prevScoreDeduct.innerText = `-${deduct} pts`;
+      prevScoreFinal.innerText = '0 pts';
+      return;
+    }
+
+    const stats = state.getTeamFullStats(teamId);
+    const currentScore = stats ? stats.totalFinal : 0;
+    const projectedFinal = Math.max(0, currentScore - deduct);
+
+    prevScoreCurrent.innerText = `${currentScore} pts`;
+    prevScoreDeduct.innerText = `-${deduct} pts`;
+    prevScoreFinal.innerText = `${projectedFinal} pts`;
+  }
+
+  function renderPenalidades() {
+    setupPenalidadesModule();
+    populatePenaltyTeamsSelect();
+    updatePenaltyLivePreview();
+
+    const penalties = state.getPenalties() || [];
+    const teams = state.getTeams() || [];
+
+    // 1. Atualiza métricas
+    const countEl = document.getElementById('pen-metric-count');
+    const pointsEl = document.getElementById('pen-metric-points');
+    const teamsEl = document.getElementById('pen-metric-teams');
+    const listCountEl = document.getElementById('penalties-list-count');
+
+    const totalPtsDeducted = penalties.reduce((acc, p) => acc + (Number(p.points) || 0), 0);
+    const penalizedTeamIds = new Set(penalties.filter(p => Number(p.points) > 0).map(p => p.teamId));
+
+    if (countEl) countEl.innerText = penalties.length;
+    if (pointsEl) pointsEl.innerText = `-${totalPtsDeducted} pts`;
+    if (teamsEl) teamsEl.innerText = penalizedTeamIds.size;
+    if (listCountEl) listCountEl.innerText = `${penalties.length} registro(s)`;
+
+    // 2. Renderiza Lista de Histórico
+    const historyContainer = document.getElementById('penalties-history-list');
+    if (historyContainer) {
+      if (penalties.length === 0) {
+        historyContainer.innerHTML = `
+          <div style="text-align: center; padding: 2.5rem 1rem; color: #64748b;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem; opacity: 0.6;">🕊️</div>
+            <div style="font-weight: 700; font-size: 0.95rem; color: #94a3b8;">Nenhuma penalidade registrada</div>
+            <div style="font-size: 0.8rem; margin-top: 0.25rem;">Todas as turmas estão com ficha disciplinar limpa.</div>
+          </div>
+        `;
+      } else {
+        historyContainer.innerHTML = penalties.map(p => {
+          const team = state.getTeam(p.teamId);
+          let timeFormatted = '--:--';
+          if (p.createdAt) {
+            try {
+              timeFormatted = new Date(p.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            } catch (e) {}
+          }
+          const teamColor = team ? team.color : '#64748b';
+          const teamTurma = team ? team.turma : '';
+          const teamName = team ? team.name : p.teamId;
+          const ptsVal = Number(p.points) || 0;
+
+          return `
+            <div class="glass-card" style="padding: 0.85rem 1rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 220px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <span style="background: ${teamColor}22; border: 1px solid ${teamColor}88; color: ${teamColor}; font-size: 0.78rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                    ${teamTurma} • ${teamName}
+                  </span>
+                  <span style="color: #facc15; font-size: 0.75rem; font-weight: 700;">${p.category || 'Penalidade'}</span>
+                  <span style="color: #64748b; font-size: 0.72rem;">às ${timeFormatted}</span>
+                </div>
+                <div style="font-size: 0.88rem; font-weight: 800; color: #f8fafc; margin-top: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <span>⚠️</span> ${p.infraction || 'Infração disciplinar'}
+                </div>
+                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem;">
+                  Lançado por: <strong style="color: #cbd5e1;">${p.judgeName || 'Comissão'}</strong>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="color: ${ptsVal > 0 ? '#ef4444' : '#fbbf24'}; font-size: 1.3rem; font-weight: 900; white-space: nowrap; font-family: 'Outfit', sans-serif;">
+                  ${ptsVal > 0 ? `-${ptsVal} pts` : '0 pts'}
+                </span>
+                <button type="button" class="btn btn-outline btn-sm btn-del-single-penalty" data-id="${p.id}" data-team="${teamTurma} - ${teamName}" data-pts="${ptsVal}" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.45); padding: 0.35rem 0.65rem; font-size: 0.76rem; border-radius: 6px; cursor: pointer;" title="Anular esta penalidade e restaurar a nota da turma">
+                  ✕ Anular
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Eventos de exclusão / anulação
+        historyContainer.querySelectorAll('.btn-del-single-penalty').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const teamLabel = btn.dataset.team;
+            const pts = btn.dataset.pts;
+
+            if (confirm(`Deseja anular esta penalidade de -${pts} pts para ${teamLabel}?\n\nOs pontos serão devolvidos imediatamente à equipe.`)) {
+              state.deletePenalty(id);
+              if (window.sound && typeof sound.playSuccess === 'function') sound.playSuccess();
+              showToast(`Penalidade anulada com sucesso! Pontos restaurados para ${teamLabel}.`, 'toast-success');
+              state.forceTelaoRefresh();
+              renderPenalidades();
+              updateMetrics();
+            }
+          });
+        });
+      }
+    }
+
+    // 3. Renderiza Tabela Resumo por Turma
+    const summaryTbody = document.getElementById('penalties-summary-tbody');
+    if (summaryTbody) {
+      summaryTbody.innerHTML = teams.map(t => {
+        const stats = state.getTeamFullStats(t.id);
+        const subtotal = stats ? stats.subtotal : 0;
+        const totalPen = stats ? stats.totalPenalidades : 0;
+        const finalPts = stats ? stats.totalFinal : 0;
+
+        return `
+          <tr>
+            <td>
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${t.color}; margin-right: 6px;"></span>
+              <strong style="color: ${t.color};">${t.turma}</strong> • ${t.name}
+            </td>
+            <td style="text-align: center; color: #94a3b8;">${t.turno}</td>
+            <td style="text-align: center; font-weight: 700; color: #cbd5e1;">${subtotal} pts</td>
+            <td style="text-align: center; font-weight: 900; color: ${totalPen > 0 ? '#ef4444' : '#64748b'};">
+              ${totalPen > 0 ? `-${totalPen} pts` : '0 pts'}
+            </td>
+            <td style="text-align: center; font-weight: 900; font-size: 0.95rem; color: #34d399;">
+              ${finalPts} pts
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  // =========================================================================
   // 11. INSCRIÇÃO PARA ATUALIZAÇÃO REATIVA EM TEMPO REAL
   // =========================================================================
 
@@ -1866,6 +2212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMetrics();
     updateTelaoStatusBadge();
     if (currentActiveTab === 'tab-admin-lancamentos') renderAdminLancamentos();
+    if (currentActiveTab === 'tab-penalidades') renderPenalidades();
     if (currentActiveTab === 'tab-online-judges') renderOnlineJudges();
     if (currentActiveTab === 'tab-matrix') renderMatrix();
     if (currentActiveTab === 'tab-audit') renderAudit();

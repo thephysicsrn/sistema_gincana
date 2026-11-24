@@ -6,7 +6,18 @@
     "gestorTitle": "Coordenação Geral da Gincana",
     "selectedSegment": "Ensino Médio",
     "selectedShift": "Matutino",
-    "telaoTurno": "Matutino"
+    "telaoTurno": "Vespertino",
+    "eventName": "Gincana SESI ESCOLA 2026",
+    "editalTitle": "SESI CONECTA: TECNOLOGIA QUE TRANSFORMA, RESÍDUO QUE GANHA NOVO DESTINO",
+    "institution": "SESI Escola / Sistema FIERN",
+    "units": [
+      "SESI Escola Macau",
+      "SESI Escola Mossoró",
+      "SESI Escola São Gonçalo do Amarante"
+    ],
+    "selectedUnit": "SESI Escola São Gonçalo do Amarante",
+    "dates": "23 e 24 de novembro de 2026",
+    "year": 2026
   },
   "judges": [
     {
@@ -593,6 +604,1921 @@
       "criteria": []
     }
   ],
-  "scores": [],
-  "penalties": []
+  "scores": [
+    {
+      "id": "sc_1795515146916_hdyn1",
+      "teamId": "t_3bm",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T10:12:26.916Z"
+    },
+    {
+      "id": "sc_1795515194313_sc3vp",
+      "teamId": "t_1am",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T10:13:14.313Z"
+    },
+    {
+      "id": "sc_1795515208732_53nkr",
+      "teamId": "t_3am",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T10:13:28.732Z"
+    },
+    {
+      "id": "sc_1795515223303_ldluz",
+      "teamId": "t_1bm",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T10:13:43.303Z"
+    },
+    {
+      "id": "sc_1795515228144_kx288",
+      "teamId": "t_2am",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T10:13:48.144Z"
+    },
+    {
+      "id": "sc_1795535822977_f5wqc",
+      "teamId": "t_2bm",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 90,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T15:57:02.977Z",
+      "updatedByGestorAt": "2026-11-24T16:00:05.663Z"
+    },
+    {
+      "id": "sc_1795515544783_ek2to",
+      "teamId": "t_1bm",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenaç��o / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:19:04.783Z"
+    },
+    {
+      "id": "sc_1795515566454_injgo",
+      "teamId": "t_3am",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:19:26.454Z"
+    },
+    {
+      "id": "sc_1795515584739_542g0",
+      "teamId": "t_3bm",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:19:44.739Z"
+    },
+    {
+      "id": "sc_1795515614307_oxtl8",
+      "teamId": "t_2am",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:20:14.307Z"
+    },
+    {
+      "id": "sc_1795515617383_tqxtv",
+      "teamId": "t_2bm",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:20:17.383Z"
+    },
+    {
+      "id": "sc_1795515619983_zl0b0",
+      "teamId": "t_1am",
+      "provaId": "p_custom_1795515487128",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 0,
+      "rubricScore": 0,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T10:20:19.983Z"
+    },
+    {
+      "id": "sc_1795520230565_n8z2s",
+      "teamId": "t_1am",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 80,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:37:10.565Z"
+    },
+    {
+      "id": "sc_1795519778167_gwt9n",
+      "teamId": "t_1am",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 80,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:29:38.168Z"
+    },
+    {
+      "id": "sc_1795520335334_dx3qh",
+      "teamId": "t_1am",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:38:55.334Z"
+    },
+    {
+      "id": "sc_1795520328848_d5339",
+      "teamId": "t_1am",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 71,
+      "rubricScore": 71,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 18,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 18
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:38:48.848Z"
+    },
+    {
+      "id": "sc_1795520350851_9zd9u",
+      "teamId": "t_1am",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 60,
+      "rubricScore": 60,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 10,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:39:10.851Z"
+    },
+    {
+      "id": "sc_1795520253193_brzme",
+      "teamId": "t_1bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 62,
+      "rubricScore": 62,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 12,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:37:33.193Z"
+    },
+    {
+      "id": "sc_1795520793493_olu1o",
+      "teamId": "t_1bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 90,
+      "rubricScore": 90,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:46:33.493Z"
+    },
+    {
+      "id": "sc_1795520821524_4znoa",
+      "teamId": "t_1bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 10
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:47:01.524Z"
+    },
+    {
+      "id": "sc_1795520812744_xlfpz",
+      "teamId": "t_1bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 15,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:46:52.744Z"
+    },
+    {
+      "id": "sc_1795520699420_h57eb",
+      "teamId": "t_2am",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:44:59.420Z"
+    },
+    {
+      "id": "sc_1795521253820_pi1zq",
+      "teamId": "t_2am",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:54:13.820Z"
+    },
+    {
+      "id": "sc_1795521251621_6s7tr",
+      "teamId": "t_2am",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 86,
+      "rubricScore": 86,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 22,
+        "Criatividade e Originalidade": 22,
+        "Interpretação e Presen��a de Palco": 22,
+        "Organização e Torcida": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:54:11.621Z"
+    },
+    {
+      "id": "sc_1795521257567_mgy4k",
+      "teamId": "t_2am",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:54:17.567Z"
+    },
+    {
+      "id": "sc_1795521296735_qd9i6",
+      "teamId": "t_2am",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 96,
+      "rubricScore": 96,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 21,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:54:56.735Z"
+    },
+    {
+      "id": "sc_1795521591042_ovwk4",
+      "teamId": "t_2bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 85,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:59:51.042Z",
+      "updatedByGestorAt": "2026-11-24T13:07:31.767Z"
+    },
+    {
+      "id": "sc_1795521121449_d5o46",
+      "teamId": "t_2bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 85,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T11:52:01.449Z",
+      "updatedByGestorAt": "2026-11-24T13:06:54.381Z"
+    },
+    {
+      "id": "sc_1795521679506_q0uw5",
+      "teamId": "t_2bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 80,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 19,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 21
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:01:19.506Z"
+    },
+    {
+      "id": "sc_1795521710184_294bi",
+      "teamId": "t_2bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 83,
+      "rubricScore": 63,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 18,
+        "Interpretação e Presen��a de Palco": 15,
+        "Organização e Torcida": 10
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:01:50.184Z",
+      "updatedByGestorAt": "2026-11-24T12:56:04.511Z"
+    },
+    {
+      "id": "sc_1795524835693_b0mqn",
+      "teamId": "t_2bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 85,
+      "rubricScore": 60,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 15,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:53:55.693Z",
+      "updatedByGestorAt": "2026-11-24T13:06:13.938Z"
+    },
+    {
+      "id": "sc_1795522384544_zxdmq",
+      "teamId": "t_3am",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Ultrapassaram alguns segundos do tempo de apresentação.",
+      "createdAt": "2026-11-24T12:13:04.544Z"
+    },
+    {
+      "id": "sc_1795523212033_whcde",
+      "teamId": "t_3bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 55,
+      "rubricScore": 55,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Não teve gestão de tempo. Passou os 5 minutos, de acordo com o item 26, resultaria zerar a prova, mas a comissão concordou e zerar apenas uma rubrica que é a de organização.",
+      "createdAt": "2026-11-24T12:26:52.033Z"
+    },
+    {
+      "id": "sc_1795522360915_a6kwl",
+      "teamId": "t_3bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 0
+      },
+      "note": "Não tiveram gestão de tempo, precisaram ser avisados pelo apresentador que o tempo iria acabar.",
+      "createdAt": "2026-11-24T12:12:40.915Z"
+    },
+    {
+      "id": "sc_1795522916582_i8owo",
+      "teamId": "t_3bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 61,
+      "rubricScore": 61,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 21,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Estouro de tempo.",
+      "createdAt": "2026-11-24T12:21:56.582Z"
+    },
+    {
+      "id": "sc_1795523225903_k1lue",
+      "teamId": "t_3am",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Não teve gestão de tempo. Passou os 5 minutos, de acordo com o item 26, resultaria zerar a prova, mas a comissão concordou e zerar apenas uma rubrica que é a de organização.",
+      "createdAt": "2026-11-24T12:27:05.903Z"
+    },
+    {
+      "id": "sc_1795522906704_n2piv",
+      "teamId": "t_3am",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 71,
+      "rubricScore": 71,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 23,
+        "Criatividade e Originalidade": 23,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 0
+      },
+      "note": "Estouro de tempo.",
+      "createdAt": "2026-11-24T12:21:46.704Z"
+    },
+    {
+      "id": "sc_1795522934078_kq06s",
+      "teamId": "t_3bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 25,
+        "Organização e Torcida": 0
+      },
+      "note": "Estouro de tempo.",
+      "createdAt": "2026-11-24T12:22:14.078Z"
+    },
+    {
+      "id": "sc_1795522950500_40hpj",
+      "teamId": "t_3am",
+      "provaId": "p_parodia",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 62,
+      "rubricScore": 62,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 22,
+        "Criatividade e Originalidade": 20,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Estouro de tempo.",
+      "createdAt": "2026-11-24T12:22:30.500Z"
+    },
+    {
+      "id": "sc_1795522956041_wup94",
+      "teamId": "t_3am",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 25,
+        "Criatividade e Originalidade": 25,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "Ultrapassou o tempo na apresentação de 5 min",
+      "createdAt": "2026-11-24T12:22:36.043Z"
+    },
+    {
+      "id": "sc_1795522987472_8f8he",
+      "teamId": "t_3bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 55,
+      "rubricScore": 55,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 20,
+        "Criatividade e Originalidade": 15,
+        "Interpretação e Presença de Palco": 20,
+        "Organização e Torcida": 0
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:23:07.472Z"
+    },
+    {
+      "id": "sc_1795523414589_vxph4",
+      "teamId": "t_1bm",
+      "provaId": "p_custom_1795444502948",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Quem é o SESINHO)",
+      "createdAt": "2026-11-24T12:30:14.589Z"
+    },
+    {
+      "id": "sc_1795523660213_sw1af",
+      "teamId": "t_3bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 80,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:34:20.213Z"
+    },
+    {
+      "id": "sc_1795523697769_73u8z",
+      "teamId": "t_3bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 15,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:34:57.770Z"
+    },
+    {
+      "id": "sc_1795523703132_wsfpv",
+      "teamId": "t_3bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 15,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:35:03.132Z"
+    },
+    {
+      "id": "sc_1795523766951_9q0l4",
+      "teamId": "t_3am",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 95,
+      "rubricScore": 95,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:06.951Z"
+    },
+    {
+      "id": "sc_1795523774486_fdbcv",
+      "teamId": "t_3am",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 85,
+      "rubricScore": 85,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:14.486Z"
+    },
+    {
+      "id": "sc_1795523775169_r1gsl",
+      "teamId": "t_3am",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 93,
+      "rubricScore": 93,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 22,
+        "Relação com o Tema": 23,
+        "Apresentação e Defesa": 23
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:15.169Z"
+    },
+    {
+      "id": "sc_1795523841908_me847",
+      "teamId": "t_2am",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:37:21.908Z"
+    },
+    {
+      "id": "sc_1795523867376_b05zc",
+      "teamId": "t_2am",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 90,
+      "rubricScore": 90,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:37:47.376Z"
+    },
+    {
+      "id": "sc_1795523879219_yn8jh",
+      "teamId": "t_2am",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 88,
+      "rubricScore": 88,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 23,
+        "Aproveitamento de Materiais": 23,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 22
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:37:59.219Z"
+    },
+    {
+      "id": "sc_1795523924651_h3h65",
+      "teamId": "t_2bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 85,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:38:44.651Z",
+      "updatedByGestorAt": "2026-11-24T13:05:37.300Z"
+    },
+    {
+      "id": "sc_1795523927678_zmhn1",
+      "teamId": "t_2bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 86,
+      "rubricScore": 86,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 23,
+        "Aproveitamento de Materiais": 23,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:38:47.678Z"
+    },
+    {
+      "id": "sc_1795523954796_qntyy",
+      "teamId": "t_2bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 95,
+      "rubricScore": 95,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:39:14.797Z"
+    },
+    {
+      "id": "sc_1795523991763_oo11k",
+      "teamId": "t_1am",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 80,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:39:51.763Z"
+    },
+    {
+      "id": "sc_1795524014591_4vq7z",
+      "teamId": "t_1am",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 60,
+      "rubricScore": 60,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 15,
+        "Aproveitamento de Materiais": 15,
+        "Relação com o Tema": 15,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:40:14.591Z"
+    },
+    {
+      "id": "sc_1795524018599_p7s9y",
+      "teamId": "t_1am",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 66,
+      "rubricScore": 66,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 21,
+        "Aproveitamento de Materiais": 15,
+        "Relação com o Tema": 15,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:40:18.599Z"
+    },
+    {
+      "id": "sc_1795524079975_np5sl",
+      "teamId": "t_1bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_adriel",
+      "judgeName": "Adriel",
+      "points": 85,
+      "rubricScore": 85,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:41:19.975Z"
+    },
+    {
+      "id": "sc_1795524082148_zbsp5",
+      "teamId": "t_1bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 92,
+      "rubricScore": 92,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 21,
+        "Relação com o Tema": 21,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:41:22.148Z"
+    },
+    {
+      "id": "sc_1795524166406_8lwa1",
+      "teamId": "t_1bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 85,
+      "rubricScore": 85,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:42:46.406Z"
+    },
+    {
+      "id": "sc_1795523663791_zwhzp",
+      "teamId": "t_1am",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 10,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:34:23.791Z"
+    },
+    {
+      "id": "sc_1795523741310_sc16l",
+      "teamId": "t_1bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 15,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:35:41.310Z"
+    },
+    {
+      "id": "sc_1795523747425_gz50m",
+      "teamId": "t_2am",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:35:47.425Z"
+    },
+    {
+      "id": "sc_1795523773483_t430z",
+      "teamId": "t_2bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 85,
+      "rubricScore": 85,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:13.483Z"
+    },
+    {
+      "id": "sc_1795523783678_fj9et",
+      "teamId": "t_3am",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 95,
+      "rubricScore": 95,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:23.678Z"
+    },
+    {
+      "id": "sc_1795523815521_xjedz",
+      "teamId": "t_3bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 98,
+      "rubricScore": 98,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 23,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:36:55.521Z"
+    },
+    {
+      "id": "sc_1795524377218_y84y9",
+      "teamId": "t_1am",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 70,
+      "rubricScore": 70,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 15,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:46:17.218Z"
+    },
+    {
+      "id": "sc_1795524392930_3kg44",
+      "teamId": "t_1bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 15
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:46:32.930Z"
+    },
+    {
+      "id": "sc_1795524404567_7s1xj",
+      "teamId": "t_2am",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:46:44.567Z"
+    },
+    {
+      "id": "sc_1795524415894_xn9wm",
+      "teamId": "t_2bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 85,
+      "rubricScore": 80,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 20,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:46:55.894Z",
+      "updatedByGestorAt": "2026-11-24T13:06:33.871Z"
+    },
+    {
+      "id": "sc_1795524448159_ra2tj",
+      "teamId": "t_3am",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 85,
+      "rubricScore": 85,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 20,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 20,
+        "Apresentação e Defesa": 20
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:47:28.159Z"
+    },
+    {
+      "id": "sc_1795524460867_z4xtq",
+      "teamId": "t_3bm",
+      "provaId": "p_recicla",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade e Inovação": 25,
+        "Aproveitamento de Materiais": 25,
+        "Relação com o Tema": 25,
+        "Apresentação e Defesa": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:47:40.867Z"
+    },
+    {
+      "id": "sc_1795524855721_ss9uz",
+      "teamId": "t_1bm",
+      "provaId": "p_parodia",
+      "judgeId": "j_artuane",
+      "judgeName": "Artuane",
+      "points": 65,
+      "rubricScore": 65,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Letra e Relação com o Tema": 15,
+        "Criatividade e Originalidade": 10,
+        "Interpretação e Presença de Palco": 15,
+        "Organização e Torcida": 25
+      },
+      "note": "",
+      "createdAt": "2026-11-24T12:54:15.721Z"
+    },
+    {
+      "id": "sc_1795528604343_9i37z",
+      "teamId": "t_1am",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 15,
+        "Clareza da mensagem": 20,
+        "Rela��ão com o tema": 15,
+        "Qualidade do conteúdo": 15,
+        "Participação da equipe": 10,
+        "Qualidade técnica": 0
+      },
+      "note": "O vídeo teve duração 1'55''",
+      "createdAt": "2026-11-24T13:56:44.343Z"
+    },
+    {
+      "id": "sc_1795528863949_nzmru",
+      "teamId": "t_1bm",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 94,
+      "rubricScore": 94,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 20,
+        "Clareza da mensagem": 20,
+        "Relação com o tema": 20,
+        "Qualidade do conteúdo": 20,
+        "Participação da equipe": 9,
+        "Qualidade técnica": 5
+      },
+      "note": "O vídeo teve duração 1'16''",
+      "createdAt": "2026-11-24T14:01:03.949Z"
+    },
+    {
+      "id": "sc_1795528537228_bwj5p",
+      "teamId": "t_1am",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:55:37.228Z"
+    },
+    {
+      "id": "sc_1795528542183_4mx9v",
+      "teamId": "t_1bm",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:55:42.184Z"
+    },
+    {
+      "id": "sc_1795528548453_az0um",
+      "teamId": "t_2am",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:55:48.453Z"
+    },
+    {
+      "id": "sc_1795528553064_0nm1f",
+      "teamId": "t_2bm",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:55:53.065Z"
+    },
+    {
+      "id": "sc_1795528558184_m2svj",
+      "teamId": "t_3am",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:55:58.184Z"
+    },
+    {
+      "id": "sc_1795528563472_3prvn",
+      "teamId": "t_3bm",
+      "provaId": "p_quiz",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T13:56:03.472Z"
+    },
+    {
+      "id": "sc_1795529145981_z25ro",
+      "teamId": "t_2am",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 52,
+      "rubricScore": 52,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 10,
+        "Clareza da mensagem": 10,
+        "Relação com o tema": 15,
+        "Qualidade do conteúdo": 5,
+        "Participação da equipe": 4,
+        "Qualidade técnica": 8
+      },
+      "note": "Péssima qualidade de imagem e mensagem fragmentada",
+      "createdAt": "2026-11-24T14:05:45.981Z"
+    },
+    {
+      "id": "sc_1795529489336_34s0j",
+      "teamId": "t_2bm",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 91,
+      "rubricScore": 91,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 18,
+        "Clareza da mensagem": 15,
+        "Relação com o tema": 20,
+        "Qualidade do conteúdo": 20,
+        "Participação da equipe": 8,
+        "Qualidade técnica": 10
+      },
+      "note": "",
+      "createdAt": "2026-11-24T14:11:29.336Z"
+    },
+    {
+      "id": "sc_1795535797316_knokt",
+      "teamId": "t_1bm",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T15:56:37.316Z"
+    },
+    {
+      "id": "sc_1795529572665_kahve",
+      "teamId": "t_3am",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T14:12:52.665Z"
+    },
+    {
+      "id": "sc_1795535800955_o0tjt",
+      "teamId": "t_2bm",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T15:56:40.955Z"
+    },
+    {
+      "id": "sc_1795529677127_9tf0r",
+      "teamId": "t_1am",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T14:14:37.127Z"
+    },
+    {
+      "id": "sc_1795529680429_r8qfb",
+      "teamId": "t_2am",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T14:14:40.429Z"
+    },
+    {
+      "id": "sc_1795529690531_w4bk1",
+      "teamId": "t_3bm",
+      "provaId": "p_pingpong",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Ping Pong)",
+      "createdAt": "2026-11-24T14:14:50.531Z"
+    },
+    {
+      "id": "sc_1795530692610_7peks",
+      "teamId": "t_2am",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:31:32.610Z"
+    },
+    {
+      "id": "sc_1795530770129_x9elz",
+      "teamId": "t_2bm",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 75,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:32:50.129Z",
+      "updatedByGestorAt": "2026-11-24T16:01:03.606Z"
+    },
+    {
+      "id": "sc_1795530837033_774vz",
+      "teamId": "t_1bm",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 2,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:33:57.033Z"
+    },
+    {
+      "id": "sc_1795530846810_rzyt2",
+      "teamId": "t_3bm",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": 3,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:34:06.810Z"
+    },
+    {
+      "id": "sc_1795530854982_jjbdc",
+      "teamId": "t_1am",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:34:14.982Z"
+    },
+    {
+      "id": "sc_1795530860968_g6bkj",
+      "teamId": "t_3am",
+      "provaId": "p_musica",
+      "judgeId": "j_joaovictor",
+      "judgeName": "João Victor",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:34:20.968Z"
+    },
+    {
+      "id": "sc_1795530990116_dv5qh",
+      "teamId": "t_3am",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 95,
+      "rubricScore": 95,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 16,
+        "Clareza da mensagem": 20,
+        "Relação com o tema": 20,
+        "Qualidade do conteúdo": 20,
+        "Participação da equipe": 9,
+        "Qualidade técnica": 10
+      },
+      "note": "",
+      "createdAt": "2026-11-24T14:36:30.116Z"
+    },
+    {
+      "id": "sc_1795531328662_qscms",
+      "teamId": "t_3bm",
+      "provaId": "p_elixo",
+      "judgeId": "j_sheyla",
+      "judgeName": "Sheyla de Paula",
+      "points": 94,
+      "rubricScore": 94,
+      "placeInProva": 1,
+      "criteriaDetails": {
+        "Criatividade": 18,
+        "Clareza da mensagem": 20,
+        "Relação com o tema": 20,
+        "Qualidade do conteúdo": 17,
+        "Participação da equipe": 9,
+        "Qualidade técnica": 10
+      },
+      "note": "",
+      "createdAt": "2026-11-24T14:42:08.662Z"
+    },
+    {
+      "id": "sc_1795530971271_pyr2n",
+      "teamId": "t_1am",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:36:11.271Z"
+    },
+    {
+      "id": "sc_1795531069208_41rlt",
+      "teamId": "t_2bm",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 75,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:37:49.208Z",
+      "updatedByGestorAt": "2026-11-24T16:00:45.931Z"
+    },
+    {
+      "id": "sc_1795531213532_y1721",
+      "teamId": "t_3am",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": 4,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:40:13.532Z"
+    },
+    {
+      "id": "sc_1795531527763_lsurk",
+      "teamId": "t_3bm",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": 1,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:45:27.763Z"
+    },
+    {
+      "id": "sc_1795531559583_fb1f9",
+      "teamId": "t_2am",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": 3,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:45:59.583Z"
+    },
+    {
+      "id": "sc_1795531565175_84iaq",
+      "teamId": "t_1bm",
+      "provaId": "p_arco",
+      "judgeId": "j_helena",
+      "judgeName": "Helena",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": 2,
+      "criteriaDetails": {},
+      "note": "",
+      "createdAt": "2026-11-24T14:46:05.175Z"
+    },
+    {
+      "id": "sc_1795538138954_dszd3",
+      "teamId": "t_1bv",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:35:38.954Z"
+    },
+    {
+      "id": "sc_1795538138121_4yors",
+      "teamId": "t_3av",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:35:38.121Z"
+    },
+    {
+      "id": "sc_1795538135853_a1oe6",
+      "teamId": "t_2bv",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:35:35.853Z"
+    },
+    {
+      "id": "sc_1795538167897_beyja",
+      "teamId": "t_3bv",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 0,
+      "rubricScore": 0,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:36:07.897Z"
+    },
+    {
+      "id": "sc_1795538180428_4e0tn",
+      "teamId": "t_2av",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:36:20.428Z"
+    },
+    {
+      "id": "sc_1795538187597_ycq3l",
+      "teamId": "t_1av",
+      "provaId": "p_xadrez",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez)",
+      "createdAt": "2026-11-24T16:36:27.597Z"
+    },
+    {
+      "id": "sc_1795538232445_hleh5",
+      "teamId": "t_2am",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:37:12.445Z"
+    },
+    {
+      "id": "sc_1795538246493_k5xsx",
+      "teamId": "t_2av",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 100,
+      "rubricScore": 100,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:37:26.493Z"
+    },
+    {
+      "id": "sc_1795538261825_mje7h",
+      "teamId": "t_3av",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 75,
+      "rubricScore": 75,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:37:41.825Z"
+    },
+    {
+      "id": "sc_1795538273024_8x9wi",
+      "teamId": "t_2bv",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 50,
+      "rubricScore": 50,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:37:53.024Z"
+    },
+    {
+      "id": "sc_1795538289658_1h96v",
+      "teamId": "t_1bv",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:38:09.658Z"
+    },
+    {
+      "id": "sc_1795538305105_awxsw",
+      "teamId": "t_1av",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 25,
+      "rubricScore": 25,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:38:25.105Z"
+    },
+    {
+      "id": "sc_1795538315173_r2835",
+      "teamId": "t_3bv",
+      "provaId": "p_custom_1795443645060",
+      "judgeId": "admin_central",
+      "judgeName": "Coordenação / Admin",
+      "points": 0,
+      "rubricScore": 0,
+      "placeInProva": null,
+      "criteriaDetails": {},
+      "note": "Lançado oficialmente pelo Painel do Admin (Xadrez Feminino)",
+      "createdAt": "2026-11-24T16:38:35.173Z"
+    }
+  ],
+  "penalties": [
+    {
+      "id": "pen_1795532919201",
+      "teamId": "t_1am",
+      "category": "Moderada - 1ª (-50 pts)",
+      "infraction": "USO DO CELULAR",
+      "points": 50,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:08:39.201Z"
+    },
+    {
+      "id": "pen_1795532962461",
+      "teamId": "t_1am",
+      "category": "Moderada - 1ª (-50 pts)",
+      "infraction": "USO DO CELULAR",
+      "points": 50,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:09:22.461Z"
+    },
+    {
+      "id": "pen_1795532894982",
+      "teamId": "t_1am",
+      "category": "Leve - 1ª (Advertência)",
+      "infraction": "",
+      "points": 0,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:08:14.982Z"
+    },
+    {
+      "id": "pen_1795532907670",
+      "teamId": "t_1bm",
+      "category": "Moderada - 1ª (-50 pts)",
+      "infraction": "USO DO CELULAR",
+      "points": 50,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:08:27.670Z"
+    },
+    {
+      "id": "pen_1795532966483",
+      "teamId": "t_1am",
+      "category": "Leve - Reincidência (-25 pts)",
+      "infraction": "USO DO CELULAR",
+      "points": 25,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:09:26.483Z"
+    },
+    {
+      "id": "pen_1795532997967",
+      "teamId": "t_3bm",
+      "category": "Leve - Reincidência (-25 pts)",
+      "infraction": "USO DO CELULAR",
+      "points": 25,
+      "judgeName": "Comissão",
+      "createdAt": "2026-11-24T15:09:57.967Z"
+    }
+  ]
 }
